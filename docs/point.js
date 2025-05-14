@@ -19,19 +19,25 @@ function getMarkerCoordinates() {
 }
 
 function dropPinAtCenter() {
+    const canvas = map.getCanvas();
+    const centerPixel = [canvas.width / 2, canvas.height / 2];
+    const centerLngLat = map.unproject(centerPixel);
+
     if (marker) {
-        let { lng, lat } = marker.getLngLat();
-        markerCoordinates.lng = lng;
-        markerCoordinates.lat = lat;
-        map.flyTo({ center: markerCoordinates, essential: true });
+        marker.setLngLat(centerLngLat);
     } else {
-        let center = map.getCenter();
-        marker = new mapboxgl.Marker().setLngLat(center).addTo(map);
-        markerCoordinates.lng = center.lng;
-        markerCoordinates.lat = center.lat;
+        marker = new mapboxgl.Marker().setLngLat(centerLngLat).addTo(map);
     }
+
+    markerCoordinates.lng = centerLngLat.lng;
+    markerCoordinates.lat = centerLngLat.lat;
+
+    map.flyTo({ center: centerLngLat, essential: true });
+
+    console.log("Marker dropped at visual center:", markerCoordinates);
     return markerCoordinates;
 }
+
 
 // Point button: activate placement mode
 document.getElementById('pointButton').addEventListener('click', function () {
