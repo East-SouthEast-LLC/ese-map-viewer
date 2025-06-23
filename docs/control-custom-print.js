@@ -6,7 +6,6 @@ document.addEventListener("DOMContentLoaded", function () {
     let customPrintVisibility = false;
     customPrintBox.style.display = 'none';
 
-    // NEW: Get the container for the preset builder
     const presetBuilderBox = document.getElementById("preset-builder-box");
     if (presetBuilderBox) {
         presetBuilderBox.style.display = 'none';
@@ -37,7 +36,6 @@ document.addEventListener("DOMContentLoaded", function () {
         if (map.getLayer(layerId)) {
             map.setLayoutProperty(layerId, 'visibility', visibility);
         }
-        // Dependent layer logic...
         if (layerId === 'floodplain') {
             map.setLayoutProperty('LiMWA', 'visibility', visibility);
             map.setLayoutProperty('floodplain-line', 'visibility', visibility);
@@ -86,7 +84,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function getCustomPrintFormHTML() {
-        // Added a "Manage Presets" button
         return `
             <strong style="display:block; text-align:center; margin-bottom:8px;">Custom Print Details</strong>
             
@@ -128,7 +125,6 @@ document.addEventListener("DOMContentLoaded", function () {
         `;
     }
 
-    // NEW: Generates the HTML for the preset builder panel
     function getPresetBuilderHTML() {
         return `
             <h4 style="text-align:center; margin-top: 0;">Preset Builder</h4>
@@ -146,16 +142,134 @@ document.addEventListener("DOMContentLoaded", function () {
         `;
     }
 
+    // *** RESTORED THIS FUNCTION ***
     function processCustomPrint() {
-        // ... (this function remains the same for now)
+        if (document.getElementById('save-info-checkbox').checked) {
+            const companyInfo = {
+                companyName: document.getElementById('custom-company-name').value,
+                address: document.getElementById('custom-address').value,
+                website: document.getElementById('custom-website').value,
+                phone: document.getElementById('custom-phone').value
+            };
+            localStorage.setItem('ese-company-info', JSON.stringify(companyInfo));
+        }
+
+        const printData = {
+            companyName: document.getElementById('custom-company-name').value,
+            clientName: document.getElementById('custom-client-name').value,
+            address: document.getElementById('custom-address').value,
+            website: document.getElementById('custom-website').value,
+            phone: document.getElementById('custom-phone').value,
+            propertyAddress: document.getElementById('custom-property-address').value,
+            scale: document.getElementById('custom-scale-input').value,
+        };
+
+        if (!printData.scale || isNaN(printData.scale) || Number(printData.scale) <= 0) {
+            alert('Please enter a valid scale in feet per inch.');
+            return;
+        }
+
+        const selectedPresetName = document.getElementById('custom-print-preset').value;
+        const pageConfigs = printPresets[selectedPresetName];
+
+        if (!pageConfigs) {
+            alert('Invalid print preset selected.');
+            return;
+        }
+
+        customPrintBox.style.display = 'none';
+        customPrintVisibility = false;
+
+        generateMultiPagePrintout(printData, pageConfigs);
     }
 
+    // *** RESTORED THIS FUNCTION ***
     function getPageHTML(printData, mapImageSrc, pageNumber) {
-        // ... (this function remains the same for now)
+        const currentDate = new Date().toLocaleDateString();
+        return `
+            <div class="frame">
+                <div class="top-frame">
+                    <div class="map-container">
+                        <img src="${mapImageSrc}" alt="Map Image for Page ${pageNumber}" />
+                    </div>
+                </div>
+                <div class="bottom-frame">
+                    <div class="custom-info-frame" style="width: 2.5in;">
+                        <span><strong>Client:</strong> ${printData.clientName}</span><br>
+                        <span><strong>Property:</strong> ${printData.propertyAddress}</span>
+                        <hr style="width:100%; border:.5px solid black; margin:5px 0;">
+                        <span><strong>${printData.companyName}</strong></span>
+                        <span>${printData.address}</span><br>
+                        <span>${printData.website} | ${printData.phone}</span><br>
+                    </div>
+                    <div class="image-container">
+                        <img src="https://static1.squarespace.com/static/536cf42ee4b0465238027de5/t/67a783e42bb54b7b434b79f1/1739031525647/ESE-GIS.jpg" alt="Company Logo" />
+                    </div>
+                    <div class="legend-frame">
+                        <div class="legend-print-title">Legend & Layers</div>
+                        ${getLegendForPrint()} 
+                    </div>
+                    <div class="inner-frame">
+                        <span class="gis-map">GIS Map</span>
+                        <span class="disclaimer">This map is for illustrative purposes only and is not adequate for legal boundary determination or regulatory interpretation.</span>
+                        <span class="date">${currentDate}</span>
+                        ${getPrintScaleBarHTML(map)}
+                        <span class="sources">Map sources include:</span>
+                        <span class="massgis">Bureau of Geographic Information (MassGIS), Commonwealth of Massachusetts, Executive Office of Technology and Security Services</span>
+                        <span class="base-map">© <a href="https://www.mapbox.com/about/maps">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a><br>
+                            <strong><a style="margin-top: 3px" href="https://apps.mapbox.com/feedback/" target="_blank">Improve this map, www.apps.mapbox.com/feedback</a></strong>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        `;
     }
 
+    // *** RESTORED THIS FUNCTION ***
     async function generateMultiPagePrintout(printData, pageConfigs) {
-        // ... (this function remains the same for now)
+        console.log(`Generating multi-page printout with preset: ${document.getElementById('custom-print-preset').value}`);
+        
+        let fullHtml = '';
+        const allToggleableLayers = ['satellite', 'parcels', 'parcel highlight', 'contours', 'agis', 'historic', 'floodplain', 'acec', 'DEP wetland', 'endangered species', 'zone II', 'soils', 'conservancy districts', 'zoning', 'conservation', 'sewer', 'sewer plans', 'stories', 'intersection'];
+        const initiallyVisibleLayers = listVisibleLayers(map, allToggleableLayers);
+        
+        if (typeof setMapToScale === 'function') {
+            setMapToScale(Number(printData.scale));
+        } else {
+            console.error("setMapToScale function not found.");
+            return;
+        }
+        if(marker) {
+            map.setCenter(marker.getLngLat());
+        }
+        
+        allToggleableLayers.forEach(layerId => setLayerVisibility(layerId, 'none'));
+
+        for (const config of pageConfigs) {
+            config.layers.forEach(layerId => setLayerVisibility(layerId, 'visible'));
+            await new Promise(resolve => map.once('idle', resolve));
+            const mapCanvas = map.getCanvas();
+            const mapImageSrc = mapCanvas.toDataURL();
+            fullHtml += getPageHTML(printData, mapImageSrc, config.page);
+            config.layers.forEach(layerId => setLayerVisibility(layerId, 'none'));
+        }
+
+        initiallyVisibleLayers.forEach(layerId => setLayerVisibility(layerId, 'visible'));
+
+        const win = window.open('', '_blank');
+        if (win) {
+            win.document.write(`
+                <!DOCTYPE html><html><head><title>Custom Map Printout</title>
+                <link rel="stylesheet" href="https://east-southeast-llc.github.io/ese-map-viewer/css/globals.css?v=2" type="text/css" />
+                </head><body class="print-body">${fullHtml}</body></html>`);
+            win.document.close();
+            win.onload = () => {
+                win.print();
+                win.close();
+            };
+        } else {
+            alert("Popup blocked! Please allow popups for this site.");
+        }
     }
 
     // --- MAIN EVENT LISTENERS ---
@@ -179,12 +293,10 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
 
-        // NEW: Listener for the Manage Presets button
         document.getElementById('manage-presets-btn').addEventListener('click', () => {
             presetBuilderBox.innerHTML = getPresetBuilderHTML();
             presetBuilderBox.style.display = 'block';
 
-            // Attach listener to the close button inside the new panel
             document.getElementById('close-builder-btn').addEventListener('click', () => {
                 presetBuilderBox.style.display = 'none';
             });
@@ -218,7 +330,7 @@ document.addEventListener("DOMContentLoaded", function () {
             updateCustomPrintBox();
         } else {
             customPrintBox.style.display = 'none';
-            presetBuilderBox.style.display = 'none'; // Also hide builder if main dialog is closed
+            presetBuilderBox.style.display = 'none';
         }
     });    
 });
