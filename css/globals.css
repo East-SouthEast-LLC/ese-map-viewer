@@ -10,9 +10,6 @@ body {
 MAP CONTAINER
 =============================================================== */
 #map { 
-  /* position: absolute;
-  top: 0; 
-  left: 0;  */
   z-index: 0;
   height: 80vh;
   width: 95vw;
@@ -198,24 +195,7 @@ DISTANCE WINDOW ALIGNMENT
 /* ============================================================
 INFO DISPLAY PANELS (for distance and scale)
 =============================================================== */
-#distance-display {
-  font-size: 12px;
-  color: #333;
-  background: white;
-  padding: 5px 10px;
-  border-radius: 5px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-  margin-top: 5px;
-  text-align: left;
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 10px;
-  max-width: 240px;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-#scale-box {
+#distance-display, #scale-box, #custom-print-box {
   font-size: 12px;
   color: #333;
   background: white;
@@ -230,8 +210,6 @@ INFO DISPLAY PANELS (for distance and scale)
 }
 
 /* ==== LEGEND STYLES ==== */
-
-/* main container for the legend */
 #legend-box {
   background: white;
   color: #333;
@@ -274,22 +252,6 @@ INFO DISPLAY PANELS (for distance and scale)
   border: 1px solid #555;
   margin-right: 8px;
   flex-shrink: 0;
-}
-
-/* ============================================================
-CUSTOM PRINT BOX STYLES
-=============================================================== */
-#custom-print-box {
-  display: none;
-  background: white;
-  color: #333;
-  padding: 10px 15px;
-  border-radius: 5px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-  margin-top: 5px;
-  max-width: 240px;
-  width: 100%;
-  box-sizing: border-box;
 }
 
 /* ============================================================
@@ -443,15 +405,16 @@ PRINT STYLES
   font-style: italic;
   font-size: 14px;
   text-align: center;
+  margin-bottom: 5px;
 }
 .legend-grid {
   display: grid;
   width: 100%;
   grid-template-columns: 1fr; /* Single column */
-  grid-template-rows: repeat(30, auto); /* More rows if needed */
-  row-gap: 1.5px; /* Tighter row spacing */
-  column-gap: 0;
-  justify-items: center; /* Center content horizontally */
+  grid-auto-flow: row;
+  grid-template-rows: repeat(13, auto);
+  row-gap: 1.5px;
+  column-gap: 10px;
 }
 .legend-section {
     font-size: .1in;
@@ -464,24 +427,10 @@ PRINT STYLES
     display: flex;
     font-family: Verdana, sans-serif;
     align-items: center;
-    font-size: .1in;
+    font-size: .09in;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-}
-.color-box {
-    width: .1in;
-    height: .1in;
-    border: .5px solid #555;
-    margin-right: 5px; /* Tighter margin */
-    flex-shrink: 0;
-}
-.color-line {
-    width: .1in;
-    height: 2px;
-    border: .5px solid #555;
-    margin-right: 5px; /* Tighter margin */
-    flex-shrink: 0;
 }
 
 /* ============================================================
@@ -491,8 +440,8 @@ PRINT STYLES
   display: none; /* Hidden by default */
   position: absolute;
   top: 10px;
-  left: 420px; /* Positioned to the right of the geocoder container */
-  width: 300px;
+  left: 415px; /* Adjusted position */
+  width: 350px; /* Made the panel wider */
   background: #f9f9f9;
   border: 1px solid #ccc;
   border-radius: 5px;
@@ -510,17 +459,19 @@ PRINT STYLES
   margin-top: 10px;
   max-height: 400px;
   overflow-y: auto;
+  display: flex; /* Ensure flex context */
+  flex-direction: column; /* Stack pages vertically */
+  gap: 10px; /* Add space between pages */
 }
 
 .preset-page {
   border-bottom: 1px solid #eee;
   padding-bottom: 10px;
-  margin-bottom: 10px;
+  /* margin-bottom is replaced by gap on the container */
 }
 
 .preset-page:last-child {
   border-bottom: none;
-  margin-bottom: 0;
 }
 
 .preset-page-header {
