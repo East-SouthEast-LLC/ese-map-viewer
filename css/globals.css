@@ -434,14 +434,14 @@ PRINT STYLES
 }
 
 /* ============================================================
-/* CUSTOM PRESET BUILDER STYLES
+/* CUSTOM PRESET BUILDER STYLES (REVISED)
 /* ============================================================ */
 #preset-builder-box {
-  display: none; /* Hidden by default */
+  display: none;
   position: absolute;
   top: 10px;
-  left: 415px; /* Adjusted position */
-  width: 350px; /* Made the panel wider */
+  left: 415px;
+  width: 450px; /* Wider panel */
   background: #f9f9f9;
   border: 1px solid #ccc;
   border-radius: 5px;
@@ -453,25 +453,24 @@ PRINT STYLES
 }
 
 #preset-pages-container {
-  border: 1px solid #ddd;
-  background: #fff;
+  display: flex;
+  flex-direction: row; /* Lay out pages horizontally */
+  overflow-x: auto;   /* Enable horizontal scrolling */
+  overflow-y: hidden; /* Disable vertical scrolling */
+  background: #e9e9e9;
   padding: 10px;
   margin-top: 10px;
-  max-height: 400px;
-  overflow-y: auto;
-  display: flex; /* Ensure flex context */
-  flex-direction: column; /* Stack pages vertically */
-  gap: 10px; /* Add space between pages */
+  min-height: 220px; /* Give the container a fixed height */
+  gap: 15px; /* Space between pages */
 }
 
 .preset-page {
-  border-bottom: 1px solid #eee;
-  padding-bottom: 10px;
-  /* margin-bottom is replaced by gap on the container */
-}
-
-.preset-page:last-child {
-  border-bottom: none;
+  width: 200px; /* Give each page a fixed width */
+  flex-shrink: 0; /* Prevent pages from shrinking */
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #fff;
+  padding: 8px;
 }
 
 .preset-page-header {
