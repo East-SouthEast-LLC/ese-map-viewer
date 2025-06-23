@@ -16,7 +16,11 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
     }
 
-    // --- PRESET CONFIGURATIONS ---
+    // --- CONFIGURATIONS ---
+
+    // The list of layers available for users to select in the builder.
+    const availableLayers = ['satellite', 'parcels', 'parcel highlight', 'contours', 'agis', 'historic', 'floodplain', 'acec', 'DEP wetland', 'endangered species', 'zone II', 'soils', 'conservancy districts', 'zoning', 'conservation', 'sewer', 'sewer plans', 'stories', 'intersection'];
+
     const printPresets = {
         'Conservation': [
             { page: 1, layers: ['parcel highlight', 'contours', 'floodplain'] },
@@ -32,6 +36,7 @@ document.addEventListener("DOMContentLoaded", function () {
     
     // --- HELPER FUNCTIONS ---
 
+    // (setLayerVisibility, loadCompanyInfo, handleCheckboxChange... all remain the same)
     function setLayerVisibility(layerId, visibility) {
         if (map.getLayer(layerId)) {
             map.setLayoutProperty(layerId, 'visibility', visibility);
@@ -129,7 +134,7 @@ document.addEventListener("DOMContentLoaded", function () {
         return `
             <h4 style="text-align:center; margin-top: 0;">Preset Builder</h4>
             <label for="preset-name-input">Preset Name:</label>
-            <input type="text" id="preset-name-input" placeholder="e.g., My Custom Preset" style="width:100%; padding: 5px; margin-top: 5px;">
+            <input type="text" id="preset-name-input" placeholder="e.g., My Custom Preset" style="width:100%; padding: 5px; margin-top: 5px; box-sizing: border-box;">
             
             <div id="preset-pages-container">
                 </div>
@@ -142,7 +147,73 @@ document.addEventListener("DOMContentLoaded", function () {
         `;
     }
 
-    // *** RESTORED THIS FUNCTION ***
+    // --- PRESET BUILDER INTERACTIVITY ---
+
+    function updatePageNumbers() {
+        const pages = presetBuilderBox.querySelectorAll('.preset-page');
+        pages.forEach((page, index) => {
+            page.querySelector('h5').textContent = `Page ${index + 1}`;
+        });
+    }
+
+    function createPageElement(pageNumber) {
+        const pageDiv = document.createElement('div');
+        pageDiv.className = 'preset-page';
+
+        const header = document.createElement('div');
+        header.className = 'preset-page-header';
+        
+        const title = document.createElement('h5');
+        title.textContent = `Page ${pageNumber}`;
+        
+        const removeBtn = document.createElement('button');
+        removeBtn.textContent = 'Remove';
+        removeBtn.type = 'button';
+        removeBtn.className = 'remove-page-btn';
+
+        header.appendChild(title);
+        header.appendChild(removeBtn);
+        
+        const select = document.createElement('select');
+        select.multiple = true;
+        select.style.width = '100%';
+        select.style.height = '120px';
+
+        availableLayers.forEach(layerId => {
+            const option = document.createElement('option');
+            option.value = layerId;
+            option.textContent = layerId;
+            select.appendChild(option);
+        });
+
+        pageDiv.appendChild(header);
+        pageDiv.appendChild(select);
+        
+        return pageDiv;
+    }
+
+    function attachPresetBuilderListeners() {
+        const pagesContainer = document.getElementById('preset-pages-container');
+        
+        document.getElementById('close-builder-btn').addEventListener('click', () => {
+            presetBuilderBox.style.display = 'none';
+        });
+
+        document.getElementById('add-page-btn').addEventListener('click', () => {
+            const pageCount = pagesContainer.querySelectorAll('.preset-page').length;
+            const newPage = createPageElement(pageCount + 1);
+            pagesContainer.appendChild(newPage);
+        });
+
+        pagesContainer.addEventListener('click', (e) => {
+            if (e.target.classList.contains('remove-page-btn')) {
+                e.target.closest('.preset-page').remove();
+                updatePageNumbers();
+            }
+        });
+    }
+    
+    // --- (Existing print functions: processCustomPrint, getPageHTML, generateMultiPagePrintout) ---
     function processCustomPrint() {
         if (document.getElementById('save-info-checkbox').checked) {
             const companyInfo = {
@@ -183,7 +254,6 @@ document.addEventListener("DOMContentLoaded", function () {
         generateMultiPagePrintout(printData, pageConfigs);
     }
 
-    // *** RESTORED THIS FUNCTION ***
     function getPageHTML(printData, mapImageSrc, pageNumber) {
         const currentDate = new Date().toLocaleDateString();
         return `
@@ -225,7 +295,6 @@ document.addEventListener("DOMContentLoaded", function () {
         `;
     }
 
-    // *** RESTORED THIS FUNCTION ***
     async function generateMultiPagePrintout(printData, pageConfigs) {
         console.log(`Generating multi-page printout with preset: ${document.getElementById('custom-print-preset').value}`);
         
@@ -272,6 +341,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
+
     // --- MAIN EVENT LISTENERS ---
     
     function attachCustomPrintFormListeners() {
@@ -296,10 +366,7 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById('manage-presets-btn').addEventListener('click', () => {
             presetBuilderBox.innerHTML = getPresetBuilderHTML();
             presetBuilderBox.style.display = 'block';
-
-            document.getElementById('close-builder-btn').addEventListener('click', () => {
-                presetBuilderBox.style.display = 'none';
-            });
+            attachPresetBuilderListeners(); // Attach listeners for the new panel
         });
     }
 
