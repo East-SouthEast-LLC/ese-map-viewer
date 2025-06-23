@@ -483,3 +483,54 @@ PRINT STYLES
     margin-right: 5px; /* Tighter margin */
     flex-shrink: 0;
 }
+
+/* ============================================================
+/* CUSTOM PRESET BUILDER STYLES
+/* ============================================================ */
+#preset-builder-box {
+  display: none; /* Hidden by default */
+  position: absolute;
+  top: 10px;
+  left: 420px; /* Positioned to the right of the geocoder container */
+  width: 300px;
+  background: #f9f9f9;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 15px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  z-index: 10;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+#preset-pages-container {
+  border: 1px solid #ddd;
+  background: #fff;
+  padding: 10px;
+  margin-top: 10px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.preset-page {
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+}
+
+.preset-page:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.preset-page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.preset-page-header h5 {
+  margin: 0;
+  font-size: 14px;
+}
