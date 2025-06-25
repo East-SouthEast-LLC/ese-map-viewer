@@ -8,7 +8,7 @@
   <link href="https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.css" rel="stylesheet" />
   
   <!-- Global CSS files -->
-  <link rel="stylesheet" href="https://east-southeast-llc.github.io/ese-map-viewer/css/globals.css?v=2" type="text/css" />
+  <link rel="stylesheet" href="https://east-southeast-llc.github.io/ese-map-viewer/css/globals.css?v=3" type="text/css" />
   <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.5.1/mapbox-gl-geocoder.css" type="text/css" />
 
   <!-- Core Libraries -->
@@ -22,44 +22,41 @@
   <nav id="menu"></nav>
   <div id="map"></div>
 
-  <!-- Container for toolkit: geocoder and control buttons -->
+  <!-- This container will be populated dynamically -->
   <div id="geocoder-container">
     <div id="geocoder" data-tooltip="Search for a location"></div>
-    <!-- Control buttons and accessory panels are dynamically added here -->
   </div>
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       
       /**
-       * Determines the town key (e.g., "chatham") by parsing the referring page's URL.
-       * This allows the same town.html file to be embedded on different Squarespace pages
-       * and automatically load the correct configuration.
+       * Determines the town key from the URL or referrer.
+       * It first checks for a '?town=' URL parameter for easy local testing.
+       * If not found, it falls back to parsing the document.referrer, which is
+       * ideal for the live Squarespace environment.
        * @param {object} config - The entire town configuration object.
-       * @returns {string} The key of the matching town (e.g., "barnstable").
+       * @returns {string} The key of the matching town (e.g., "chatham").
        */
-      function getTownFromReferrer(config) {
-          const referrer = document.referrer; // e.g., "https://www.ese-llc.com/barnstable"
-          
-          // For local testing or direct access, you might use a URL parameter as a backup.
+      function getTownKey(config) {
           const urlParams = new URLSearchParams(window.location.search);
           const paramTown = urlParams.get('town');
           if (paramTown && config[paramTown]) {
+              console.log(`Loading town from URL parameter: ${paramTown}`);
               return paramTown;
           }
 
+          const referrer = document.referrer;
           if (!referrer) {
               console.warn("No referrer found. Defaulting to Chatham.");
-              return 'chatham'; // Default to Chatham if there's no referrer
+              return 'chatham'; 
           }
 
           try {
-              const referrerUrl = new URL(referrer);
-              const path = referrerUrl.pathname; // e.g., "/barnstable" or "/toc"
-
-              // Find the town key (e.g., "chatham") that has a matching path in the config
+              const referrerPath = new URL(referrer).pathname;
               for (const townKey in config) {
-                  if (config[townKey].path === path) {
+                  if (config[townKey].path === referrerPath) {
+                      console.log(`Loading town from referrer path: ${referrerPath}`);
                       return townKey;
                   }
               }
@@ -67,152 +64,155 @@
               console.error("Could not parse referrer URL:", e);
           }
           
-          // Fallback to Chatham if no path match is found
-          console.warn(`No town config matched the referrer path "${path}". Defaulting to Chatham.`);
+          console.warn(`No town config matched the referrer. Defaulting to Chatham.`);
           return 'chatham';
       }
 
-      // Fetch the master configuration file first
-      fetch('https://east-southeast-llc.github.io/ese-map-viewer/docs/town-config.json')
-        .then(response => response.json())
-        .then(config => {
-          // Determine the current town using the new function
-          const townName = getTownFromReferrer(config);
-          const townConfig = config[townName];
+      /**
+       * Asynchronously loads a script and returns a promise.
+       * @param {string} src - The URL of the script to load.
+       * @returns {Promise} A promise that resolves when the script loads.
+       */
+      function loadScript(src) {
+        return new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = src;
+            script.onload = resolve;
+            script.onerror = reject;
+            document.body.appendChild(script);
+        });
+      }
 
-          document.title = townConfig.townName + " | ESE Map Viewer";
-          window.eseMapBaseUrl = townConfig.baseShareUrl;
+      /**
+       * Dynamically builds the HTML for the toolkit buttons based on features.
+       * @param {object} features - The features object from the town config.
+       */
+      function buildToolkitUI(features) {
+          const geocoderContainer = document.getElementById('geocoder-container');
+          const customPrintButtonHTML = features.customPrint 
+              ? '<button class="mapboxgl-ctrl-custom-print" id="customPrintButton" aria-label="Custom Print" data-tooltip="Create a custom multi-page printout"></button>' 
+              : '<button class="mapboxgl-ctrl-seven" aria-label="placeholder"></button>';
+              
+          const customPrintBoxHTML = features.customPrint ? '<div id="custom-print-box"></div>' : '';
 
-          mapboxgl.accessToken = 'pk.eyJ1IjoiZXNlLXRvaCIsImEiOiJja2Vhb24xNTEwMDgxMzFrYjVlaTVjOXkxIn0.IsPo5lOndNUc3lDLuBa1ZA';
-          const map = new mapboxgl.Map({
-            container: 'map',
-            style: 'mapbox://styles/ese-toh/ckh2ss32s06i119paer9mt67h',
-            zoom: townConfig.map.zoom,
-            center: townConfig.map.center
-          });
-          window.map = map;
+          const toolkitHTML = `
+              <div> 
+                <button class="mapboxgl-ctrl-point" id="pointButton" aria-label="Point" data-tooltip="Drop a point on the map"></button>
+                <button class="mapboxgl-ctrl-print" id="printButton" aria-label="Print" data-tooltip="Print map"></button>
+                <button class="mapboxgl-ctrl-measure" id="distanceButton" aria-label="Measure" data-tooltip="Measure distances (on/off)"></button>
+                <button class="mapboxgl-ctrl-legend" id="legendButton" aria-label="Legend" data-tooltip="Show/Hide Legend"></button>
+                <button class="mapboxgl-ctrl-ten" id="placeholderButton1" aria-label="Placeholder" data-tooltip="Placeholder"></button>
+              </div>
+              <div> 
+                <button class="mapboxgl-ctrl-point-center" id="pointCButton" aria-label="Point Center" data-tooltip="Center the point or centerpoint"></button>
+                <button class="mapboxgl-ctrl-parea" id="pareaButton" aria-label="Print Area" data-tooltip="Print Area"></button>
+                <button class="mapboxgl-ctrl-three" id="threeButton" aria-label="three" data-tooltip="Placeholder"></button>
+                <button class="mapboxgl-ctrl-four" id="fourButton" aria-label="four" data-tooltip="Placeholder"></button>
+                <button class="mapboxgl-ctrl-sZoom" id="scaleZoom" aria-label="Zoom to Scale" data-tooltip="Zoom to Scale"></button>
+              </div>
+              <div> 
+                <button class="mapboxgl-ctrl-point-off" id="pointOffButton" aria-label="Point Off" data-tooltip="Remove the point from the map"></button>
+                ${customPrintButtonHTML}
+                <button class="mapboxgl-ctrl-clear" id="clearButton" aria-label="eight" data-tooltip="Clear measurements"></button>
+                <button class="mapboxgl-ctrl-nine" id="nineButton" aria-label="nine" data-tooltip="Placeholder"></button>
+                <button class="mapboxgl-ctrl-ten" id="tenButton" aria-label="ten" data-tooltip="Placeholder"></button>
+              </div>
+              <button class="mapboxgl-ctrl-share" id="shareButton" data-tooltip="Share the map with a URL">Share Map</button>
+              <div id="distance-display"></div>
+              <div id="scale-box"></div>
+              <div id="legend-box"></div>
+              ${customPrintBoxHTML}
+              <div id="sZoomBox" class="hidden"></div>
+          `;
+          // Use innerHTML to add all elements at once.
+          // Note: We skip the geocoder div since it's already in the static HTML.
+          const tempDiv = document.createElement('div');
+          tempDiv.innerHTML = toolkitHTML;
+          while (tempDiv.firstChild) {
+            geocoderContainer.appendChild(tempDiv.firstChild);
+          }
+      }
+      
+      /**
+       * Maps a layer ID from the config to its corresponding JS filename.
+       * Handles special cases where the ID doesn't match the filename.
+       * @param {string} layerId - The layer ID from town-config.json.
+       * @returns {string} The full script URL.
+       */
+      function getLayerScriptPath(layerId) {
+          const baseUrl = 'https://east-southeast-llc.github.io/ese-map-viewer/docs/layers/';
+          const specialCases = {
+              'parcel highlight': 'parcel-highlight.js',
+              'lidar contours': 'lidar-contours.js',
+              'DEP wetland': 'depwetland.js',
+              'endangered species': 'endangered-species.js',
+              'zone II': 'zoneii.js',
+              'conservancy districts': 'conservancydistricts.js',
+              'sewer plans': 'sewer-plans.js'
+          };
+          const filename = specialCases[layerId] || `${layerId}.js`;
+          return `${baseUrl}${filename}?v=2`;
+      }
 
-          const geocoder = new MapboxGeocoder({
-            accessToken: mapboxgl.accessToken,
-            mapboxgl: mapboxgl
-          });
-          document.getElementById('geocoder').appendChild(geocoder.onAdd(map));
+      /**
+       * Main application logic.
+       */
+      async function main() {
+          try {
+              const response = await fetch('https://east-southeast-llc.github.io/ese-map-viewer/docs/town-config.json');
+              const config = await response.json();
 
-          loadControlButtons(townConfig.features);
-          loadControls(townConfig.features);
-          
-          loadScript(`https://east-southeast-llc.github.io/ese-map-viewer/docs/layers/towns.js?v=2`);
-          
-          const menuLayerIds = townConfig.layers.filter(id => id !== 'towns');
+              const townKey = getTownKey(config);
+              const townConfig = config[townKey];
 
-          menuLayerIds.forEach(layerId => {
-            let scriptPath = `https://east-southeast-llc.github.io/ese-map-viewer/docs/layers/`;
-            let scriptSrc = '';
+              document.title = `${townConfig.townName} | ESE Map Viewer`;
+              window.eseMapBaseUrl = townConfig.baseShareUrl;
+              
+              buildToolkitUI(townConfig.features);
 
-            if (layerId === 'parcel highlight') {
-              scriptSrc = `${scriptPath}parcel-highlight.js?v=2`;
-            } else if (layerId === 'lidar contours') {
-              scriptSrc = `${scriptPath}lidar-contours.js?v=2`;
-            } else if (layerId === 'DEP wetland') {
-              scriptSrc = `${scriptPath}depwetland.js?v=2`;
-            } else if (layerId === 'endangered species') {
-              scriptSrc = `${scriptPath}endangered-species.js?v=2`;
-            } else if (layerId === 'zone II') {
-              scriptSrc = `${scriptPath}zoneii.js?v=2`;
-            } else if (layerId === 'conservancy districts') {
-              scriptSrc = `${scriptPath}conservancydistricts.js?v=2`;
-            } else if (layerId === 'sewer plans') {
-              scriptSrc = `${scriptPath}sewer-plans.js?v=2`;
-            } else {
-              scriptSrc = `${scriptPath}${layerId}.js?v=2`;
-            }
-            
-            if (scriptSrc) {
-                loadScript(scriptSrc);
-            }
-          });
-          
-          loadScript('https://east-southeast-llc.github.io/ese-map-viewer/docs/toggleable-menu.js?v=2', () => {
-              if (window.initializeMenu) {
-                  window.initializeMenu(menuLayerIds);
+              const map = new mapboxgl.Map({
+                  container: 'map',
+                  style: 'mapbox://styles/ese-toh/ckh2ss32s06i119paer9mt67h',
+                  zoom: townConfig.map.zoom,
+                  center: townConfig.map.center
+              });
+              window.map = map; // Make map globally accessible
+
+              const geocoder = new MapboxGeocoder({ accessToken: mapboxgl.accessToken, mapboxgl: mapboxgl });
+              document.getElementById('geocoder').appendChild(geocoder.onAdd(map));
+              
+              // Load all control scripts
+              const controlScripts = [
+                  'control-button.js', 'control-print.js', 'control-print-area.js',
+                  'control-share.js', 'control-scale.js', 'control-measure.js', 'control-legend.js'
+              ];
+              if (townConfig.features.customPrint) {
+                  controlScripts.push('control-custom-print.js');
               }
-          });
+              const controlPromises = controlScripts.map(script => loadScript(`https://east-southeast-llc.github.io/ese-map-viewer/docs/${script}?v=3`));
 
-          loadScript('https://east-southeast-llc.github.io/ese-map-viewer/docs/decode-url.js?v=2', () => {
-            map.on('load', function () {
-              applyUrlParams(map);
-            });
-          });
+              // Load all layer scripts from the config
+              const layerPromises = townConfig.layers.map(layerId => loadScript(getLayerScriptPath(layerId)));
+              
+              // Wait for all scripts to load before initializing the menu and URL params
+              await Promise.all([...controlPromises, ...layerPromises]);
 
-        })
-        .catch(error => console.error('Error loading town configuration:', error));
+              await loadScript('https://east-southeast-llc.github.io/ese-map-viewer/docs/toggleable-menu.js?v=3');
+              if (window.initializeMenu) {
+                  window.initializeMenu(townConfig.layers);
+              }
+
+              await loadScript('https://east-southeast-llc.github.io/ese-map-viewer/docs/decode-url.js?v=3');
+              map.on('load', () => applyUrlParams(map));
+
+          } catch (error) {
+              console.error('Failed to initialize the map application:', error);
+              document.body.innerHTML = 'Error: Could not load map configuration. Please try again later.';
+          }
+      }
+
+      main();
     });
-
-    function loadScript(src, callback) {
-        const script = document.createElement('script');
-        script.src = src;
-        if (callback) {
-            script.onload = callback;
-        }
-        document.body.appendChild(script);
-    }
-    
-    function loadControls(features) {
-        const controlScripts = [
-            'control-button.js', 'control-print.js', 'control-print-area.js',
-            'control-share.js', 'control-scale.js', 'control-measure.js', 'control-legend.js'
-        ];
-
-        if (features.customPrint) {
-            controlScripts.push('control-custom-print.js');
-        }
-
-        controlScripts.forEach(scriptName => loadScript(`https://east-southeast-llc.github.io/ese-map-viewer/docs/${scriptName}?v=2`));
-    }
-
-    function loadControlButtons(features) {
-        const geocoderContainer = document.getElementById('geocoder-container');
-        const customPrintButtonHTML = features.customPrint 
-            ? '<button class="mapboxgl-ctrl-custom-print" id="customPrintButton" aria-label="Custom Print" data-tooltip="Create a custom multi-page printout"></button>' 
-            : '<button class="mapboxgl-ctrl-seven" aria-label="placeholder"></button>';
-            
-        const customPrintBoxHTML = features.customPrint ? '<div id="custom-print-box"></div>' : '';
-
-        geocoderContainer.innerHTML += `
-            <!-- First row of control buttons -->
-            <div> 
-              <button class="mapboxgl-ctrl-point" id="pointButton" aria-label="Point" data-tooltip="Drop a point on the map"></button>
-              <button class="mapboxgl-ctrl-print" id="printButton" aria-label="Print" data-tooltip="Print map"></button>
-              <button class="mapboxgl-ctrl-measure" id="distanceButton" aria-label="Measure" data-tooltip="Measure distances (on/off)"></button>
-              <button class="mapboxgl-ctrl-legend" id="legendButton" aria-label="Legend" data-tooltip="Show/Hide Legend"></button>
-              <button class="mapboxgl-ctrl-ten" id="placeholderButton1" aria-label="Placeholder" data-tooltip="Placeholder"></button>
-            </div>
-            <!-- Second row of control buttons -->
-            <div> 
-              <button class="mapboxgl-ctrl-point-center" id="pointCButton" aria-label="Point Center" data-tooltip="Center the point or centerpoint"></button>
-              <button class="mapboxgl-ctrl-parea" id="pareaButton" aria-label="Print Area" data-tooltip="Print Area"></button>
-              <button class="mapboxgl-ctrl-three" id="threeButton" aria-label="three" data-tooltip="Placeholder"></button>
-              <button class="mapboxgl-ctrl-four" id="fourButton" aria-label="four" data-tooltip="Placeholder"></button>
-              <button class="mapboxgl-ctrl-sZoom" id="scaleZoom" aria-label="Zoom to Scale" data-tooltip="Zoom to Scale"></button>
-            </div>
-            <!-- Third row of control buttons -->
-            <div> 
-              <button class="mapboxgl-ctrl-point-off" id="pointOffButton" aria-label="Point Off" data-tooltip="Remove the point from the map"></button>
-              ${customPrintButtonHTML}
-              <button class="mapboxgl-ctrl-clear" id="clearButton" aria-label="eight" data-tooltip="Clear measurements"></button>
-              <button class="mapboxgl-ctrl-nine" id="nineButton" aria-label="nine" data-tooltip="Placeholder"></button>
-              <button class="mapboxgl-ctrl-ten" id="tenButton" aria-label="ten" data-tooltip="Placeholder"></button>
-            </div>
-            <!-- Share button -->
-            <button class="mapboxgl-ctrl-share" id="shareButton" data-tooltip="Share the map with a URL">Share Map</button>
-            <!-- Accessory display items -->
-            <div id="distance-display"></div>
-            <div id="scale-box"></div>
-            <div id="legend-box"></div>
-            ${customPrintBoxHTML}
-            <div id="sZoomBox" class="hidden"></div>
-        `;
-    }
   </script>
 </body>
 </html>

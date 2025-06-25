@@ -63,5 +63,39 @@
     "features": {
       "customPrint": false
     }
+  },
+  "harwich": {
+    "townName": "Harwich",
+    "path": "/harwich",
+    "baseShareUrl": "https://ese-llc.com/harwich",
+    "map": {
+      "center": [-70.06, 41.69],
+      "zoom": 11.75
+    },
+    "layers": [
+        "satellite",
+        "parcels",
+        "parcel highlight",
+        "lidar contours",
+        "historic",
+        "floodplain",
+        "acec",
+        "zone II",
+        "towns",
+        "priority habitat",
+        "estimated habitat",
+        "vernal pools",
+        "soils",
+        "DEP wetland",
+        "conservancy districts",
+        "zoning",
+        "conservation",
+        "sewer",
+        "stories",
+        "intersection"
+    ],
+    "features": {
+      "customPrint": false
+    }
   }
 }
