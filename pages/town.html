@@ -22,10 +22,47 @@
   <nav id="menu"></nav>
   <div id="map"></div>
 
-  <!-- This container will be populated dynamically -->
+  <!-- All UI elements are now static in the HTML -->
   <div id="geocoder-container">
     <div id="geocoder" data-tooltip="Search for a location"></div>
+    <!-- first row of control buttons -->
+    <div> 
+      <button class="mapboxgl-ctrl-point" id="pointButton" aria-label="Point" data-tooltip="Drop a point on the map"></button>
+      <button class="mapboxgl-ctrl-print" id="printButton" aria-label="Print" data-tooltip="Print map"></button>
+      <button class="mapboxgl-ctrl-measure" id="distanceButton" aria-label="Measure" data-tooltip="Measure distances (on/off)"></button>
+      <button class="mapboxgl-ctrl-legend" id="legendButton" aria-label="Legend" data-tooltip="Show/Hide Legend"></button>
+      <button class="mapboxgl-ctrl-ten" id="placeholderButton1" aria-label="Placeholder" data-tooltip="Placeholder"></button>
+    </div>
+    <!-- second row of control buttons -->
+    <div> 
+      <button class="mapboxgl-ctrl-point-center" id="pointCButton" aria-label="Point Center" data-tooltip="Center the point or centerpoint"></button>
+      <button class="mapboxgl-ctrl-parea" id="pareaButton" aria-label="Print Area" data-tooltip="Print Area"></button>
+      <button class="mapboxgl-ctrl-three" id="threeButton" aria-label="three" data-tooltip="Placeholder"></button>
+      <button class="mapboxgl-ctrl-four" id="fourButton" aria-label="four" data-tooltip="Placeholder"></button>
+      <button class="mapboxgl-ctrl-sZoom" id="scaleZoom" aria-label="Zoom to Scale" data-tooltip="Zoom to Scale"></button>
+    </div>
+    <!-- third row of control buttons -->
+    <div> 
+      <button class="mapboxgl-ctrl-point-off" id="pointOffButton" aria-label="Point Off" data-tooltip="Remove the point from the map"></button>
+      <!-- One of these two buttons will be hidden by the script -->
+      <button class="mapboxgl-ctrl-custom-print" id="customPrintButton" aria-label="Custom Print" data-tooltip="Create a custom multi-page printout"></button>
+      <button class="mapboxgl-ctrl-seven" id="customPrintPlaceholder" aria-label="placeholder" style="display: none;"></button>
+      
+      <button class="mapboxgl-ctrl-clear" id="clearButton" aria-label="eight" data-tooltip="Clear measurements"></button>
+      <button class="mapboxgl-ctrl-nine" id="nineButton" aria-label="nine" data-tooltip="Placeholder"></button>
+      <button class="mapboxgl-ctrl-ten" id="tenButton" aria-label="ten" data-tooltip="Placeholder"></button>
+    </div>
+    <!-- share button -->
+    <button class="mapboxgl-ctrl-share" id="shareButton" data-tooltip="Share the map with a URL">Share Map</button>
+    
+    <!-- accessory display items -->
+    <div id="distance-display"></div>
+    <div id="scale-box"></div>
+    <div id="legend-box"></div>
+    <div id="custom-print-box"></div>
+    <div id="sZoomBox" class="hidden"></div>
   </div>
+
 
   <script>
     // ========================================================================
@@ -49,49 +86,6 @@
             document.body.appendChild(script);
         });
       }
-
-      function buildToolkitUI(features) {
-          const geocoderContainer = document.getElementById('geocoder-container');
-          
-          const customPrintButtonHTML = features.customPrint 
-              ? '<button class="mapboxgl-ctrl-custom-print" id="customPrintButton" aria-label="Custom Print" data-tooltip="Create a custom multi-page printout"></button>' 
-              : '<button class="mapboxgl-ctrl-seven" aria-label="placeholder"></button>';
-              
-          const toolkitHTML = `
-              <div> 
-                <button class="mapboxgl-ctrl-point" id="pointButton" aria-label="Point" data-tooltip="Drop a point on the map"></button>
-                <button class="mapboxgl-ctrl-print" id="printButton" aria-label="Print" data-tooltip="Print map"></button>
-                <button class="mapboxgl-ctrl-measure" id="distanceButton" aria-label="Measure" data-tooltip="Measure distances (on/off)"></button>
-                <button class="mapboxgl-ctrl-legend" id="legendButton" aria-label="Legend" data-tooltip="Show/Hide Legend"></button>
-                <button class="mapboxgl-ctrl-ten" id="placeholderButton1" aria-label="Placeholder" data-tooltip="Placeholder"></button>
-              </div>
-              <div> 
-                <button class="mapboxgl-ctrl-point-center" id="pointCButton" aria-label="Point Center" data-tooltip="Center the point or centerpoint"></button>
-                <button class="mapboxgl-ctrl-parea" id="pareaButton" aria-label="Print Area" data-tooltip="Print Area"></button>
-                <button class="mapboxgl-ctrl-three" id="threeButton" aria-label="three" data-tooltip="Placeholder"></button>
-                <button class="mapboxgl-ctrl-four" id="fourButton" aria-label="four" data-tooltip="Placeholder"></button>
-                <button class="mapboxgl-ctrl-sZoom" id="scaleZoom" aria-label="Zoom to Scale" data-tooltip="Zoom to Scale"></button>
-              </div>
-              <div> 
-                <button class="mapboxgl-ctrl-point-off" id="pointOffButton" aria-label="Point Off" data-tooltip="Remove the point from the map"></button>
-                ${customPrintButtonHTML}
-                <button class="mapboxgl-ctrl-clear" id="clearButton" aria-label="eight" data-tooltip="Clear measurements"></button>
-                <button class="mapboxgl-ctrl-nine" id="nineButton" aria-label="nine" data-tooltip="Placeholder"></button>
-                <button class="mapboxgl-ctrl-ten" id="tenButton" aria-label="ten" data-tooltip="Placeholder"></button>
-              </div>
-              <button class="mapboxgl-ctrl-share" id="shareButton" data-tooltip="Share the map with a URL">Share Map</button>
-              <div id="distance-display"></div>
-              <div id="scale-box"></div>
-              <div id="legend-box"></div>
-              ${features.customPrint ? '<div id="custom-print-box"></div>' : ''}
-              <div id="sZoomBox" class="hidden"></div>
-          `;
-          const tempDiv = document.createElement('div');
-          tempDiv.innerHTML = toolkitHTML;
-          while (tempDiv.firstChild) {
-            geocoderContainer.appendChild(tempDiv.firstChild);
-          }
-      }
       
       function getLayerScriptPath(layerId) {
           const baseUrl = 'https://east-southeast-llc.github.io/ese-map-viewer/docs/layers/';
@@ -110,7 +104,6 @@
 
       async function main() {
           try {
-              // --- Stage 1: Get Config and Initialize the Map ---
               const response = await fetch('https://east-southeast-llc.github.io/ese-map-viewer/docs/town-config.json');
               const config = await response.json();
               
@@ -121,6 +114,15 @@
 
               document.title = `${townConfig.townName} | ESE Map Viewer`;
               window.eseMapBaseUrl = townConfig.baseShareUrl;
+              
+              // Toggle visibility of the custom print button based on config
+              if (townConfig.features.customPrint) {
+                  document.getElementById('customPrintButton').style.display = 'block';
+                  document.getElementById('customPrintPlaceholder').style.display = 'none';
+              } else {
+                  document.getElementById('customPrintButton').style.display = 'none';
+                  document.getElementById('customPrintPlaceholder').style.display = 'block';
+              }
 
               const map = new mapboxgl.Map({
                   container: 'map',
@@ -129,13 +131,11 @@
                   center: townConfig.map.center
               });
               window.map = map;
-              
+
               const geocoder = new MapboxGeocoder({ accessToken: mapboxgl.accessToken, mapboxgl: mapboxgl });
               document.getElementById('geocoder').appendChild(geocoder.onAdd(map));
               
-              // --- Stage 2: Build the UI and THEN load the scripts that control it ---
-              buildToolkitUI(townConfig.features);
-
+              // Load all scripts. They will now find their static elements.
               const controlScripts = [
                   'control-button.js', 'control-print.js', 'control-print-area.js',
                   'control-share.js', 'control-scale.js', 'control-measure.js', 'control-legend.js'
@@ -144,11 +144,8 @@
                   controlScripts.push('control-custom-print.js');
               }
               const controlPromises = controlScripts.map(script => loadScript(`https://east-southeast-llc.github.io/ese-map-viewer/docs/${script}?v=3`));
-              
-              // --- Stage 3: Load Layer scripts ---
               const layerPromises = townConfig.layers.map(layerId => loadScript(getLayerScriptPath(layerId)));
               
-              // --- Stage 4: Wait for everything to load, then initialize menu and URL params ---
               await Promise.all([...controlPromises, ...layerPromises]);
 
               await loadScript('https://east-southeast-llc.github.io/ese-map-viewer/docs/toggleable-menu.js?v=3');
