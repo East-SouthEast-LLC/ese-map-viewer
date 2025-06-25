@@ -68,7 +68,7 @@
           
           const menuLayerIds = townConfig.layers.filter(id => id !== 'towns');
 
-          // --- MODIFIED SCRIPT LOADING LOGIC ---
+          // --- REVISED SCRIPT LOADING LOGIC ---
           // Use an explicit if/else block for clarity and to handle special cases.
           menuLayerIds.forEach(layerId => {
             let scriptPath = `https://east-southeast-llc.github.io/ese-map-viewer/docs/layers/`;
@@ -89,12 +89,16 @@
             } else if (layerId === 'sewer plans') {
               scriptSrc = `${scriptPath}sewer-plans.js?v=2`;
             } else {
-              // Default case for simple, single-word layer IDs
+              // Default case for simple, single-word layer IDs that match their filenames
               scriptSrc = `${scriptPath}${layerId}.js?v=2`;
             }
-            loadScript(scriptSrc);
+            
+            // Only load the script if a source was determined
+            if (scriptSrc) {
+                loadScript(scriptSrc);
+            }
           });
-          // --- END OF MODIFIED LOGIC ---
+          // --- END OF REVISED LOGIC ---
           
           loadScript('https://east-southeast-llc.github.io/ese-map-viewer/docs/toggleable-menu.js?v=2', () => {
               if (window.initializeMenu) {

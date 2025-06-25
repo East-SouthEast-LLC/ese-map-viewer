@@ -77,7 +77,7 @@ window.initializeMenu = function(layerIds) {
                 'zone II': ['zone-ii-outline', 'zone-ii-labels'],
                 'endangered species': ['endangered-species-labels', 'vernal-pools', 'vernal-pools-labels'],
                 'sewer plans': ['sewer-plans-outline'],
-                'lidar-contours': ['contour-labels']
+                'lidar contours': ['contour-labels']
             };
 
             if (subLayerToggles[clickedLayer]) {
