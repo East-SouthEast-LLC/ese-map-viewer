@@ -7,12 +7,12 @@
   <script src="https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.js"></script>
   <link href="https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.css" rel="stylesheet" />
   
-  <!-- import css files -->
+  <!-- Global CSS files -->
   <link rel="stylesheet" href="https://east-southeast-llc.github.io/ese-map-viewer/css/globals.css?v=2" type="text/css" />
   <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.5.1/mapbox-gl-geocoder.css" type="text/css" />
 
+  <!-- Core Libraries -->
   <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.5.1/mapbox-gl-geocoder.min.js"></script>
-  <!-- Promise polyfill script required to use Mapbox GL Geocoder in IE 11 -->
   <script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.auto.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@turf/turf"></script>
@@ -22,20 +22,19 @@
   <nav id="menu"></nav>
   <div id="map"></div>
 
-  <!-- container for control buttons -->
+  <!-- Container for toolkit: geocoder and control buttons -->
   <div id="geocoder-container">
     <div id="geocoder" data-tooltip="Search for a location"></div>
-
-    <!-- Control buttons will be dynamically added here -->
-
+    <!-- Control buttons and accessory panels are dynamically added here -->
   </div>
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      // Get town from URL query parameter (e.g., ?town=chatham)
+      // Get town name from URL query parameter (e.g., ?town=chatham), default to 'chatham'
       const urlParams = new URLSearchParams(window.location.search);
-      const townName = urlParams.get('town') || 'chatham'; // Default to chatham
+      const townName = urlParams.get('town') || 'chatham'; 
 
+      // Fetch the master configuration file
       fetch('https://east-southeast-llc.github.io/ese-map-viewer/docs/town-config.json')
         .then(response => response.json())
         .then(config => {
@@ -45,101 +44,110 @@
             return;
           }
 
-          // Set the window title
+          // --- Initialize the application based on the loaded configuration ---
+          
           document.title = townConfig.townName + " | ESE Map Viewer";
-
-          // Set the base url for the page
           window.eseMapBaseUrl = townConfig.baseShareUrl;
 
-          // set the mapbox access token and initialize the map
+          // Initialize the Mapbox map
           mapboxgl.accessToken = 'pk.eyJ1IjoiZXNlLXRvaCIsImEiOiJja2Vhb24xNTEwMDgxMzFrYjVlaTVjOXkxIn0.IsPo5lOndNUc3lDLuBa1ZA';
-          var map = new mapboxgl.Map({
+          const map = new mapboxgl.Map({
             container: 'map',
             style: 'mapbox://styles/ese-toh/ckh2ss32s06i119paer9mt67h',
             zoom: townConfig.map.zoom,
             center: townConfig.map.center
           });
-          window.map = map; // Make map globally available
+          window.map = map; // Make map globally accessible for control scripts
 
-          // add geocoder control to the map
+          // Add Geocoder
           const geocoder = new MapboxGeocoder({
             accessToken: mapboxgl.accessToken,
             mapboxgl: mapboxgl
           });
           document.getElementById('geocoder').appendChild(geocoder.onAdd(map));
 
-          // Load control buttons
+          // Dynamically load the toolkit buttons and control scripts
           loadControlButtons(townConfig.features);
-
-          // Load all layer scripts specified in the config
-          townConfig.layers.forEach(layerName => {
-            const script = document.createElement('script');
-            // Handle special cases for layer names
-            if (layerName === 'DEP wetland') {
-                script.src = `https://east-southeast-llc.github.io/ese-map-viewer/docs/layers/depwetland.js?v=2`;
-            } else if (layerName === 'lidar-contours') {
-                script.src = `https://east-southeast-llc.github.io/ese-map-viewer/docs/layers/lidar-contours.js?v=2`;
-            }
-            else {
-                script.src = `https://east-southeast-llc.github.io/ese-map-viewer/docs/layers/${layerName}.js?v=2`;
-            }
-            document.body.appendChild(script);
+          loadControls(townConfig.features);
+          
+          // Dynamically load all layer scripts specified in the config
+          townConfig.layers.forEach(layerId => {
+            loadScript(`https://east-southeast-llc.github.io/ese-map-viewer/docs/layers/${formatLayerIdForFilename(layerId)}.js?v=2`);
           });
           
-          // Load controls
-          loadControls(townConfig.features);
-
-          // Load toggleable menu
-          const toggleScript = document.createElement('script');
-          toggleScript.src = 'https://east-southeast-llc.github.io/ese-map-viewer/docs/toggleable-menu.js?v=2';
-          toggleScript.onload = () => {
-              // Override toggleableLayerIds with the ones from config
+          // Load and initialize the toggleable menu once all other scripts are likely loaded
+          loadScript('https://east-southeast-llc.github.io/ese-map-viewer/docs/toggleable-menu.js?v=2', () => {
               if (window.initializeMenu) {
                   window.initializeMenu(townConfig.layers);
               }
-          };
-          document.body.appendChild(toggleScript);
+          });
 
-
-          // Load URL decoder
-          const decodeScript = document.createElement('script');
-          decodeScript.src = 'https://east-southeast-llc.github.io/ese-map-viewer/docs/decode-url.js?v=2';
-          document.body.appendChild(decodeScript);
-          
-          map.on('load', function () {
-            applyUrlParams(map);
+          // Load the URL decoder for shared links
+          loadScript('https://east-southeast-llc.github.io/ese-map-viewer/docs/decode-url.js?v=2', () => {
+            map.on('load', function () {
+              applyUrlParams(map);
+            });
           });
 
         })
         .catch(error => console.error('Error loading town configuration:', error));
     });
 
+    /**
+     * Dynamically loads a script into the document.
+     * @param {string} src - The source URL of the script.
+     * @param {function} [callback] - An optional callback function to run when the script loads.
+     */
+    function loadScript(src, callback) {
+        const script = document.createElement('script');
+        script.src = src;
+        if (callback) {
+            script.onload = callback;
+        }
+        document.body.appendChild(script);
+    }
+
+    /**
+     * Formats a layer ID into a valid filename (e.g., "endangered species" -> "endangered-species").
+     * @param {string} layerId - The layer ID from the config file.
+     * @returns {string} A formatted string suitable for a filename.
+     */
+    function formatLayerIdForFilename(layerId) {
+        return layerId.replace(/\s+/g, '-').toLowerCase();
+    }
+    
+    /**
+     * Loads the control panel scripts.
+     * @param {object} features - The features object from the town config.
+     */
     function loadControls(features) {
         const controlScripts = [
-            'control-button.js',
-            'control-print.js',
-            'control-print-area.js',
-            'control-share.js',
-            'control-scale.js',
-            'control-measure.js',
-            'control-legend.js'
+            'control-button.js', 'control-print.js', 'control-print-area.js',
+            'control-share.js', 'control-scale.js', 'control-measure.js', 'control-legend.js'
         ];
 
         if (features.customPrint) {
             controlScripts.push('control-custom-print.js');
         }
 
-        controlScripts.forEach(scriptName => {
-            const script = document.createElement('script');
-            script.src = `https://east-southeast-llc.github.io/ese-map-viewer/docs/${scriptName}?v=2`;
-            document.body.appendChild(script);
-        });
+        controlScripts.forEach(scriptName => loadScript(`https://east-southeast-llc.github.io/ese-map-viewer/docs/${scriptName}?v=2`));
     }
 
+    /**
+     * Injects the HTML for the control buttons into the geocoder container.
+     * @param {object} features - The features object from the town config.
+     */
     function loadControlButtons(features) {
         const geocoderContainer = document.getElementById('geocoder-container');
-        let buttonsHTML = `
-            <!-- first row of control buttons -->
+        const customPrintButtonHTML = features.customPrint 
+            ? '<button class="mapboxgl-ctrl-custom-print" id="customPrintButton" aria-label="Custom Print" data-tooltip="Create a custom multi-page printout"></button>' 
+            : '<button class="mapboxgl-ctrl-seven" aria-label="placeholder"></button>'; // Placeholder if no custom print
+            
+        const customPrintBoxHTML = features.customPrint ? '<div id="custom-print-box"></div>' : '';
+
+        // Note: Using innerHTML for simplicity. For complex applications, creating elements with document.createElement is safer.
+        geocoderContainer.innerHTML += `
+            <!-- First row of control buttons -->
             <div> 
               <button class="mapboxgl-ctrl-point" id="pointButton" aria-label="Point" data-tooltip="Drop a point on the map"></button>
               <button class="mapboxgl-ctrl-print" id="printButton" aria-label="Print" data-tooltip="Print map"></button>
@@ -147,8 +155,7 @@
               <button class="mapboxgl-ctrl-legend" id="legendButton" aria-label="Legend" data-tooltip="Show/Hide Legend"></button>
               <button class="mapboxgl-ctrl-ten" id="placeholderButton1" aria-label="Placeholder" data-tooltip="Placeholder"></button>
             </div>
-
-            <!-- second row of control buttons -->
+            <!-- Second row of control buttons -->
             <div> 
               <button class="mapboxgl-ctrl-point-center" id="pointCButton" aria-label="Point Center" data-tooltip="Center the point or centerpoint"></button>
               <button class="mapboxgl-ctrl-parea" id="pareaButton" aria-label="Print Area" data-tooltip="Print Area"></button>
@@ -156,30 +163,24 @@
               <button class="mapboxgl-ctrl-four" id="fourButton" aria-label="four" data-tooltip="Placeholder"></button>
               <button class="mapboxgl-ctrl-sZoom" id="scaleZoom" aria-label="Zoom to Scale" data-tooltip="Zoom to Scale"></button>
             </div>
-
-            <!-- third row of control buttons -->
+            <!-- Third row of control buttons -->
             <div> 
               <button class="mapboxgl-ctrl-point-off" id="pointOffButton" aria-label="Point Off" data-tooltip="Remove the point from the map"></button>
-              ${features.customPrint ? '<button class="mapboxgl-ctrl-custom-print" id="customPrintButton" aria-label="Custom Print" data-tooltip="Create a custom multi-page printout"></button>' : ''}
+              ${customPrintButtonHTML}
               <button class="mapboxgl-ctrl-clear" id="clearButton" aria-label="eight" data-tooltip="Clear measurements"></button>
               <button class="mapboxgl-ctrl-nine" id="nineButton" aria-label="nine" data-tooltip="Placeholder"></button>
               <button class="mapboxgl-ctrl-ten" id="tenButton" aria-label="ten" data-tooltip="Placeholder"></button>
             </div>
-
-            <!-- share button -->
+            <!-- Share button -->
             <button class="mapboxgl-ctrl-share" id="shareButton" data-tooltip="Share the map with a URL">Share Map</button>
-
-            <!-- accessory display items -->
+            <!-- Accessory display items -->
             <div id="distance-display"></div>
             <div id="scale-box"></div>
             <div id="legend-box"></div>
-            ${features.customPrint ? '<div id="custom-print-box"></div>' : ''}
+            ${customPrintBoxHTML}
             <div id="sZoomBox" class="hidden"></div>
         `;
-        geocoderContainer.innerHTML += buttonsHTML;
     }
-
   </script>
-
 </body>
 </html>

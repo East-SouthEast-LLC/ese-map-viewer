@@ -1,18 +1,23 @@
 // toggleable-menu.js
 
+/**
+ * Initializes the toggleable layer menu and the map layout.
+ * This function is now designed to be called explicitly from the main HTML page.
+ * @param {string[]} layerIds - An array of layer IDs to be included in the menu.
+ */
 window.initializeMenu = function(layerIds) {
-    // Define the widths for the side menus based on new CSS
+    // Define the pixel widths for the side menus from the CSS
     const menuOnlyWidth = 220;
-    const fullToolkitWidth = 480; // Updated from 490
+    const fullToolkitWidth = 480;
 
-    // Get the map's container element
+    // Get the required DOM elements
     const mapContainer = document.getElementById('map');
     const menu = document.getElementById('menu');
 
-    // Clear any existing menu items
+    // Clear any existing menu items to prevent duplication
     menu.innerHTML = '';
 
-    // Add the 'tools' button first
+    // Statically create and add the 'tools' button, as it's common to all maps
     const toolsLink = document.createElement('a');
     toolsLink.href = '#';
     toolsLink.className = '';
@@ -20,41 +25,36 @@ window.initializeMenu = function(layerIds) {
     toolsLink.onclick = function(e) {
         e.preventDefault();
         e.stopPropagation();
-        var geocoderContainer = document.getElementById("geocoder-container");
-        // Toggle display and set map position accordingly
-        if (getComputedStyle(geocoderContainer).display === "none") {
-            geocoderContainer.style.display = "flex";
-            this.className = 'active';
-            // Adjust map width and margin for the full toolkit
+        const geocoderContainer = document.getElementById("geocoder-container");
+        
+        // Toggle the visibility of the toolkit panel
+        const isHidden = getComputedStyle(geocoderContainer).display === "none";
+        geocoderContainer.style.display = isHidden ? "flex" : "none";
+        this.className = isHidden ? 'active' : '';
+
+        // Adjust map width and margin based on the toolkit's visibility
+        if (isHidden) {
             mapContainer.style.width = `calc(95vw - ${fullToolkitWidth}px)`;
             mapContainer.style.marginLeft = `${fullToolkitWidth}px`;
         } else {
-            geocoderContainer.style.display = "none";
-            this.className = '';
-            // Adjust map width and margin for the layer menu only
             mapContainer.style.width = `calc(95vw - ${menuOnlyWidth}px)`;
             mapContainer.style.marginLeft = `${menuOnlyWidth}px`;
         }
 
-        // Use a timeout to resize the map after the CSS transition
-        setTimeout(function() {
-            map.resize();
-        }, 400); // This should match the transition duration in the CSS
+        // Use a timeout to resize the map after the CSS transition completes
+        setTimeout(() => map.resize(), 400); // Duration should match the CSS transition
     };
     menu.appendChild(toolsLink);
 
-
-    // set up the corresponding toggle button for each layer
-    for (var i = 0; i < layerIds.length; i++) {
-        var id = layerIds[i];
-        
-        var link = document.createElement('a');
+    // Dynamically create a toggle button for each layer specified in the config
+    layerIds.forEach(id => {
+        const link = document.createElement('a');
         link.href = '#';
         link.className = '';
         link.textContent = id;
 
         link.onclick = function(e) {
-            var clickedLayer = this.textContent;
+            const clickedLayer = this.textContent;
             e.preventDefault();
             e.stopPropagation();
 
@@ -66,57 +66,36 @@ window.initializeMenu = function(layerIds) {
             const isVisible = map.getLayoutProperty(clickedLayer, 'visibility') === 'visible';
             const newVisibility = isVisible ? 'none' : 'visible';
             
-            // Toggle main layer
+            // Toggle the main layer's visibility
             map.setLayoutProperty(clickedLayer, 'visibility', newVisibility);
 
-            // handle floodplain layers -----------------------------------
-            if (clickedLayer === 'floodplain') {
-                map.setLayoutProperty('LiMWA', 'visibility', newVisibility);
-                map.setLayoutProperty('floodplain-line', 'visibility', newVisibility);
-                map.setLayoutProperty('floodplain-labels', 'visibility', newVisibility);
-            }
+            // --- Handle visibility for dependent or related sub-layers ---
+            const subLayerToggles = {
+                'floodplain': ['LiMWA', 'floodplain-line', 'floodplain-labels'],
+                'DEP wetland': ['dep-wetland-line', 'dep-wetland-labels'],
+                'soils': ['soils-labels', 'soils-outline'],
+                'zone II': ['zone-ii-outline', 'zone-ii-labels'],
+                'endangered species': ['endangered-species-labels', 'vernal-pools', 'vernal-pools-labels'],
+                'sewer plans': ['sewer-plans-outline'],
+                'lidar-contours': ['contour-labels']
+            };
 
-            // handle dep wetland layers -----------------------------------
-            if (clickedLayer === 'DEP wetland') {
-                map.setLayoutProperty('dep-wetland-line', 'visibility', newVisibility);
-                map.setLayoutProperty('dep-wetland-labels', 'visibility', newVisibility);
-            }
-
-            // handle soils layers ----------------------------------------
-            if (clickedLayer === 'soils') {
-                map.setLayoutProperty('soils-labels', 'visibility', newVisibility);
-                map.setLayoutProperty('soils-outline', 'visibility', newVisibility);
-            }
-
-            // handle zone II layers ----------------------------------------
-            if (clickedLayer === 'zone II') {
-                map.setLayoutProperty('zone-ii-outline', 'visibility', newVisibility);
-                map.setLayoutProperty('zone-ii-labels', 'visibility', newVisibility);
-            }
-
-            // handle endangered species layers -----------------------
-            if (clickedLayer === 'endangered species') {
-                map.setLayoutProperty('endangered-species-labels', 'visibility', newVisibility);
-                map.setLayoutProperty('vernal-pools', 'visibility', newVisibility);
-                map.setLayoutProperty('vernal-pools-labels', 'visibility', newVisibility);
-            }
-
-            // handle sewer plans layers -----------------------------------
-            if (clickedLayer === 'sewer plans') {
-                map.setLayoutProperty('sewer-plans-outline', 'visibility', newVisibility);
-            }
-             // handle lidar contours layers -----------------------------------
-            if (clickedLayer === 'lidar-contours') {
-                map.setLayoutProperty('contour-labels', 'visibility', newVisibility);
+            if (subLayerToggles[clickedLayer]) {
+                subLayerToggles[clickedLayer].forEach(subLayer => {
+                    if (map.getLayer(subLayer)) {
+                        map.setLayoutProperty(subLayer, 'visibility', newVisibility);
+                    }
+                });
             }
             // ------------------------------------------------------------
 
-            // Always update button visual state based on new visibility
+            // Update the button's visual state
             this.className = newVisibility === 'visible' ? 'active' : '';
-            // once map renders, update legend
+            
+            // Trigger a legend update after the map has settled
             if (typeof window.updateLegend === 'function') {
                 if (!map._legendUpdateListenerAdded) {
-                    map.once('idle', function() {
+                    map.once('idle', () => {
                         window.updateLegend();
                         map._legendUpdateListenerAdded = false; 
                     });
@@ -124,27 +103,18 @@ window.initializeMenu = function(layerIds) {
                 }
             }
         };
-
         menu.appendChild(link);
-    }
+    });
     
-    // Set the initial position of the map to account for the layer menu
+    // Set the initial position and size of the map to account for the layer menu
     mapContainer.style.width = `calc(95vw - ${menuOnlyWidth}px)`;
     mapContainer.style.marginLeft = `${menuOnlyWidth}px`;
     map.resize();
 
-
+    // Add the scale control to the map
+    // This is the single source for the scale control now.
     map.addControl(new mapboxgl.ScaleControl({
         maxWidth: 200,
         unit: 'imperial'
     }), 'bottom-right');
 };
-
-map.on('load', function() {
-    // This will be called if the script is loaded in a non-modular way
-    // and will use the default list of layers.
-    if (!window.townConfig) {
-        var defaultLayers = ['tools', 'satellite', 'parcels', 'parcel highlight', 'contours', 'agis', 'historic', 'floodplain', 'acec', 'DEP wetland', 'endangered species', 'zone II', 'soils', 'conservancy districts', 'zoning', 'conservation', 'sewer', 'sewer plans', 'stories', 'intersection'];
-        window.initializeMenu(defaultLayers);
-    }
-});
