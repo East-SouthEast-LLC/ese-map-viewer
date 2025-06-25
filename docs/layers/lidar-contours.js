@@ -1,27 +1,28 @@
 map.on('load', function () {
-    map.addSource('contours', {
+    // Add the vector source for the LIDAR contours.
+    // It's good practice for the source name to match the layer ID for clarity.
+    map.addSource('lidar contours', {
         type: 'vector',
         url: 'mapbox://ese-toh.djcjlqsr'
     });
 
+    // Add the main layer for the contour lines.
+    // The 'id' now matches what the menu button is looking for.
     map.addLayer({
-        id: 'contours',
+        id: 'lidar contours',
         type: 'line',
-        source: 'contours',
+        source: 'lidar contours', // Point to the correctly named source
         'source-layer': 'CONT-ELBOW-9gwgnx',
         layout: {
-            // make layer invisible by default
             visibility: 'none',
             'line-join': 'round',
             'line-cap': 'round'
-            // 'symbol-placement': 'line',
-            // 'text-field': ['concat', ['to-string', ['get', 'Elevation']], 'ft']
         },
         paint: {
             'line-color': [
                 'match',
                 ['get', 'Elevation'],
-                '-2', //
+                '-2',
                 '#08ADEF',
                 /* other */ '#07C327'
             ],
@@ -29,23 +30,23 @@ map.on('load', function () {
         }
     });
 
-    // Add the contour labels layer
+    // Add the corresponding labels layer for the contours.
     map.addLayer({
-        id: 'contour-labels',
+        id: 'contour-labels', // This sub-layer ID is handled by the toggle logic
         type: 'symbol',
-        source: 'contours', // Ensure this source exists
-        'source-layer': 'CONT-ELBOW-9gwgnx', // Ensure this layer exists in the source
+        source: 'lidar contours', // Point to the correctly named source
+        'source-layer': 'CONT-ELBOW-9gwgnx',
         layout: {
-            'symbol-placement': 'line', // Align labels along the line
-            'symbol-spacing': 100, // Add more labels by reducing spacing (default is 250)
+            'symbol-placement': 'line',
+            'symbol-spacing': 100,
             'text-field': ['concat', ['to-string', ['get', 'Elevation']]],
-            'text-font': ['Open Sans Regular', 'Arial Unicode MS Regular'], // Font
-            'text-size': 10, // Text size
-            visibility: 'none', // Initially invisible
+            'text-font': ['Open Sans Regular', 'Arial Unicode MS Regular'],
+            'text-size': 10,
+            visibility: 'none' // This is toggled correctly by the main button
         },
         paint: {
-            'text-color': '#07C327', // Label color
-            'text-halo-color': '#ffffff', // Halo for readability
+            'text-color': '#07C327',
+            'text-halo-color': '#ffffff',
             'text-halo-width': 1,
         }
     });
