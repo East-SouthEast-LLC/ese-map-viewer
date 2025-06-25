@@ -31,54 +31,16 @@
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       
-      /**
-       * Determines the town key (e.g., "chatham") by parsing the referring page's URL.
-       * This allows the same town.html file to be embedded on different Squarespace pages
-       * and automatically load the correct configuration.
-       * @param {object} config - The entire town configuration object.
-       * @returns {string} The key of the matching town (e.g., "barnstable").
-       */
-      function getTownFromReferrer(config) {
-          const referrer = document.referrer; // e.g., "https://www.ese-llc.com/barnstable"
-          
-          // For local testing or direct access, you might use a URL parameter as a backup.
-          const urlParams = new URLSearchParams(window.location.search);
-          const paramTown = urlParams.get('town');
-          if (paramTown && config[paramTown]) {
-              return paramTown;
-          }
+      // Get town from URL query parameter (e.g., ?town=barnstable)
+      const urlParams = new URLSearchParams(window.location.search);
+      // Default to 'chatham' if the parameter is missing or invalid.
+      const townName = urlParams.get('town') || 'chatham'; 
 
-          if (!referrer) {
-              console.warn("No referrer found. Defaulting to Chatham.");
-              return 'chatham'; // Default to Chatham if there's no referrer
-          }
-
-          try {
-              const referrerUrl = new URL(referrer);
-              const path = referrerUrl.pathname; // e.g., "/barnstable" or "/toc"
-
-              // Find the town key (e.g., "chatham") that has a matching path in the config
-              for (const townKey in config) {
-                  if (config[townKey].path === path) {
-                      return townKey;
-                  }
-              }
-          } catch (e) {
-              console.error("Could not parse referrer URL:", e);
-          }
-          
-          // Fallback to Chatham if no path match is found
-          console.warn(`No town config matched the referrer path "${path}". Defaulting to Chatham.`);
-          return 'chatham';
-      }
-
-      // Fetch the master configuration file first
       fetch('https://east-southeast-llc.github.io/ese-map-viewer/docs/town-config.json')
         .then(response => response.json())
         .then(config => {
-          // Determine the current town using the new function
-          const townName = getTownFromReferrer(config);
-          const townConfig = config[townName];
+          // Use the town name from the URL, or default to chatham if not found in config
+          const townConfig = config[townName] || config['chatham'];
 
           document.title = townConfig.townName + " | ESE Map Viewer";
           window.eseMapBaseUrl = townConfig.baseShareUrl;
@@ -179,7 +141,7 @@
         const customPrintBoxHTML = features.customPrint ? '<div id="custom-print-box"></div>' : '';
 
         geocoderContainer.innerHTML += `
-            <!-- First row of control buttons -->
+            <!-- First row -->
             <div> 
               <button class="mapboxgl-ctrl-point" id="pointButton" aria-label="Point" data-tooltip="Drop a point on the map"></button>
               <button class="mapboxgl-ctrl-print" id="printButton" aria-label="Print" data-tooltip="Print map"></button>
@@ -187,7 +149,7 @@
               <button class="mapboxgl-ctrl-legend" id="legendButton" aria-label="Legend" data-tooltip="Show/Hide Legend"></button>
               <button class="mapboxgl-ctrl-ten" id="placeholderButton1" aria-label="Placeholder" data-tooltip="Placeholder"></button>
             </div>
-            <!-- Second row of control buttons -->
+            <!-- Second row -->
             <div> 
               <button class="mapboxgl-ctrl-point-center" id="pointCButton" aria-label="Point Center" data-tooltip="Center the point or centerpoint"></button>
               <button class="mapboxgl-ctrl-parea" id="pareaButton" aria-label="Print Area" data-tooltip="Print Area"></button>
@@ -195,7 +157,7 @@
               <button class="mapboxgl-ctrl-four" id="fourButton" aria-label="four" data-tooltip="Placeholder"></button>
               <button class="mapboxgl-ctrl-sZoom" id="scaleZoom" aria-label="Zoom to Scale" data-tooltip="Zoom to Scale"></button>
             </div>
-            <!-- Third row of control buttons -->
+            <!-- Third row -->
             <div> 
               <button class="mapboxgl-ctrl-point-off" id="pointOffButton" aria-label="Point Off" data-tooltip="Remove the point from the map"></button>
               ${customPrintButtonHTML}
