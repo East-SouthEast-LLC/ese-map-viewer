@@ -6,7 +6,7 @@
   <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
   <script src="https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.js"></script>
   <link href="https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.css" rel="stylesheet" />
-  
+
   <!-- Global CSS files -->
   <link rel="stylesheet" href="https://east-southeast-llc.github.io/ese-map-viewer/css/globals.css?v=3" type="text/css" />
   <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.5.1/mapbox-gl-geocoder.css" type="text/css" />
@@ -33,6 +33,9 @@
     // ========================================================================
     const ESE_TOWN_ID = "chatham"; // <-- Options: "chatham", "barnstable", "harwich"
     // ========================================================================
+
+    // Set the Mapbox access token globally BEFORE any other script runs.
+    mapboxgl.accessToken = 'pk.eyJ1IjoiZXNlLXRvaCIsImEiOiJja2Vhb24xNTEwMDgxMzFrYjVlaTVjOXkxIn0.IsPo5lOndNUc3lDLuBa1ZA';
 
 
     document.addEventListener('DOMContentLoaded', function() {
@@ -128,7 +131,6 @@
               const response = await fetch('https://east-southeast-llc.github.io/ese-map-viewer/docs/town-config.json');
               const config = await response.json();
               
-              // Use the global ID to get the correct configuration.
               const townConfig = config[ESE_TOWN_ID];
               if (!townConfig) {
                   throw new Error(`Town ID "${ESE_TOWN_ID}" not found in configuration.`);
@@ -139,6 +141,7 @@
               
               buildToolkitUI(townConfig.features);
 
+              // Now this will work because the access token is already set.
               const map = new mapboxgl.Map({
                   container: 'map',
                   style: 'mapbox://styles/ese-toh/ckh2ss32s06i119paer9mt67h',
