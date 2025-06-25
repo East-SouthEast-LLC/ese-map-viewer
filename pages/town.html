@@ -63,25 +63,44 @@
           loadControlButtons(townConfig.features);
           loadControls(townConfig.features);
           
-          // --- MODIFIED LOGIC ---
-          // Always load the 'towns' layer script, as it's a default base layer.
+          // Always load the 'towns' layer script as a default base layer.
           loadScript(`https://east-southeast-llc.github.io/ese-map-viewer/docs/layers/towns.js?v=2`);
           
-          // Get the list of layers that should be toggleable in the menu.
           const menuLayerIds = townConfig.layers.filter(id => id !== 'towns');
 
-          // Load the scripts for only the toggleable layers.
+          // --- MODIFIED SCRIPT LOADING LOGIC ---
+          // Use an explicit if/else block for clarity and to handle special cases.
           menuLayerIds.forEach(layerId => {
-            loadScript(`https://east-southeast-llc.github.io/ese-map-viewer/docs/layers/${formatLayerIdForFilename(layerId)}.js?v=2`);
+            let scriptPath = `https://east-southeast-llc.github.io/ese-map-viewer/docs/layers/`;
+            let scriptSrc = '';
+
+            if (layerId === 'parcel highlight') {
+              scriptSrc = `${scriptPath}parcel-highlight.js?v=2`;
+            } else if (layerId === 'lidar contours') {
+              scriptSrc = `${scriptPath}lidar-contours.js?v=2`;
+            } else if (layerId === 'DEP wetland') {
+              scriptSrc = `${scriptPath}depwetland.js?v=2`;
+            } else if (layerId === 'endangered species') {
+              scriptSrc = `${scriptPath}endangered-species.js?v=2`;
+            } else if (layerId === 'zone II') {
+              scriptSrc = `${scriptPath}zoneii.js?v=2`;
+            } else if (layerId === 'conservancy districts') {
+              scriptSrc = `${scriptPath}conservancydistricts.js?v=2`;
+            } else if (layerId === 'sewer plans') {
+              scriptSrc = `${scriptPath}sewer-plans.js?v=2`;
+            } else {
+              // Default case for simple, single-word layer IDs
+              scriptSrc = `${scriptPath}${layerId}.js?v=2`;
+            }
+            loadScript(scriptSrc);
           });
+          // --- END OF MODIFIED LOGIC ---
           
-          // Load and initialize the menu with the filtered list of layers.
           loadScript('https://east-southeast-llc.github.io/ese-map-viewer/docs/toggleable-menu.js?v=2', () => {
               if (window.initializeMenu) {
                   window.initializeMenu(menuLayerIds);
               }
           });
-          // --- END OF MODIFIED LOGIC ---
 
           loadScript('https://east-southeast-llc.github.io/ese-map-viewer/docs/decode-url.js?v=2', () => {
             map.on('load', function () {
@@ -100,10 +119,6 @@
             script.onload = callback;
         }
         document.body.appendChild(script);
-    }
-
-    function formatLayerIdForFilename(layerId) {
-        return layerId.replace(/\s+/g, '-').toLowerCase();
     }
     
     function loadControls(features) {
