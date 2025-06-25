@@ -44,10 +44,7 @@
     <!-- third row of control buttons -->
     <div> 
       <button class="mapboxgl-ctrl-point-off" id="pointOffButton" aria-label="Point Off" data-tooltip="Remove the point from the map"></button>
-      <!-- One of these two buttons will be hidden by the script -->
       <button class="mapboxgl-ctrl-custom-print" id="customPrintButton" aria-label="Custom Print" data-tooltip="Create a custom multi-page printout"></button>
-      <button class="mapboxgl-ctrl-seven" id="customPrintPlaceholder" aria-label="placeholder" style="display: none;"></button>
-      
       <button class="mapboxgl-ctrl-clear" id="clearButton" aria-label="eight" data-tooltip="Clear measurements"></button>
       <button class="mapboxgl-ctrl-nine" id="nineButton" aria-label="nine" data-tooltip="Placeholder"></button>
       <button class="mapboxgl-ctrl-ten" id="tenButton" aria-label="ten" data-tooltip="Placeholder"></button>
@@ -114,15 +111,6 @@
 
               document.title = `${townConfig.townName} | ESE Map Viewer`;
               window.eseMapBaseUrl = townConfig.baseShareUrl;
-              
-              // Toggle visibility of the custom print button based on config
-              if (townConfig.features.customPrint) {
-                  document.getElementById('customPrintButton').style.display = 'block';
-                  document.getElementById('customPrintPlaceholder').style.display = 'none';
-              } else {
-                  document.getElementById('customPrintButton').style.display = 'none';
-                  document.getElementById('customPrintPlaceholder').style.display = 'block';
-              }
 
               const map = new mapboxgl.Map({
                   container: 'map',
@@ -135,14 +123,11 @@
               const geocoder = new MapboxGeocoder({ accessToken: mapboxgl.accessToken, mapboxgl: mapboxgl });
               document.getElementById('geocoder').appendChild(geocoder.onAdd(map));
               
-              // Load all scripts. They will now find their static elements.
+              // Load all scripts. They will now find their static elements correctly.
               const controlScripts = [
-                  'control-button.js', 'control-print.js', 'control-print-area.js',
+                  'control-button.js', 'control-print.js', 'control-custom-print.js', 'control-print-area.js',
                   'control-share.js', 'control-scale.js', 'control-measure.js', 'control-legend.js'
               ];
-              if (townConfig.features.customPrint) {
-                  controlScripts.push('control-custom-print.js');
-              }
               const controlPromises = controlScripts.map(script => loadScript(`https://east-southeast-llc.github.io/ese-map-viewer/docs/${script}?v=3`));
               const layerPromises = townConfig.layers.map(layerId => loadScript(getLayerScriptPath(layerId)));
               

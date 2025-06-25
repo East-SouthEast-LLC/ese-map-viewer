@@ -27,10 +27,7 @@
       "sewer plans",
       "stories",
       "intersection"
-    ],
-    "features": {
-      "customPrint": true
-    }
+    ]
   },
   "barnstable": {
     "townName": "Barnstable",
@@ -59,10 +56,7 @@
       "sewer",
       "stories",
       "intersection"
-    ],
-    "features": {
-      "customPrint": false
-    }
+    ]
   },
   "harwich": {
     "townName": "Harwich",
@@ -91,9 +85,6 @@
         "sewer",
         "stories",
         "intersection"
-    ],
-    "features": {
-      "customPrint": false
-    }
+    ]
   }
 }
