@@ -30,11 +30,9 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      // Get town name from URL query parameter (e.g., ?town=chatham), default to 'chatham'
       const urlParams = new URLSearchParams(window.location.search);
       const townName = urlParams.get('town') || 'chatham'; 
 
-      // Fetch the master configuration file
       fetch('https://east-southeast-llc.github.io/ese-map-viewer/docs/town-config.json')
         .then(response => response.json())
         .then(config => {
@@ -44,12 +42,9 @@
             return;
           }
 
-          // --- Initialize the application based on the loaded configuration ---
-          
           document.title = townConfig.townName + " | ESE Map Viewer";
           window.eseMapBaseUrl = townConfig.baseShareUrl;
 
-          // Initialize the Mapbox map
           mapboxgl.accessToken = 'pk.eyJ1IjoiZXNlLXRvaCIsImEiOiJja2Vhb24xNTEwMDgxMzFrYjVlaTVjOXkxIn0.IsPo5lOndNUc3lDLuBa1ZA';
           const map = new mapboxgl.Map({
             container: 'map',
@@ -57,32 +52,37 @@
             zoom: townConfig.map.zoom,
             center: townConfig.map.center
           });
-          window.map = map; // Make map globally accessible for control scripts
+          window.map = map;
 
-          // Add Geocoder
           const geocoder = new MapboxGeocoder({
             accessToken: mapboxgl.accessToken,
             mapboxgl: mapboxgl
           });
           document.getElementById('geocoder').appendChild(geocoder.onAdd(map));
 
-          // Dynamically load the toolkit buttons and control scripts
           loadControlButtons(townConfig.features);
           loadControls(townConfig.features);
           
-          // Dynamically load all layer scripts specified in the config
-          townConfig.layers.forEach(layerId => {
+          // --- MODIFIED LOGIC ---
+          // Always load the 'towns' layer script, as it's a default base layer.
+          loadScript(`https://east-southeast-llc.github.io/ese-map-viewer/docs/layers/towns.js?v=2`);
+          
+          // Get the list of layers that should be toggleable in the menu.
+          const menuLayerIds = townConfig.layers.filter(id => id !== 'towns');
+
+          // Load the scripts for only the toggleable layers.
+          menuLayerIds.forEach(layerId => {
             loadScript(`https://east-southeast-llc.github.io/ese-map-viewer/docs/layers/${formatLayerIdForFilename(layerId)}.js?v=2`);
           });
           
-          // Load and initialize the toggleable menu once all other scripts are likely loaded
+          // Load and initialize the menu with the filtered list of layers.
           loadScript('https://east-southeast-llc.github.io/ese-map-viewer/docs/toggleable-menu.js?v=2', () => {
               if (window.initializeMenu) {
-                  window.initializeMenu(townConfig.layers);
+                  window.initializeMenu(menuLayerIds);
               }
           });
+          // --- END OF MODIFIED LOGIC ---
 
-          // Load the URL decoder for shared links
           loadScript('https://east-southeast-llc.github.io/ese-map-viewer/docs/decode-url.js?v=2', () => {
             map.on('load', function () {
               applyUrlParams(map);
@@ -93,11 +93,6 @@
         .catch(error => console.error('Error loading town configuration:', error));
     });
 
-    /**
-     * Dynamically loads a script into the document.
-     * @param {string} src - The source URL of the script.
-     * @param {function} [callback] - An optional callback function to run when the script loads.
-     */
     function loadScript(src, callback) {
         const script = document.createElement('script');
         script.src = src;
@@ -107,19 +102,10 @@
         document.body.appendChild(script);
     }
 
-    /**
-     * Formats a layer ID into a valid filename (e.g., "endangered species" -> "endangered-species").
-     * @param {string} layerId - The layer ID from the config file.
-     * @returns {string} A formatted string suitable for a filename.
-     */
     function formatLayerIdForFilename(layerId) {
         return layerId.replace(/\s+/g, '-').toLowerCase();
     }
     
-    /**
-     * Loads the control panel scripts.
-     * @param {object} features - The features object from the town config.
-     */
     function loadControls(features) {
         const controlScripts = [
             'control-button.js', 'control-print.js', 'control-print-area.js',
@@ -133,19 +119,14 @@
         controlScripts.forEach(scriptName => loadScript(`https://east-southeast-llc.github.io/ese-map-viewer/docs/${scriptName}?v=2`));
     }
 
-    /**
-     * Injects the HTML for the control buttons into the geocoder container.
-     * @param {object} features - The features object from the town config.
-     */
     function loadControlButtons(features) {
         const geocoderContainer = document.getElementById('geocoder-container');
         const customPrintButtonHTML = features.customPrint 
             ? '<button class="mapboxgl-ctrl-custom-print" id="customPrintButton" aria-label="Custom Print" data-tooltip="Create a custom multi-page printout"></button>' 
-            : '<button class="mapboxgl-ctrl-seven" aria-label="placeholder"></button>'; // Placeholder if no custom print
+            : '<button class="mapboxgl-ctrl-seven" aria-label="placeholder"></button>';
             
         const customPrintBoxHTML = features.customPrint ? '<div id="custom-print-box"></div>' : '';
 
-        // Note: Using innerHTML for simplicity. For complex applications, creating elements with document.createElement is safer.
         geocoderContainer.innerHTML += `
             <!-- First row of control buttons -->
             <div> 
