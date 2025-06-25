@@ -1,0 +1,68 @@
+{
+  "chatham": {
+    "townName": "Chatham",
+    "baseShareUrl": "https://ese-llc.com/toc",
+    "map": {
+      "center": [-69.991, 41.687],
+      "zoom": 12
+    },
+    "layers": [
+      "satellite",
+      "parcels",
+      "parcel highlight",
+      "lidar-contours",
+      "agis",
+      "historic",
+      "floodplain",
+      "acec",
+      "DEP wetland",
+      "endangered species",
+      "zone II",
+      "soils",
+      "conservancy districts",
+      "zoning",
+      "conservation",
+      "sewer",
+      "sewer plans",
+      "stories",
+      "intersection",
+      "towns"
+    ],
+    "features": {
+      "customPrint": true
+    }
+  },
+  "barnstable": {
+    "townName": "Barnstable",
+    "baseShareUrl": "https://ese-llc.com/barnstable",
+    "map": {
+      "center": [-70.36, 41.660],
+      "zoom": 12
+    },
+    "layers": [
+      "satellite",
+      "parcels",
+      "parcel highlight",
+      "contours",
+      "agis",
+      "historic",
+      "floodplain",
+      "acec",
+      "DEP wetland",
+      "endangered species",
+      "zone II",
+      "soils",
+      "conservancy districts",
+      "zoning",
+      "conservation",
+      "sewer",
+      "sewer plans",
+      "stories",
+      "intersection",
+      "towns"
+    ],
+    "features": {
+      "customPrint": false
+    }
+  }
+}

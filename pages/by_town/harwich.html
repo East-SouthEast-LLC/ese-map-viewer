@@ -1,0 +1,1713 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Show and hide layers</title>
+<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+<script src="https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.js"></script>
+<link href="https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.css" rel="stylesheet" />
+
+<style>
+	body { margin: 0; padding: 0; }
+	#map { position: relative; margin-top: -590px; border:none; top: 0; left 0; height: 80vh; width: 95vw; }
+	#geocoder { position: relative; top: -50; left: 0; width: 80px;}
+	#ScaleControl { position: relative; top: 0; left: 0; width: 80px;}
+</style>
+</head>
+<body>
+
+<script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.5.1/mapbox-gl-geocoder.min.js"></script>
+<link
+rel="stylesheet"
+href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.5.1/mapbox-gl-geocoder.css"
+type="text/css"
+/>
+<!-- Promise polyfill script required to use Mapbox GL Geocoder in IE 11 -->
+<script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.auto.min.js"></script>
+<style>
+#menu {
+background: #fff;
+position: relative;
+z-index: 1;
+top: 0px;
+left: 0px;
+border-radius: 3px;
+width: 144px;
+border: 1px solid rgba(0, 0, 0, 0.4);
+font-family: 'Open Sans', sans-serif;
+}
+#menu a {
+font-size: 13px;
+color: #404040;
+display: block;
+margin: 0;
+padding: 0;
+padding: 1px;
+text-decoration: none;
+border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+text-align: center;
+}
+#menu a:last-child {
+border: none;
+}
+#menu a:hover {
+background-color: #f8f8f8;
+color: #404040;
+}
+#menu a.active {
+background-color: #3887be;
+color: #ffffff;
+}
+#menu a.active:hover {
+background: #3074a4;
+}
+</style>
+<nav id="menu"></nav>
+<div id="map"></div>
+<div id="geocoder"></div>
+
+
+
+<script>
+	mapboxgl.accessToken = 'pk.eyJ1IjoiZXNlLXRvaCIsImEiOiJja2Vhb24xNTEwMDgxMzFrYjVlaTVjOXkxIn0.IsPo5lOndNUc3lDLuBa1ZA';
+var map = new mapboxgl.Map({
+container: 'map',
+style: 'mapbox://styles/ese-toh/ckh2ss32s06i119paer9mt67h',
+zoom: 11.75,
+center: [-70.06, 41.69]
+});
+
+
+// satellite
+map.on('load', function() {
+// add source and layer for raster
+map.addSource('satellite', {
+type: 'raster',
+url: 'mapbox://mapbox.satellite'
+});
+map.addLayer({
+'id': 'satellite',
+'type': 'raster',
+'source': 'satellite',
+'layout': {
+// make layer visible by default
+'visibility': 'none'
+},
+'source-layer': 'satellite'
+});
+});
+
+// contours
+map.on('load', function() {
+map.addSource('contours', {
+type: 'vector',
+url: 'mapbox://ese-toh.djcjlqsr'
+});
+map.addLayer({
+'id': 'contours',
+'type': 'line',
+'source': 'contours',
+'source-layer': 'CONT-ELBOW-9gwgnx',
+'layout': {
+// make layer invisible by default
+'visibility': 'none',
+'line-join': 'round',
+'line-cap': 'round'
+//'symbol-placement': 'line',
+//'text-field': ['concat', ['to-string', ['get', 'Elevation']], 'ft']
+},
+'paint': {
+'line-color': [
+	'match',
+	['get', 'Elevation'],
+	'-2', //
+	'#08ADEF',
+	/* other */ '#07C327'
+	],
+'line-width': 0.5
+}
+});
+});
+const popup = new mapboxgl.Popup({
+closeButton: false,
+closeOnClick: false
+});
+//        map.on('click', 'contours', function (e) {
+//          new mapboxgl.Popup()
+//            .setLngLat(e.lngLat)
+//            .setHTML('<strong>'+e.features[0].properties.Elevation + '</strong><br>')
+//            .addTo(map);
+//     //(e.features[0].properties.PID + " - " + e.features[0].properties.LINK)  <strong>97 Tilipi Run</strong><p>Parcel ID:14A3-2-B<p>
+//    });
+    // Change the cursor to a pointer when the mouse is over the states layer.
+    map.on('mouseenter', 'contours', function (e) {
+        map.getCanvas().style.cursor = 'pointer';
+		// Copy coordinates array.
+		const coordinates = (e.lngLat);
+		const description = e.features[0].properties.Elevation;
+		popup.setLngLat(coordinates).setHTML(description).addTo(map);
+    });
+    map.on('mouseleave', 'contours', function () {
+        map.getCanvas().style.cursor = '';
+	//	popup.remove();
+    });
+
+// historic
+map.on('load', function() {
+map.addSource('historic', {
+type: 'vector',
+url: 'mapbox://ese-toh.90pe1azb'
+});
+map.addLayer({
+'id': 'historic',
+'type': 'fill',
+'source': 'historic',
+'source-layer': 'TOC_Historic-d4lyva',
+'layout': {
+// make layer invisible by default
+'visibility': 'none'
+},
+'paint': {
+'fill-color': [
+	'match',
+	['get', 'Status'],
+	'Proposed',
+	'#F2BD67',
+	'1024-0018',
+	'#D75F48',
+	/* other */ '#5c580f'
+	],
+'fill-opacity': 0.4
+}
+});
+});
+        map.on('click', 'historic', function (e) {
+             new mapboxgl.Popup()
+            .setLngLat(e.lngLat)
+            .setHTML("Historic District: "+e.features[0].properties.District +'<br>' +"Status / Reference: "+'<strong>'+e.features[0].properties.Status + '</strong><br>' +
+"Documentation: "+'<a href=\"'+ e.features[0].properties.URL +'" target="_blank"><b><u>Link to Document</u></b></a>')
+            .addTo(map);
+     //(e.features[0].properties.PID + " - " + e.features[0].properties.LINK)  <strong>97 Tilipi Run</strong><p>Parcel ID:14A3-2-B<p>
+    });
+    map.on('mouseenter', 'historic', function () {
+        map.getCanvas().style.cursor = 'pointer';
+    });
+    map.on('mouseleave', 'historic', function () {
+        map.getCanvas().style.cursor = '';
+    });
+
+// acec
+map.on('load', function() {
+map.addSource('acec', {
+type: 'vector',
+url: 'mapbox://ese-toh.2wnv388a'
+});
+map.addLayer({
+'id': 'acec',
+'type': 'fill',
+'source': 'acec',
+'source-layer': 'ACEC-2023-02-26-4wucwh',
+'layout': {
+// make layer invisible by default
+'visibility': 'none'
+},
+'paint': {
+'fill-color': '#CD06D8',
+'fill-opacity': 0.35
+}
+});
+});
+        map.on('click', 'acec', function (e) {
+             new mapboxgl.Popup()
+            .setLngLat(e.lngLat)
+            .setHTML("Area of Critical Environmental Concern: "+'<strong>'+e.features[0].properties.NAME +'</strong><br>'+"DEP ACEC Designation: "+'<a href=\"'+ e.features[0].properties.LINK +'" target="_blank"><b><u>Link to Document</u></b></a>')
+            .addTo(map);
+     //(e.features[0].properties.PID + " - " + e.features[0].properties.LINK)  <strong>97 Tilipi Run</strong><p>Parcel ID:14A3-2-B<p>
+    });
+    map.on('mouseenter', 'acec', function () {
+        map.getCanvas().style.cursor = 'pointer';
+    });
+    map.on('mouseleave', 'acec', function () {
+        map.getCanvas().style.cursor = '';
+    });
+
+
+// zone II
+map.on('load', function() {
+map.addSource('zone II', {
+type: 'vector',
+url: 'mapbox://ese-toh.9xot04xz'
+});
+map.addLayer({
+'id': 'zone II',
+'type': 'fill',
+'source': 'zone II',
+'source-layer': 'zoneII-01dowh',
+'layout': {
+// make layer invisible by default
+'visibility': 'none'
+},
+'paint': {
+'fill-color': '#2758d6',
+'fill-opacity': 0.4
+}
+});
+});
+        map.on('click', 'zone II', function (e) {
+             new mapboxgl.Popup()
+            .setLngLat(e.lngLat)
+            .setHTML("Zone II number: "+'<strong>'+e.features[0].properties.ZII_NUM + '</strong><br>' + "Water Supplier: "+'<strong>'+e.features[0].properties.SUPPLIER + '</strong><br>' + "Town: "+'<strong>'+e.features[0].properties.TOWN + '</strong><br>')
+            .addTo(map);
+     //(e.features[0].properties.PID + " - " + e.features[0].properties.LINK)  <strong>97 Tilipi Run</strong><p>Parcel ID:14A3-2-B<p>
+    });
+    map.on('mouseenter', 'zone II', function () {
+        map.getCanvas().style.cursor = 'pointer';
+    });
+    map.on('mouseleave', 'zone II', function () {
+        map.getCanvas().style.cursor = '';
+    });
+
+// towns
+map.on('load', function() {
+map.addSource('towns', {
+type: 'vector',
+url: 'mapbox://ese-toh.9kac7735'
+});
+map.addLayer({
+'id': 'towns',
+'type': 'line',
+'source': 'towns',
+'source-layer': 'TOWNS-d0onvn',
+'layout': {
+// make layer invisible by default
+'visibility': 'visible'
+},
+'paint': {
+'line-color': '#08f8fc',
+'line-width': 1
+},
+});
+});
+map.on('load', function() {
+map.addSource('priority habitat', {
+type: 'vector',
+url: 'mapbox://ese-toh.256zd2fn'
+});
+map.addLayer({
+'id': 'priority habitat',
+'type': 'fill',
+'source': 'priority habitat',
+'source-layer': 'nhesp-prihab-bajnd6',
+'layout': {
+// make layer invisible by default
+'visibility': 'none'
+},
+'paint': {
+'fill-color': '#1DB708',
+'fill-opacity': 0.3
+}
+});
+});
+        map.on('click', 'priority habitat', function (e) {     
+          new mapboxgl.Popup()
+            .setLngLat(e.lngLat)
+            .setHTML("Priority Habitat ID: "+'<strong>'+e.features[0].properties.PRIHAB_ID + '</strong><br>' )
+            .addTo(map);
+     //(e.features[0].properties.PID + " - " + e.features[0].properties.LINK)  <strong>97 Tilipi Run</strong><p>Parcel ID:14A3-2-B<p>
+    });
+    map.on('mouseenter', 'priority habitat', function () {
+        map.getCanvas().style.cursor = 'pointer';
+    });
+    map.on('mouseleave', 'priority habitat', function () {
+        map.getCanvas().style.cursor = '';
+    });
+
+// estimated habitat
+map.on('load', function() {
+map.addSource('estimated habitat', {
+type: 'vector',
+url: 'mapbox://ese-toh.5x0ao54p'
+});
+map.addLayer({
+'id': 'estimated habitat',
+'type': 'fill',
+'source': 'estimated habitat',
+'source-layer': 'nhesp-esthab-c8ow5w',
+'layout': {
+// make layer invisible by default
+'visibility': 'none'
+},
+'paint': {
+'fill-color': '#A28F06',
+'fill-opacity': 0.3
+}
+});
+});
+        map.on('click', 'estimated habitat', function (e) {   
+          new mapboxgl.Popup()
+            .setLngLat(e.lngLat)
+            .setHTML("Estimated Habitat ID: "+'<strong>'+e.features[0].properties.ESTHAB_ID + '</strong><br>' )
+            .addTo(map);
+     //(e.features[0].properties.PID + " - " + e.features[0].properties.LINK)  <strong>97 Tilipi Run</strong><p>Parcel ID:14A3-2-B<p>
+    });
+    map.on('mouseenter', 'estimated habitat', function () {
+        map.getCanvas().style.cursor = 'pointer';
+    });
+    map.on('mouseleave', 'estimated habitat', function () {
+        map.getCanvas().style.cursor = '';
+    });
+
+// vernal pools
+map.on('load', function() {
+map.addSource('vernal pools', {
+type: 'vector',
+url: 'mapbox://ese-toh.7p4glkq9'
+});
+map.addLayer({
+'id': 'vernal pools',
+'type': 'circle',
+'source': 'vernal pools',
+'source-layer': 'nhesp-cvp-5xj2xr',
+'layout': {
+// make layer invisible by default
+'visibility': 'none'
+},
+'paint': {
+'circle-color': '#0D71F9',
+'circle-radius': {
+'base': 1.5,
+'stops': [
+[12, 3],
+[22, 180]
+]
+}
+}
+});
+});
+      map.on('click', 'vernal pools', function (e) {  
+          new mapboxgl.Popup()
+            .setLngLat(e.lngLat)
+            .setHTML("Vernal Pool ID: "+'<strong>'+e.features[0].properties.cvp_num + '</strong><br>' )
+            .addTo(map);
+     //(e.features[0].properties.PID + " - " + e.features[0].properties.LINK)  <strong>97 Tilipi Run</strong><p>Parcel ID:14A3-2-B<p>
+    });
+    map.on('mouseenter', 'vernal pools', function () {
+        map.getCanvas().style.cursor = 'pointer';
+    });
+    map.on('mouseleave', 'vernal pools', function () {
+        map.getCanvas().style.cursor = '';
+    });
+
+// soils 
+map.on('load', function() {
+map.addSource('soils', {
+type: 'vector',
+url: 'mapbox://ese-toh.5udsb6bq'
+});
+map.addLayer({
+'id': 'soils',
+'type': 'fill',
+'source': 'soils',
+'source-layer': 'SOI_BARN-ae2ugp',
+'layout': {
+'visibility': 'none'
+},
+'paint': {
+'fill-opacity': [
+	'match',
+	['get', 'SLOPE'],
+	'0',
+	0.6,
+	'A',
+	0.45,
+	'B',
+	0.50,
+	'C',
+	0.55,
+	'D',
+	0.60,
+	/* other */ 0.04
+	],
+'fill-color': [
+	'match',
+	['get', 'MUSYM'],
+	'258A',
+	'#C88F0D',
+	'430B',
+	'#EAE23B',
+	'430C',
+	'#FFE60A',
+	'431B',
+	'#EBEE1E',
+	'431C',
+	'#EBEE1E',
+	'432D',
+	'#EBEE1E',
+	'485C',
+	'#EEF108',
+	'488C',
+	'#E4E65A',
+	'489C',
+	'#E4E65A',
+	'490C',
+	'#E4E65A',
+	'494C',
+	'#E4E65A',
+	'610',
+	'#EEEF89',
+	'225B',
+	'#BC8A26',
+	'11A',
+	'#444F61',
+	'220A',
+	'#BA7E06',
+	'220B',
+	'#BA7E06',
+	'259A',
+	'#F6EE2E',
+	'259B',
+	'#F6EE2E',
+	'252A',
+	'#F5E663',
+	'252B',
+	'#F5E663',
+	'252C',
+	'#F5E663',
+	'252D',
+	'#F5E663',
+	'263B',
+	'#f5b73b',
+	'263C',
+	'#f5b73b',
+	'263D',
+	'#f5b73b',
+	'256A',
+	'#edd768',
+	'652',
+	'#8c8a80',
+	'611',
+	'#fdff99',
+	'264A',
+	'#f0f26f',
+	'264B',
+	'#f0f26f',
+	'264C',
+	'#f0f26f',
+	'264D',
+	'#f0f26f',
+	'265A',
+	'#dee046',
+	'265B',
+	'#dee046',
+	'265C',
+	'#dee046',
+	'52A',
+	'#272D4B',
+	'54A',
+	'#211F56',
+	'55A',
+	'#5F5E6D',
+	'253A',
+	'#e3dc81',
+	'253B',
+	'#e3dc81',
+	'242C',
+	'#e3dc81',
+	'242D',
+	'#e3dc81',
+	'226A',
+	'#9e951c',
+	'226B',
+	'#9e951c',
+	'226C',
+	'#9e951c',
+	'612C',
+	'#c9c973',
+	'612D',
+	'#c9c973',
+	'613C',
+	'#e0e094',
+	'66A',
+	'#484679',
+	'12A',
+	'#131230',
+	'13A',
+	'#524670',
+	'254A',
+	'#c2b91d',
+	'254B',
+	'#c2b91d',
+	'254C',
+	'#c2b91d',
+	'254D',
+	'#c2b91d',
+	'245A',
+	'#c2b91d',
+	'245B',
+	'#c2b91d',
+	'245C',
+	'#c2b91d',
+	'245D',
+	'#c2b91d',
+	'299',
+	'#f2e6a7',
+	'299A',
+	'#f2e6a7',
+	'299B',
+	'#f2e6a7',
+	'299C',
+	'#f2e6a7',
+	'299D',
+	'#f2e6a7',
+	'380B',
+	'#807c69',
+	'380C',
+	'#807c69',
+	'381B',
+	'#6e6d67',
+	'381C',
+	'#6e6d67',
+	'38A',
+	'#412D70',
+	'600',
+	'#d1cebe',
+	'435A',
+	'#f5ef98',
+	'435B',
+	'#f5ef98',
+	'435C',
+	'#f5ef98',
+	'435D',
+	'#f5ef98',
+	'436B',
+	'#f3f7a8',
+	'436C',
+	'#f3f7a8',
+	'436D',
+	'#f3f7a8',
+	'483C',
+	'#f2f196',
+	'483D',
+	'#f2f196',
+	'484C',
+	'#f2e796',
+	'484D',
+	'#f2e796',
+	'493D',
+	'#b5b18f',
+	'14A',
+	'#6A8195',
+	'269A',
+	'#d1c877',
+	'665',
+	'#e3e1cc',
+	'602',
+	'#45443f',
+	'21A',
+	'#355D7E',
+	'1',
+	'#378df0',
+	'607',
+	'#2872bd',
+	'608',
+	'#76ace3',
+	'53A',
+	'#323538',
+	'260A',
+	'#323538',
+	'431D',
+	'#787437',
+	/* other */ '#273613'
+	],
+        },
+});
+});
+        map.on('click', 'soils', function (e) {
+          new mapboxgl.Popup()
+            .setLngLat(e.lngLat)
+            .setHTML("Numeric State Legend: "+'<strong>'+e.features[0].properties.MUSYM + '</strong><br>' + "Published Map Unit: "+'<strong>'+e.features[0].properties.MUS_TXT + '</strong><br>' + '<strong>'+e.features[0].properties.MUS_DESC + '</strong><br>' )
+            .addTo(map);
+     //(e.features[0].properties.PID + " - " + e.features[0].properties.LINK)  <strong>97 Tilipi Run</strong><p>Parcel ID:14A3-2-B<p>
+    });
+    map.on('mouseenter', 'soils', function () {
+        map.getCanvas().style.cursor = 'pointer';
+    });
+    map.on('mouseleave', 'soils', function () {
+        map.getCanvas().style.cursor = '';
+    });
+
+// DEP wetland
+map.on('load', function() {
+map.addSource('DEP wetland', {
+type: 'vector',
+url: 'mapbox://ese-toh.75g1xaec'
+});
+map.addLayer({
+'id': 'DEP wetland',
+'type': 'fill',
+'source': 'DEP wetland',
+'source-layer': 'BARNSTABLEwetlandsDEP_POLY-arr54b',
+'layout': {
+'visibility': 'none'
+},
+'paint': {
+'fill-opacity': [
+	'match',
+	['get', 'IT_VALC'],
+	'BA',
+	0.5,
+	'BB',
+	0.4,
+	'BB-BE',
+	0.4,
+	'BB-D',
+	0.4,
+	'BB-M',
+	0.4,
+	'BB-OW',
+	0.4,
+	'BB-SM',
+	0.6,
+	'BB-SS',
+	0.6,
+	'BB-WS1',
+	0.6,
+	'BB-WS2',
+	0.6,
+	'BE',
+	0.4,
+	'BG',
+	0.5,
+	'CB',
+	0.5,
+	'D',
+	0.4,
+	'DM',
+	0.5,
+	'M',
+	0.4,
+	'OW',
+	0.4,
+	'RS',
+	0.4,
+	'SM',
+	0.4,
+	'SS',
+	0.4,
+	'TF',
+	0.5,
+	'WS1',
+	0.5,
+	'WS2',
+	0.6,
+	'WS3',
+	0.6,
+	/* other */ 0.001
+	],
+'fill-color': [
+	'match',
+	['get', 'IT_VALC'],
+	'BA',
+	'#F7F124',
+	'BB',
+	'#DCD609',
+	'BB-BE',
+	'#D0D041',
+	'BB-D',
+	'#99F108',
+	'BB-M',
+	'#24AF0B',
+	'BB-OW',
+	'#1BB5CA',
+	'BB-SM',
+	'#24AF0B',
+	'BB-SS',
+	'#32D34F',
+	'BB-WS1',
+	'#1F9A35',
+	'BB-WS2',
+	'#056828',
+	'BE',
+	'#D7E00F',
+	'BG',
+	'#0C9955',
+	'CB',
+	'#BB0418',
+	'D',
+	'#99F108',
+	'DM',
+	'#056A56',
+	'M',
+	'#26A04E',
+	'OW',
+	'#2B8ACB',
+	'RS',
+	'#B5C0C8',
+	'SM',
+	'#389C3F',
+	'SS',
+	'#24CF31',
+	'TF',
+	'#F3F4CC',
+	'WS1',
+	'#1F9A35',
+	'WS2',
+	'#056828',
+	'WS3',
+	'#448842',
+	/* other */ '#5c580f'
+	],
+        },
+});
+});
+        map.on('click', 'DEP wetland', function (e) {
+          new mapboxgl.Popup()
+            .setLngLat(e.lngLat)
+            .setHTML("Wetland Identifier: "+'<strong>'+e.features[0].properties.IT_VALDESC + '</strong><br>' +
+"Wetland Code: "+'<strong>'+e.features[0].properties.IT_VALC + '</strong><br>' )
+            .addTo(map);
+     //(e.features[0].properties.PID + " - " + e.features[0].properties.LINK)  <strong>97 Tilipi Run</strong><p>Parcel ID:14A3-2-B<p>
+    });
+    map.on('mouseenter', 'DEP wetland', function () {
+        map.getCanvas().style.cursor = 'pointer';
+    });
+    map.on('mouseleave', 'DEP wetland', function () {
+        map.getCanvas().style.cursor = '';
+    });
+
+// DEP wetland line
+map.on('load', function() {
+map.addSource('DEP wetland line', {
+type: 'vector',
+url: 'mapbox://ese-toh.2zhgmmx7'
+});
+map.addLayer({
+'id': 'DEP wetland line',
+'type': 'line',
+'source': 'DEP wetland line',
+'source-layer': 'BARNSTABLEwetlandsDEP_ARC-1hjeg7',
+'layout': {
+// make layer invisible by default
+'visibility': 'none',
+'line-join': 'round',
+'line-cap': 'round'
+},
+'paint': {
+'line-color': [
+	'match',
+	['get', 'ARC_CODE'],
+	'0', //EDGE OF OCEAN
+	'#08ADEF',
+	'1', //SHORELINE
+	'#EBF90A',
+	'2', //CLOSURE
+	'#EBECDD',
+	'3', //APPARENT WETLAND LIMIT
+	'#F2A5EF',
+	'7', //HYDRO CONNECTION
+	'#0B11F0',
+	'8', //MLW
+	'#5E87ED',
+	'88', //EDGE INTERUPTED
+	'#5EE1ED',
+	/* other */ '#ff0000'
+	],
+'line-width': {
+'base': 2.0,
+'stops': [
+[12, 2],
+[22, 5]
+]
+},
+}
+});
+});
+        map.on('click', 'DEP wetland line', function (e) {
+          new mapboxgl.Popup()
+            .setLngLat(e.lngLat)
+            .setHTML("Wetland Identifier: "+'<strong>'+e.features[0].properties.ARC_CODE_D + '</strong><br>')
+            .addTo(map);
+     //(e.features[0].properties.PID + " - " + e.features[0].properties.LINK)  <strong>97 Tilipi Run</strong><p>Parcel ID:14A3-2-B<p>
+    });
+    map.on('mouseenter', 'DEP wetland line', function () {
+        map.getCanvas().style.cursor = 'pointer';
+    });
+    map.on('mouseleave', 'DEP wetland line', function () {
+        map.getCanvas().style.cursor = '';
+    });
+
+// LiMWA
+map.on('load', function() {
+	map.addSource('LiMWA', {
+		type: 'vector',
+		url: 'mapbox://ese-toh.7h5nwda9'
+	});
+	map.addLayer({
+		'id': 'LiMWA',
+		'type': 'line',
+		'source': 'LiMWA',
+		'source-layer': 'LiMWA-dtmi75',
+		'layout': {
+			'visibility': 'none'
+//			'line-join': 'round',
+//			'line-cap': 'round'
+		},
+		'paint': {
+			'line-color': '#E70B0B',
+			'line-width': 3.0
+		},
+});
+	map.addSource('floodplain', {
+		type: 'vector',
+		url: 'mapbox://ese-toh.a7lml4y4'
+	});
+
+	map.addLayer({
+		'id': 'floodplain',
+		'type': 'fill',
+		'source': 'floodplain',
+		'source-layer': '25001c-2014-c2ck89',
+		'layout': {
+			'visibility': 'none'
+		},
+		'paint': {
+			'fill-opacity': [
+				'match',
+				['get', 'ZONE_SUBTY'],
+				'0.2 PCT ANNUAL CHANCE FLOOD HAZARD', 0.4,
+				'AREA OF MINIMAL FLOOD HAZARD', 0.001,
+				/* other */ 0.4
+			],
+			'fill-color': [
+				'match',
+				['get', 'FLD_ZONE'],
+				'AE', '#eb8c34',
+				'VE', '#eb3a34',
+				'AO', '#F7FE20',
+				'X', '#2578F9',
+				'A', '#2e4bf0',
+				/* other */ '#ff0000'
+			],
+        },
+});
+});
+   map.on('click', 'floodplain', function (e) {
+        new mapboxgl.Popup()
+            .setLngLat(e.lngLat)
+            .setHTML("Flood Zone: "+'<strong>'+e.features[0].properties.FLD_ZONE + '</strong><br>' +
+"Elevation:"+'<strong>'+e.features[0].properties.STATIC_BFE + '</strong><br>' + '<br>' + "The thick red line is the LiMWA.")
+            .addTo(map);
+     //(e.features[0].properties.PID + " - " + e.features[0].properties.LINK)  <strong>97 Tilipi Run</strong><p>Parcel ID:14A3-2-B<p>
+    });
+    map.on('mouseenter', 'floodplain', function () {
+        map.getCanvas().style.cursor = 'pointer';
+    });
+    map.on('mouseleave', 'floodplain', function () {
+        map.getCanvas().style.cursor = '';
+    });
+
+// parcels
+map.on('load', function() {
+map.addSource('parcels', {
+type: 'vector',
+url: 'mapbox://ese-toh.5ehygl9z'
+});
+map.addLayer({
+'id': 'parcels',
+'type': 'fill',
+'source': 'parcels',
+'source-layer': 'CC-2020-11-02-c73syu',
+'layout': {
+// make layer invisible by default
+'visibility': 'none'
+},
+'paint': {
+'fill-opacity': 0.1,
+'fill-color': '#FEFEFE',
+'fill-outline-color': '#000000'
+},
+});
+});
+        map.on('click', 'parcels', function (e) {
+          new mapboxgl.Popup()
+            .setLngLat(e.lngLat)
+            .setHTML("Address: "+'<strong>'+e.features[0].properties.ADDRESS + '</strong><br>' +
+"Webpage: "+'<a href=\"'+ e.features[0].properties.URL +'" target="_blank"><b><u>Link to Page</u></b></a>')
+            .addTo(map);
+     //(e.features[0].properties.PID + " - " + e.features[0].properties.LINK)  <strong>97 Tilipi Run</strong><p>Parcel ID:14A3-2-B<p>
+    });
+    map.on('mouseenter', 'parcels', function () {
+        map.getCanvas().style.cursor = 'pointer';
+    });
+    map.on('mouseleave', 'parcels', function () {
+        map.getCanvas().style.cursor = '';
+    });
+
+// conservancy districts
+map.on('load', function() {
+map.addSource('conservancy districts', {
+type: 'vector',
+url: 'mapbox://ese-toh.7jk998tu'
+});
+map.addLayer({
+'id': 'conservancy districts',
+'type': 'fill',
+'source': 'conservancy districts',
+'source-layer': 'CONS_DIST-2updta',
+'layout': {
+// make layer invisible by default
+'visibility': 'none'
+},
+'paint': {
+'fill-opacity': 0.4,
+'fill-color': [
+	'match',
+	['get', 'CONS_TYPE'],
+	'BOG',
+	'#239607',
+	'DITCH',
+	'#072483',
+	'MARSH',
+	'#4FD33F',
+	'SWAMP',
+	'#21A546',
+	'WATER',
+	'#18A7AA',
+	/* other */ '#ff0000'
+	],
+'fill-outline-color': '#257618'
+}
+});
+});
+        map.on('click', 'conservancy districts', function (e) {
+          new mapboxgl.Popup()
+            .setLngLat(e.lngLat)
+            .setHTML("Conservancy District: " + '<strong>'+e.features[0].properties.CONS_DIST + '</strong><br>' +
+'<br>' +
+e.features[0].properties.CONS_DIST + " Elevation: "+'<strong>'+e.features[0].properties.CONS_ELEV+" "+e.features[0].properties.CONS_DATUM+'</strong><br>' +
+e.features[0].properties.CONS_DIST + " Water Elevation: "+'<strong>'+e.features[0].properties.WATER_ELEV+" "+e.features[0].properties.CONS_DATUM+'</strong><br>' +
+'<br>' +
+"Conservancy District Contour: " +'<strong>'+e.features[0].properties.CONT_NAVD+" "+e.features[0].properties.CONV_DATUM + '</strong><br>'+ '<br>'+
+"Description: "+e.features[0].properties.CONS_DESC)
+            .addTo(map);
+    });
+    map.on('mouseenter', 'conservancy districts', function () {
+        map.getCanvas().style.cursor = 'pointer';
+    });
+    map.on('mouseleave', 'conservancy districts', function () {
+        map.getCanvas().style.cursor = '';
+    });
+
+// zoning
+map.on('load', function() {
+map.addSource('zoning', {
+type: 'vector',
+url: 'mapbox://ese-toh.axftqzuv'
+});
+map.addLayer({
+'id': 'zoning',
+'type': 'fill',
+'source': 'zoning',
+'source-layer': 'Zoning-3yb43g',
+'layout': {
+// make layer invisible by default
+'visibility': 'none'
+},
+'paint': {
+'fill-opacity': 0.4,
+'fill-color': [
+	'match',
+	['get', 'TOWNCODE'],
+//nps
+	'RC3',
+	'#f1f748',
+	'F',
+	'#f1f748',
+	'NSP',
+	'#f1f748',
+	'S',
+	'#f1f748',
+	'SC',
+	'#f1f748',
+	'SS',
+	'#f1f748',
+//municipal
+	'M',
+	'#60cccc',
+	'M/C',
+	'#4ed130',
+//residential
+	'R20',
+	'#72a5ed',
+	'R20A',
+	'#5877bf',
+	'R25',
+	'#877613',
+	'R30',
+	'#3d4eeb',
+	'R40',
+	'#2c97d1',
+	'R40A',
+	'#4836cf',
+	'R60',
+	'#842cd1',
+	'R80',
+	'#877613',
+//industrial
+	'I',
+	'#5f6069',
+//business
+	'GB1',
+	'#ab5c46',
+	'GB2',
+	'#c24a29',
+	'GB3',
+	'#a32807',
+	'SB',
+	'#d97b09',
+//to be sorted
+	'A',
+	'#bdad55',
+	'B',
+	'#bdad55',
+	'B1',
+	'#bdad55',
+	'B2',
+	'#21A546',
+	'B3',
+	'#bdad55',
+	'B4',
+	'#bdad55',
+	'BL-1',
+	'#bdad55',
+	'BL-2',
+	'#bdad55',
+	'C',
+	'#bdad55',
+	'C1',
+	'#bdad55',
+	'C2',
+	'#bdad55',
+	'C3',
+	'#bdad55',
+	'CD',
+	'#bdad55',
+	'CH',
+	'#21A546',
+	'CH1',
+	'#bdad55',
+	'CH2',
+	'#bdad55',
+	'CV',
+	'#bdad55',
+	'D',
+	'#bdad55',
+	'E',
+	'#bdad55',
+	'EB',
+	'#bdad55',
+	'FLEX',
+	'#bdad55',
+	'G',
+	'#bdad55',
+	'GB',
+	'#bdad55',
+	'GC',
+	'#bdad55',
+	'GC I',
+	'#bdad55',
+	'GC II',
+	'#bdad55',
+	'GC III',
+	'#bdad55',
+	'GD',
+	'#bdad55',
+	'H',
+	'#bdad55',
+	'HB',
+	'#bdad55',
+	'HD',
+	'#bdad55',
+	'HG',
+	'#bdad55',
+	'HO',
+	'#bdad55',
+	'HVB',
+	'#bdad55',
+	'I1',
+	'#bdad55',
+	'IL',
+	'#bdad55',
+	'IN',
+	'#bdad55',
+	'IND',
+	'#bdad55',
+	'IND L',
+	'#bdad55',
+	'LB',
+	'#bdad55',
+	'LI',
+	'#bdad55',
+	'MAR',
+	'#bdad55',
+	'MB',
+	'#bdad55',
+	'MB-A1',
+	'#bdad55',
+	'MB-A2',
+	'#bdad55',
+	'MB-B',
+	'#bdad55',
+	'MRD',
+	'#bdad55',
+	'MRL',
+	'#bdad55',
+	'MRL1',
+	'#bdad55',
+	'MS',
+	'#bdad55',
+	'MU',
+	'#bdad55',
+	'NZ',
+	'#bdad55',
+	'OM',
+	'#bdad55',
+	'R',
+	'#bdad55',
+	'R1',
+	'#bdad55',
+	'R-1',
+	'#bdad55',
+	'R2',
+	'#bdad55',
+	'R-2',
+	'#bdad55',
+	'R3',
+	'#bdad55',
+	'R5',
+	'#bdad55',
+	'R87',
+	'#bdad55',
+	'RA',
+	'#bdad55',
+	'RAH',
+	'#bdad55',
+	'RB',
+	'#bdad55',
+	'RC',
+	'#bdad55',
+	'RC-1',
+	'#bdad55',
+	'RC-2',
+	'#bdad55',
+	'RD',
+	'#bdad55',
+	'RD-1',
+	'#bdad55',
+	'Res1',
+	'#bdad55',
+	'Res2',
+	'#bdad55',
+	'Res3',
+	'#bdad55',
+	'ResB',
+	'#bdad55',
+	'RF',
+	'#bdad55',
+	'RF-1',
+	'#bdad55',
+	'RF-2',
+	'#bdad55',
+	'RG',
+	'#bdad55',
+	'RH1',
+	'#bdad55',
+	'RH2',
+	'#bdad55',
+	'RH3',
+	'#bdad55',
+	'RL',
+	'#bdad55',
+	'RM',
+	'#bdad55',
+	'RR',
+	'#bdad55',
+	'RS40',
+	'#bdad55',
+	'S&D',
+	'#bdad55',
+	'SD-1',
+	'#bdad55',
+	'SDD',
+	'#bdad55',
+	'SF',
+	'#bdad55',
+	'TCC',
+	'#bdad55',
+	'TD',
+	'#bdad55',
+	'UB',
+	'#bdad55',
+	'VB',
+	'#bdad55',
+	'VB-A',
+	'#bdad55',
+	'VB-B',
+	'#bdad55',
+	'VC',
+	'#bdad55',
+	/* other */ '#ff0000'
+	],
+'fill-outline-color': '#257618'
+}
+});
+});
+        map.on('click', 'zoning', function (e) {
+          new mapboxgl.Popup()
+            .setLngLat(e.lngLat)
+            .setHTML("Zoning District: " + '<strong>'+e.features[0].properties.TOWNCODE + '</strong><br>' +
+'<br>' + "Check with the Town Clerk or Planning Department." + '<br>' + '<strong>' + "This layer is from 2004" + '</strong>')
+            .addTo(map);
+    });
+    map.on('mouseenter', 'zoning', function () {
+        map.getCanvas().style.cursor = 'pointer';
+    });
+    map.on('mouseleave', 'zoning', function () {
+        map.getCanvas().style.cursor = '';
+    });
+
+// agis
+map.on('load', function() {
+map.addSource('agis', {
+type: 'vector',
+url: 'mapbox://ese-toh.chkrbtah'
+});
+map.addLayer({
+'id': 'agis',
+'type': 'fill',
+'source': 'agis',
+'source-layer': 'aGIS-6x9985',
+'layout': {
+'visibility': 'none'
+},
+'paint': {
+'fill-opacity': 0.4,
+'fill-color': [
+	'match',
+	['get', 'DATE'],
+	'-',
+	'#FFFFFF',
+	/* other */ '#3CD935'
+	],
+        },
+});
+});
+        map.on('click', 'agis', function (e) {
+          new mapboxgl.Popup()
+            .setLngLat(e.lngLat)
+            .setHTML("Address " + '<strong>'+e.features[0].properties.ADDRESS + '</strong><br>' + "Date of photography: " + '<strong>'+e.features[0].properties.DATE + '</strong><br>' + "Link to Page: "+'<a href=\"'+ e.features[0].properties.URL +'" target="_blank"><b><u>Link to Page</u></b></a>')
+            .addTo(map);
+    });
+    map.on('mouseenter', 'agis', function () {
+        map.getCanvas().style.cursor = 'pointer';
+    });
+    map.on('mouseleave', 'agis', function () {
+        map.getCanvas().style.cursor = '';
+    });
+
+// conservation
+map.on('load', function() {
+map.addSource('conservation', {
+type: 'vector',
+url: 'mapbox://ese-toh.cu9m7vny'
+});
+map.addLayer({
+'id': 'conservation',
+'type': 'fill',
+'source': 'conservation',
+'source-layer': 'ccf-2021-02-25-6ghyhf',
+'layout': {
+'visibility': 'none'
+},
+'paint': {
+'fill-opacity': 0.4,
+'fill-color': [
+	'match',
+	['get', 'Last_Updat'],
+	'CCF_Owned_Parcels_JBedits',
+	'#abe356',
+	/* other */ '#22c410'
+	],
+        },
+});
+});
+        map.on('click', 'conservation', function (e) {
+          new mapboxgl.Popup()
+            .setLngLat(e.lngLat)
+            .setHTML("CCF Parcel: " + '<strong>'+e.features[0].properties.CCF_ID + '</strong><br>' +
+'<br>' + "The light green parcels are approximate, the dark green parcels are more accurate.")
+            .addTo(map);
+    });
+    map.on('mouseenter', 'conservation', function () {
+        map.getCanvas().style.cursor = 'pointer';
+    });
+    map.on('mouseleave', 'conservation', function () {
+        map.getCanvas().style.cursor = '';
+    });
+
+// town parcels
+map.on('load', function() {
+map.addSource('town parcels', {
+type: 'vector',
+url: 'mapbox://ese-toh.3t2puzyv'
+});
+map.addLayer({
+'id': 'town parcels',
+'type': 'fill',
+'source': 'town parcels',
+'source-layer': 'TownParcels2018-4he0y3',
+'layout': {
+'visibility': 'none'
+},
+'paint': {
+'fill-opacity': 0.4,
+'fill-color': [
+	'match',
+	['get', 'Use'],
+	'Conservation',
+	'#abe356',
+	/* other */ '#3df2dd'
+	],
+        },
+});
+});
+        map.on('click', 'town parcels', function (e) {
+          new mapboxgl.Popup()
+            .setLngLat(e.lngLat)
+            .setHTML("Address: " + '<strong>'+e.features[0].properties.ADDRESS + '</strong><br>' + "Use: " + e.features[0].properties.Use + '<br>' + "This is a start based on the 2018 Town of Chatham GIS Data acquired from MassGIS.")
+            .addTo(map);
+    });
+    map.on('mouseenter', 'town parcels', function () {
+        map.getCanvas().style.cursor = 'pointer';
+    });
+    map.on('mouseleave', 'town parcels', function () {
+        map.getCanvas().style.cursor = '';
+    });
+
+// sewer
+map.on('load', function() {
+map.addSource('sewer', {
+type: 'vector',
+url: 'mapbox://ese-toh.0ylassrw'
+});
+map.addLayer({
+'id': 'sewer',
+'type': 'fill',
+'source': 'sewer',
+'source-layer': 'Chatham_Sewer_2020c-bx3fy3',
+'layout': {
+'visibility': 'none'
+},
+'paint': {
+'fill-opacity': 0.4,
+'fill-color': [
+	'match',
+	['get', 'CONTRACT'],
+	'2010',
+	'#473b02',
+	'2011',
+	'#756410',
+	'2012',
+	'#5e4f1e',
+	'2013',
+	'#86873d',
+	'2014',
+	'#8c872a',
+	'2015',
+	'#ced12e',
+	'2016',
+	'#87713d',
+	'2017',
+	'#634d19',
+	'2018',
+	'#4a3503',
+	'2019',
+	'#8a8506',
+	'2020',
+	'#e7fa16',
+	'2021',
+	'#3d3610',
+	'2022',
+	'#78672c',
+	/* other */ '#ffffff'
+	],
+        },
+});
+});
+        map.on('click', 'sewer', function (e) {
+          new mapboxgl.Popup()
+            .setLngLat(e.lngLat)
+            .setHTML("Approximate year constructed: "+e.features[0].properties.CONTRACT+'<br>' +"Address: "+'<strong>'+e.features[0].properties.ADDRESS + '</strong><br>' +
+"Webpage: "+'<a href=\"'+ e.features[0].properties.URL +'" target="_blank"><b><u>Link to Page</u></b></a>')
+            .addTo(map);
+    });
+    map.on('mouseenter', 'sewer', function () {
+        map.getCanvas().style.cursor = 'pointer';
+    });
+    map.on('mouseleave', 'sewer', function () {
+        map.getCanvas().style.cursor = '';
+    });
+
+// stories
+map.on('load', function() {
+map.addSource('stories', {
+type: 'vector',
+url: 'mapbox://ese-toh.1ma2t07c'
+});
+map.addLayer({
+'id': 'stories',
+'type': 'fill',
+'source': 'stories',
+'source-layer': '55-2018-1wy2zb',
+'layout': {
+// make layer invisible by default
+'visibility': 'none'
+},
+'paint': {
+'fill-opacity': 0.4,
+'fill-color': [
+	'match',
+	['get', 'STORIESS'],
+	'0',
+	'#e2ffcc',
+	'1',
+	'#fffbb3',
+	'1.1',
+	'#b3ffec',
+	'1.2',
+	'#a5f0dd',
+	'1.3',
+	'#94e0cd',
+	'1.4',
+	'#94ebd5',
+	'1.5',
+	'#8cf2ff',
+	'1.6',
+	'#7fe8f5',
+	'1.7',
+	'#72e0ed',
+	'1.8',
+	'#63cfdb',
+	'1.9',
+	'#5ac5d1',
+	'2',
+	'#5e90f2',
+	'2.3',
+	'#4c7bd9',
+	'2.5',
+	'#3b64b8',
+	'2.8',
+	'#2b53a6',
+	'3',
+	'#3841e8',
+	/* other */ '#ffffff'
+	],
+'fill-outline-color': '#257618'
+}
+});
+});
+        map.on('click', 'stories', function (e) {
+             new mapboxgl.Popup()
+            .setLngLat(e.lngLat)
+            .setHTML("Number of Stories: "+'<strong>'+e.features[0].properties.STORIES + '</strong><br>' + "Building Description: "+'<strong>'+e.features[0].properties.BLD_DESC + '</strong><br>' + "Zoning: "+'<strong>'+e.features[0].properties.ZONING + '</strong><br>')
+            .addTo(map);
+    });
+    map.on('mouseenter', 'stories', function () {
+        map.getCanvas().style.cursor = 'pointer';
+    });
+    map.on('mouseleave', 'stories', function () {
+        map.getCanvas().style.cursor = '';
+    });
+
+// owner location
+map.on('load', function() {
+map.addSource('owner location', {
+type: 'vector',
+url: 'mapbox://ese-toh.1ma2t07c'
+});
+map.addLayer({
+'id': 'owner location',
+'type': 'fill',
+'source': 'owner location',
+'source-layer': '55-2018-1wy2zb',
+'layout': {
+// make layer invisible by default
+'visibility': 'none'
+},
+'paint': {
+'fill-opacity': 0.5,
+'fill-color': [
+	'match',
+	['get', 'OUTEY'],
+	'CH',
+	'#14B9F7',
+	'MA',
+	'#ff7373',
+	'CT',
+	'#73fffa',
+	'NY',
+	'#ffd900',
+	'NJ',
+	'#ffff00',
+	'VT',
+	'#3DCB00',
+	'RI',
+	'#99D8FF',
+	'NH',
+	'#73CB51',
+	'ME',
+	'#416379',
+	'FL',
+	'#FFE000',
+	/* other */ '#F014F7'
+	],
+'fill-outline-color': '#257618'
+}
+});
+});
+        map.on('click', 'owner location', function (e) {
+             new mapboxgl.Popup()
+            .setLngLat(e.lngLat)
+            .setHTML("Owner Mailing Location: " + '<strong>' + e.features[0].properties.OWN_TOWN + ", " + e.features[0].properties.OWN_STATE + '</strong>')
+            .addTo(map);
+    });
+    map.on('mouseenter', 'owner location', function () {
+        map.getCanvas().style.cursor = 'pointer';
+    });
+    map.on('mouseleave', 'owner location', function () {
+        map.getCanvas().style.cursor = '';
+    });
+
+// intersection
+map.on('load', function() {
+map.addSource('intersection', {
+type: 'vector',
+url: 'mapbox://ese-toh.9c4wu0zd'
+});
+map.addLayer({
+'id': 'intersection',
+'type': 'fill',
+'source': 'intersection',
+'source-layer': 'Intersections-2d91o8',
+'layout': {
+// make layer invisible by default
+'visibility': 'none'
+},
+'paint': {
+'fill-opacity': 0.5,
+'fill-color': '#14B9F7',
+'fill-outline-color': '#257618'
+}
+});
+});
+        map.on('click', 'intersection', function (e) {
+             new mapboxgl.Popup()
+            .setLngLat(e.lngLat)
+	    .setHTML("Insection: "+'<strong>' + e.features[0].properties.Int_Name + '</strong><br>' + "Webpage: "+'<a href=\"'+ e.features[0].properties.Link +'" target="_blank"><b><u>Link to Page</u></b></a>')
+            .addTo(map);
+    });
+    map.on('mouseenter', 'intersection', function () {
+        map.getCanvas().style.cursor = 'pointer';
+    });
+    map.on('mouseleave', 'intersection', function () {
+        map.getCanvas().style.cursor = '';
+    });
+
+// parcel highlight
+map.on('load', function() {
+map.addSource('parcel highlight', {
+type: 'vector',
+url: 'mapbox://ese-toh.1ya31624'
+});
+map.addLayer({
+'id': 'parcel highlight',
+'type': 'line',
+'source': 'parcel highlight',
+'source-layer': 'CapeTowns-2icvsh',
+'layout': {
+// make layer invisible by default
+'visibility': 'none',
+'line-join': 'round',
+'line-cap': 'round'
+},
+'paint': {
+'line-color': '#a0fa39',
+'line-width': 1.5
+}
+});
+});
+
+// buttons
+var toggleableLayerIds = ['satellite','parcels','parcel highlight','contours','agis','historic','floodplain','acec','DEP wetland','priority habitat','estimated habitat','vernal pools','zone II','soils','conservancy districts','zoning','conservation','sewer','stories','intersection','towns'];
+for (var i = 0; i < toggleableLayerIds.length; i++) {
+var id = toggleableLayerIds[i];
+ 
+var link = document.createElement('a');
+link.href = '#';
+link.className = '';
+link.textContent = id;
+
+link.onclick = function(e) {
+var clickedLayer = this.textContent;
+e.preventDefault();
+e.stopPropagation();
+var visibility = map.getLayoutProperty(clickedLayer, 'visibility');
+// toggle layer visibility by changing the layout object's visibility property
+if (visibility === 'visible') {
+map.setLayoutProperty(clickedLayer, 'visibility', 'none');
+this.className = '';
+} else {
+this.className = 'active';
+map.setLayoutProperty(clickedLayer, 'visibility', 'visible');
+}
+
+var satelliteVisibility = map.getLayoutProperty('satellite', 'visibility');
+map.moveLayer ('satellite','floodplain');
+map.moveLayer ('satellite', 'LiMWA');
+map.moveLayer ('satellite', 'contours');
+map.moveLayer ('parcels', 'satellite');
+ // Toggle the visibility of LiMWA based on floodplain status
+    var floodplainVisibility = map.getLayoutProperty('floodplain', 'visibility');
+    if (floodplainVisibility === 'visible') {
+      map.setLayoutProperty('LiMWA', 'visibility', 'visible');
+    } else {
+      map.setLayoutProperty('LiMWA', 'visibility', 'none');
+    }
+	var wetlandVisibility = map.getLayoutProperty('DEP wetland', 'visibility');
+    if (wetlandVisibility === 'visible') {
+      map.setLayoutProperty('DEP wetland line', 'visibility', 'visible');
+    } else {
+      map.setLayoutProperty('DEP wetland line', 'visibility', 'none');
+    }
+
+
+};
+var layers = document.getElementById('menu');
+layers.appendChild(link);
+}
+map.addControl(new mapboxgl.ScaleControl({
+	maxWidth: 200,
+	unit: 'imperial'
+}), 'bottom-right'
+);
+map.addControl(
+new MapboxGeocoder({
+accessToken: mapboxgl.accessToken,
+
+mapboxgl: mapboxgl
+})
+);
+</script>
+</body>
+</html>
