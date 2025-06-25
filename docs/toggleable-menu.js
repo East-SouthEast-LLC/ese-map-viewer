@@ -6,18 +6,11 @@
  * @param {string[]} layerIds - An array of layer IDs to be included in the menu.
  */
 window.initializeMenu = function(layerIds) {
-    // --- Define layout constants ---
-    const leftMargin = 20; // Space from the left edge of the viewport to the menu
-    const menuWidth = 180; // The width of the layer menu itself
-    const toolkitWidth = 260; // The width of the geocoder/tools panel
-    const spaceBetween = 20; // Space between the menu and the map (or toolkit and map)
-    const rightMargin = 20; // Space on the far right side of the map
-    
-    // Calculate the total horizontal offset from the left edge when panels are open
-    const menuOnlyOffset = leftMargin + menuWidth + spaceBetween;
-    const fullToolkitOffset = leftMargin + menuWidth + 10 + toolkitWidth + spaceBetween; // 10 is the gap in the flex container
+    // Define the pixel widths for the side menus from the CSS
+    const menuOnlyWidth = 220;
+    const fullToolkitWidth = 480;
 
-    // --- Get DOM elements ---
+    // Get the required DOM elements
     const mapContainer = document.getElementById('map');
     const menu = document.getElementById('menu');
 
@@ -41,11 +34,11 @@ window.initializeMenu = function(layerIds) {
 
         // Adjust map width and margin based on the toolkit's visibility
         if (isHidden) {
-            mapContainer.style.marginLeft = `${fullToolkitOffset}px`;
-            mapContainer.style.width = `calc(100vw - ${fullToolkitOffset}px - ${rightMargin}px)`;
+            mapContainer.style.width = `calc(95vw - ${fullToolkitWidth}px)`;
+            mapContainer.style.marginLeft = `${fullToolkitWidth}px`;
         } else {
-            mapContainer.style.marginLeft = `${menuOnlyOffset}px`;
-            mapContainer.style.width = `calc(100vw - ${menuOnlyOffset}px - ${rightMargin}px)`;
+            mapContainer.style.width = `calc(95vw - ${menuOnlyWidth}px)`;
+            mapContainer.style.marginLeft = `${menuOnlyWidth}px`;
         }
 
         // Use a timeout to resize the map after the CSS transition completes
@@ -73,8 +66,10 @@ window.initializeMenu = function(layerIds) {
             const isVisible = map.getLayoutProperty(clickedLayer, 'visibility') === 'visible';
             const newVisibility = isVisible ? 'none' : 'visible';
             
+            // Toggle the main layer's visibility
             map.setLayoutProperty(clickedLayer, 'visibility', newVisibility);
 
+            // --- Handle visibility for dependent or related sub-layers ---
             const subLayerToggles = {
                 'floodplain': ['LiMWA', 'floodplain-line', 'floodplain-labels'],
                 'DEP wetland': ['dep-wetland-line', 'dep-wetland-labels'],
@@ -92,9 +87,12 @@ window.initializeMenu = function(layerIds) {
                     }
                 });
             }
+            // ------------------------------------------------------------
 
+            // Update the button's visual state
             this.className = newVisibility === 'visible' ? 'active' : '';
             
+            // Trigger a legend update after the map has settled
             if (typeof window.updateLegend === 'function') {
                 if (!map._legendUpdateListenerAdded) {
                     map.once('idle', () => {
@@ -109,11 +107,12 @@ window.initializeMenu = function(layerIds) {
     });
     
     // Set the initial position and size of the map to account for the layer menu
-    mapContainer.style.marginLeft = `${menuOnlyOffset}px`;
-    mapContainer.style.width = `calc(100vw - ${menuOnlyOffset}px - ${rightMargin}px)`;
+    mapContainer.style.width = `calc(95vw - ${menuOnlyWidth}px)`;
+    mapContainer.style.marginLeft = `${menuOnlyWidth}px`;
     map.resize();
 
     // Add the scale control to the map
+    // This is the single source for the scale control now.
     map.addControl(new mapboxgl.ScaleControl({
         maxWidth: 200,
         unit: 'imperial'

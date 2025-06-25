@@ -1,23 +1,20 @@
 /* ============================================================
 GLOBAL RESETS
 =============================================================== */
-html, body { 
-  height: 100%; /* Make the html and body fill their container (the iframe) */
+body { 
   margin: 0; 
   padding: 0; 
-  overflow: hidden; /* Prevent scrollbars on the main body */
 }
 
 /* ============================================================
 MAP CONTAINER
 =============================================================== */
 #map { 
-  position: absolute;
-  top: 0;
-  left: 0; /* Let the JS handle the left margin */
   z-index: 0;
-  height: 100%; /* Make the map fill the body (which is 100% of the iframe) */
-  /* Width and margin-left will be set by toggleable-menu.js */
+  height: 80vh;
+  width: 95vw;
+  margin: 0 auto;
+  display: block;
   transition: width 0.4s ease, margin-left 0.4s ease;
 }
 
@@ -38,10 +35,10 @@ MENU (Layer toggle UI)
   background: #f9f9f9;
   position: absolute;
   z-index: 1;
-  top: 20px; /* Add some space from the top */
+  top: 0;
   left: 20px;
   width: 180px;
-  max-height: calc(100% - 40px); /* Adjust max-height to be relative to the container */
+  max-height: 80vh;
   overflow-y: auto;
   border: 1px solid rgba(0, 0, 0, 0.15);
   border-radius: 5px;
@@ -49,6 +46,7 @@ MENU (Layer toggle UI)
   box-sizing: border-box;
   font-family: 'Open Sans', sans-serif;
   
+  /* Layout styles */
   display: flex;
   flex-direction: column;
   gap: 3px;
@@ -62,6 +60,8 @@ MENU (Layer toggle UI)
   padding: 4px;
   text-decoration: none;
   text-align: center;
+
+  /* Bubble styles */
   background-color: white;
   border-radius: 5px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
@@ -94,20 +94,22 @@ GEOCODER CONTAINER (for control buttons and search bar)
 #geocoder-container {
   display: none; /* Initially hidden */
   position: absolute;
-  top: 20px; /* Match menu's top position */
+  top: 0;
   left: 220px;
   z-index: 1;
   flex-direction: column;
   gap: 5px;
   width: 260px;
   
+  /* New container styles */
   background: #f9f9f9;
   border: 1px solid rgba(0, 0, 0, 0.15);
   border-radius: 5px;
   padding: 10px;
   box-sizing: border-box;
 
-  max-height: calc(100% - 40px); /* Adjust max-height to be relative to the container */
+  /* Add scrolling behavior to the entire container */
+  max-height: 80vh;
   overflow-y: auto;
   overflow-x: hidden;
 }
