@@ -30,17 +30,55 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const townName = urlParams.get('town') || 'chatham'; 
+      
+      /**
+       * Determines the town key (e.g., "chatham") by parsing the referring page's URL.
+       * This allows the same town.html file to be embedded on different Squarespace pages
+       * and automatically load the correct configuration.
+       * @param {object} config - The entire town configuration object.
+       * @returns {string} The key of the matching town (e.g., "barnstable").
+       */
+      function getTownFromReferrer(config) {
+          const referrer = document.referrer; // e.g., "https://www.ese-llc.com/barnstable"
+          
+          // For local testing or direct access, you might use a URL parameter as a backup.
+          const urlParams = new URLSearchParams(window.location.search);
+          const paramTown = urlParams.get('town');
+          if (paramTown && config[paramTown]) {
+              return paramTown;
+          }
 
+          if (!referrer) {
+              console.warn("No referrer found. Defaulting to Chatham.");
+              return 'chatham'; // Default to Chatham if there's no referrer
+          }
+
+          try {
+              const referrerUrl = new URL(referrer);
+              const path = referrerUrl.pathname; // e.g., "/barnstable" or "/toc"
+
+              // Find the town key (e.g., "chatham") that has a matching path in the config
+              for (const townKey in config) {
+                  if (config[townKey].path === path) {
+                      return townKey;
+                  }
+              }
+          } catch (e) {
+              console.error("Could not parse referrer URL:", e);
+          }
+          
+          // Fallback to Chatham if no path match is found
+          console.warn(`No town config matched the referrer path "${path}". Defaulting to Chatham.`);
+          return 'chatham';
+      }
+
+      // Fetch the master configuration file first
       fetch('https://east-southeast-llc.github.io/ese-map-viewer/docs/town-config.json')
         .then(response => response.json())
         .then(config => {
+          // Determine the current town using the new function
+          const townName = getTownFromReferrer(config);
           const townConfig = config[townName];
-          if (!townConfig) {
-            console.error('Configuration for town not found:', townName);
-            return;
-          }
 
           document.title = townConfig.townName + " | ESE Map Viewer";
           window.eseMapBaseUrl = townConfig.baseShareUrl;
@@ -63,13 +101,10 @@
           loadControlButtons(townConfig.features);
           loadControls(townConfig.features);
           
-          // Always load the 'towns' layer script as a default base layer.
           loadScript(`https://east-southeast-llc.github.io/ese-map-viewer/docs/layers/towns.js?v=2`);
           
           const menuLayerIds = townConfig.layers.filter(id => id !== 'towns');
 
-          // --- REVISED SCRIPT LOADING LOGIC ---
-          // Use an explicit if/else block for clarity and to handle special cases.
           menuLayerIds.forEach(layerId => {
             let scriptPath = `https://east-southeast-llc.github.io/ese-map-viewer/docs/layers/`;
             let scriptSrc = '';
@@ -89,16 +124,13 @@
             } else if (layerId === 'sewer plans') {
               scriptSrc = `${scriptPath}sewer-plans.js?v=2`;
             } else {
-              // Default case for simple, single-word layer IDs that match their filenames
               scriptSrc = `${scriptPath}${layerId}.js?v=2`;
             }
             
-            // Only load the script if a source was determined
             if (scriptSrc) {
                 loadScript(scriptSrc);
             }
           });
-          // --- END OF REVISED LOGIC ---
           
           loadScript('https://east-southeast-llc.github.io/ese-map-viewer/docs/toggleable-menu.js?v=2', () => {
               if (window.initializeMenu) {

@@ -1,6 +1,7 @@
 {
   "chatham": {
     "townName": "Chatham",
+    "path": "/toc",
     "baseShareUrl": "https://ese-llc.com/toc",
     "map": {
       "center": [-69.991, 41.687],
@@ -33,6 +34,7 @@
   },
   "barnstable": {
     "townName": "Barnstable",
+    "path": "/barnstable",
     "baseShareUrl": "https://ese-llc.com/barnstable",
     "map": {
       "center": [-70.36, 41.660],
