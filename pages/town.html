@@ -110,7 +110,7 @@
 
       async function main() {
           try {
-              // --- Stage 1: Get Config and Build the Static HTML ---
+              // --- Stage 1: Get Config and Initialize the Map ---
               const response = await fetch('https://east-southeast-llc.github.io/ese-map-viewer/docs/town-config.json');
               const config = await response.json();
               
@@ -121,10 +121,7 @@
 
               document.title = `${townConfig.townName} | ESE Map Viewer`;
               window.eseMapBaseUrl = townConfig.baseShareUrl;
-              
-              buildToolkitUI(townConfig.features);
 
-              // --- Stage 2: Initialize Map and Load All Scripts Concurrently ---
               const map = new mapboxgl.Map({
                   container: 'map',
                   style: 'mapbox://styles/ese-toh/ckh2ss32s06i119paer9mt67h',
@@ -132,10 +129,13 @@
                   center: townConfig.map.center
               });
               window.map = map;
-
+              
               const geocoder = new MapboxGeocoder({ accessToken: mapboxgl.accessToken, mapboxgl: mapboxgl });
               document.getElementById('geocoder').appendChild(geocoder.onAdd(map));
               
+              // --- Stage 2: Build the UI and THEN load the scripts that control it ---
+              buildToolkitUI(townConfig.features);
+
               const controlScripts = [
                   'control-button.js', 'control-print.js', 'control-print-area.js',
                   'control-share.js', 'control-scale.js', 'control-measure.js', 'control-legend.js'
@@ -144,9 +144,11 @@
                   controlScripts.push('control-custom-print.js');
               }
               const controlPromises = controlScripts.map(script => loadScript(`https://east-southeast-llc.github.io/ese-map-viewer/docs/${script}?v=3`));
+              
+              // --- Stage 3: Load Layer scripts ---
               const layerPromises = townConfig.layers.map(layerId => loadScript(getLayerScriptPath(layerId)));
               
-              // --- Stage 3: Wait for scripts to load, then initialize menu ---
+              // --- Stage 4: Wait for everything to load, then initialize menu and URL params ---
               await Promise.all([...controlPromises, ...layerPromises]);
 
               await loadScript('https://east-southeast-llc.github.io/ese-map-viewer/docs/toggleable-menu.js?v=3');
@@ -154,7 +156,6 @@
                   window.initializeMenu(townConfig.layers);
               }
 
-              // --- Stage 4: Initialize URL parameter handling ---
               await loadScript('https://east-southeast-llc.github.io/ese-map-viewer/docs/decode-url.js?v=3');
               map.on('load', () => applyUrlParams(map));
 
