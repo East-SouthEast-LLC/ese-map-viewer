@@ -153,7 +153,8 @@ CONTROL BUTTON STYLES
 .mapboxgl-ctrl-point         { background-image: url('https://www.ese-llc.com/s/marker-blue-random.svg'); }
 .mapboxgl-ctrl-print         { background-image: url('https://img.icons8.com/ios-glyphs/30/000000/print.png'); }
 .mapboxgl-ctrl-custom-print  { background-image: url('https://east-southeast-llc.github.io/ese-map-viewer/img/custom-print.png'); }
-.mapboxgl-ctrl-measure       { background-image: url('https://www.ese-llc.com/s/marker-blue-measure.svg'); }
+.mapboxgl-ctrl-measure-distance { background-image: url('https://www.ese-llc.com/s/marker-blue-measure.svg'); }
+.mapboxgl-ctrl-measure-area  { background-image: url('https://img.icons8.com/ios-glyphs/30/polygon.png'); }
 .mapboxgl-ctrl-legend        { background-image: url('https://east-southeast-llc.github.io/ese-map-viewer/img/legend.png'); }
 .mapboxgl-ctrl-bookmark      { background-image: url('https://img.icons8.com/ios-glyphs/30/bookmark-ribbon.png'); }
 
