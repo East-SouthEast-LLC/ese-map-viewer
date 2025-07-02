@@ -1,29 +1,8 @@
 function setupToggleableMenu() {
-    const menuRightEdge = 305;
-    const toolkitRightEdge = 575;
-    const desiredGap = 10;
-    const menuOnlyOffset = menuRightEdge + desiredGap;
-    const fullToolkitOffset = toolkitRightEdge + desiredGap;
-    
-    const mapContainer = document.getElementById('map');
     const geocoderContainer = document.getElementById("geocoder-container");
-
-    function openToolkit() {
-        if (getComputedStyle(geocoderContainer).display === "none") {
-            geocoderContainer.style.display = "flex";
-            const toolsButton = document.querySelector('[data-layer-id="tools"]');
-            if(toolsButton) toolsButton.classList.add('active');
-            
-            document.getElementById('bookmark-box').style.display = 'none';
-            document.getElementById('bookmarkButton').classList.remove('active');
-            document.getElementById('identify-box').style.display = 'none'; // This is the new line
-            document.getElementById('identifyButton').classList.remove('active');
-
-            mapContainer.style.width = `calc(95vw - ${fullToolkitOffset}px)`;
-            mapContainer.style.marginLeft = `${fullToolkitOffset}px`;
-            setTimeout(() => map.resize(), 400);
-        }
-    }
+    
+    // The initial sizing is now handled by our global resizeMap function
+    // which is called from main-app.js after the menu is set up.
 
     if (window.toggleableLayerIds && window.toggleableLayerIds.length > 0) {
         for (const id of window.toggleableLayerIds) {
@@ -54,6 +33,23 @@ function setupToggleableMenu() {
                     }
                     return;
                 }
+
+    function openToolkit() {
+        if (getComputedStyle(geocoderContainer).display === "none") {
+            geocoderContainer.style.display = "flex";
+            const toolsButton = document.querySelector('[data-layer-id="tools"]');
+            if(toolsButton) toolsButton.classList.add('active');
+            
+            document.getElementById('bookmark-box').style.display = 'none';
+            document.getElementById('bookmarkButton').classList.remove('active');
+            document.getElementById('identify-box').style.display = 'none'; // This is the new line
+            document.getElementById('identifyButton').classList.remove('active');
+
+            mapContainer.style.width = `calc(95vw - ${fullToolkitOffset}px)`;
+            mapContainer.style.marginLeft = `${fullToolkitOffset}px`;
+            setTimeout(() => map.resize(), 400);
+        }
+    }
 
                 if (!map.getLayer(clickedLayer)) {
                     return console.warn("Layer not found:", clickedLayer);

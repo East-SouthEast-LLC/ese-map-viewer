@@ -17,9 +17,36 @@ const geocoder = new MapboxGeocoder({
 });
 document.getElementById('geocoder').appendChild(geocoder.onAdd(map));
 
-window.addEventListener('resize', () => {
+// Add this new function to main-app.js
+
+function resizeMap() {
+    if (!window.map || !document.getElementById('geocoder-container')) return;
+
+    const mapContainer = document.getElementById('map');
+    const geocoderContainer = document.getElementById('geocoder-container');
+
+    // These values must match the ones in toggleable-menu.js
+    const menuRightEdge = 305;
+    const toolkitRightEdge = 575;
+    const desiredGap = 10; 
+    const menuOnlyOffset = menuRightEdge + desiredGap;
+    const fullToolkitOffset = toolkitRightEdge + desiredGap;
+
+    // Check if the toolkit is open and apply the correct size
+    if (getComputedStyle(geocoderContainer).display === "flex") {
+        mapContainer.style.width = `calc(95vw - ${fullToolkitOffset}px)`;
+        mapContainer.style.marginLeft = `${fullToolkitOffset}px`;
+    } else {
+        mapContainer.style.width = `calc(95vw - ${menuOnlyOffset}px)`;
+        mapContainer.style.marginLeft = `${menuOnlyOffset}px`;
+    }
+
+    // Finally, tell the map to redraw itself to fit the new dimensions
     map.resize();
-});
+}
+
+// Update the existing resize listener to call our new function
+window.addEventListener('resize', resizeMap);
 
 function loadLayerScript(layerName) {
     return new Promise((resolve, reject) => {
@@ -145,6 +172,9 @@ map.on('load', function () {
                                     }
                                 });
                                 applyUrlParams(map);
+
+                                // Call resizeMap once to set the initial size correctly
+                                resizeMap(); 
                             };
                             document.body.appendChild(menuScript);
                         })
