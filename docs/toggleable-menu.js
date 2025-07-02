@@ -1,9 +1,8 @@
+// docs/toggleable-menu.js
+
 function setupToggleableMenu() {
     const geocoderContainer = document.getElementById("geocoder-container");
     
-    // The initial sizing is now handled by our global resizeMap function
-    // which is called from main-app.js after the menu is set up.
-
     if (window.toggleableLayerIds && window.toggleableLayerIds.length > 0) {
         for (const id of window.toggleableLayerIds) {
             const link = document.createElement('a');
@@ -17,19 +16,13 @@ function setupToggleableMenu() {
                 e.stopPropagation();
 
                 if (clickedLayer === "tools") {
-                    if (getComputedStyle(geocoderContainer).display === "none") {
-                        openToolkit();
-                    } else {
-                        geocoderContainer.style.display = "none";
-                        this.classList.remove('active');
-                        
-                        // Also hide the bookmark box when closing the main toolkit
-                        document.getElementById('bookmark-box').style.display = 'none';
-                        document.getElementById('bookmarkButton').classList.remove('active');
-
-                        mapContainer.style.width = `calc(95vw - ${menuOnlyOffset}px)`;
-                        mapContainer.style.marginLeft = `${menuOnlyOffset}px`;
-                        setTimeout(() => map.resize(), 400);
+                    const isVisible = getComputedStyle(geocoderContainer).display === 'flex';
+                    geocoderContainer.style.display = isVisible ? 'none' : 'flex';
+                    this.classList.toggle('active', !isVisible);
+                    
+                    // Call our global resize function after changing the layout
+                    if (typeof resizeMap === 'function') {
+                        setTimeout(resizeMap, 50); // Use a small delay to ensure DOM has updated
                     }
                     return;
                 }

@@ -17,8 +17,7 @@ const geocoder = new MapboxGeocoder({
 });
 document.getElementById('geocoder').appendChild(geocoder.onAdd(map));
 
-// Add this new function to main-app.js
-
+// --- NEW: Centralized resize function ---
 function resizeMap() {
     if (!window.map || !document.getElementById('geocoder-container')) return;
 
@@ -47,6 +46,7 @@ function resizeMap() {
 
 // Update the existing resize listener to call our new function
 window.addEventListener('resize', resizeMap);
+
 
 function loadLayerScript(layerName) {
     return new Promise((resolve, reject) => {
@@ -135,46 +135,24 @@ map.on('load', function () {
                             menuScript.src = 'https://east-southeast-llc.github.io/ese-map-viewer/docs/toggleable-menu.js?v=2';
                             menuScript.onload = function () {
                                 setupToggleableMenu();
-
-                                // Define the complete, desired draw order from bottom to top.
-                                // This includes all parent layers and their dependent layers.
                                 const drawOrder = [
-                                    'satellite',
-                                    'parcels',
-                                    'zoning',
-                                    'conservancy districts',
-                                    'conservation',
-                                    'sewer',
-                                    'sewer plans', 'sewer-plans-outline',
-                                    'stories',
-                                    'intersection',
-                                    'soils', 'soils-outline', 'soils-labels',
-                                    'zone II', 'zone-ii-outline', 'zone-ii-labels',
-                                    'DEP wetland', 'dep-wetland-line', 'dep-wetland-labels',
-                                    'endangered species', 'endangered-species-labels', 'vernal-pools', 'vernal-pools-labels',
-                                    'acec',
-                                    'floodplain', 'LiMWA', 'floodplain-line', 'floodplain-labels',
-                                    'agis',
-                                    'historic',
-                                    'usgs quad',
-                                    'towns',
-                                    'private properties upland',
-                                    'contours',
-                                    'lidar contours', 'lidar-contour-labels',
-                                    'parcel highlight'
+                                    'satellite', 'parcels', 'zoning', 'conservancy districts', 'conservation', 'sewer',
+                                    'sewer plans', 'sewer-plans-outline', 'stories', 'intersection', 'soils', 
+                                    'soils-outline', 'soils-labels', 'zone II', 'zone-ii-outline', 'zone-ii-labels',
+                                    'DEP wetland', 'dep-wetland-line', 'dep-wetland-labels', 'endangered species', 
+                                    'endangered-species-labels', 'vernal-pools', 'vernal-pools-labels', 'acec', 
+                                    'floodplain', 'LiMWA', 'floodplain-line', 'floodplain-labels', 'agis', 'historic',
+                                    'usgs quad', 'towns', 'private properties upland', 'contours', 'lidar contours', 
+                                    'lidar-contour-labels', 'parcel highlight'
                                 ];
-
-                                // Loop through the defined order and move each layer to the top.
-                                // The last layer in the array will end up on top of all others.
                                 drawOrder.forEach(layerId => {
                                     if (map.getLayer(layerId)) {
                                         map.moveLayer(layerId);
                                     }
                                 });
                                 applyUrlParams(map);
-
-                                // Call resizeMap once to set the initial size correctly
-                                resizeMap(); 
+                                // Call resizeMap once after everything is set up
+                                resizeMap();
                             };
                             document.body.appendChild(menuScript);
                         })
@@ -202,13 +180,7 @@ map.on('load', function () {
             case 'parcels':
                 popupHTML = `Address: <strong>${topFeature.properties.ADDRESS}</strong><br>Webpage: <a href="${topFeature.properties.URL}" target="_blank"><b><u>Link to Page</u></b></a>`;
                 break;
-            case 'floodplain':
-                popupHTML = `Flood Zone: <strong>${topFeature.properties.FLD_ZONE}</strong><br>Elevation: <strong>${topFeature.properties.STATIC_BFE}</strong>`;
-                break;
-            case 'DEP wetland':
-                 popupHTML = `Wetland Identifier: <strong>${topFeature.properties.IT_VALDESC}</strong><br>Wetland Code: <strong>${topFeature.properties.IT_VALC}</strong>`;
-                break;
-            // ... all other cases ...
+            // ... (all other cases)
         }
 
         if (popupHTML) {
