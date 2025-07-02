@@ -17,6 +17,10 @@ const geocoder = new MapboxGeocoder({
 });
 document.getElementById('geocoder').appendChild(geocoder.onAdd(map));
 
+window.addEventListener('resize', () => {
+    map.resize();
+});
+
 function loadLayerScript(layerName) {
     return new Promise((resolve, reject) => {
         const script = document.createElement('script');
