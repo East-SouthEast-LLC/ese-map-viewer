@@ -77,8 +77,8 @@ document.getElementById('shareButton').addEventListener('click', function() {
     // Manually check if the USGS layer is active and add it to the URL
     const usgsButton = document.querySelector('a[data-layer-id="usgs quad"]');
     if (usgsButton && usgsButton.classList.contains('active')) {
-        if (!visibleLayerIds.includes('usgs quad')) {
-            visibleLayerIds.push('usgs quad');
+        if (!visibleLayerIds.includes('usgs')) {
+            visibleLayerIds.push('usgs');
         }
     }
     

@@ -32,7 +32,7 @@ function applyUrlParams(map) {
         const decodedLayerId = decodeURIComponent(layerId);
 
         // Special case for USGS layer
-        if (decodedLayerId === 'usgs quad') {
+        if (decodedLayerId === 'usgs') {
             if (typeof initializeUsgsTileManager === 'function') {
                 initializeUsgsTileManager();
             }
