@@ -37,7 +37,7 @@ function loadLayerScript(layerName) {
                 scriptName = "sewer-plans";
             } else if (layerName === "private properties upland") {
                 scriptName = "private-properties-upland";
-            } else if (layerName === "usgs quad") {
+            } else if (layerName === "usgs") {
                 scriptName = "usgs-tile-manager";
             }
         
