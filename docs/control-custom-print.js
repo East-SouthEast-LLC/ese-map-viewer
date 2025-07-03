@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", function () {
             { page: 2, layers: ['parcel highlight', 'satellite', 'acec'] },
             { page: 3, layers: ['parcel highlight', 'lidar contours', 'DEP wetland'] },
             { page: 4, layers: ['parcel highlight', 'satellite', 'endangered species'] },
-            { page: 5, layers: ['usgs quad'] }
+            { page: 5, layers: ['usgs'] }
         ],
         'Test Hole': [
             { page: 1, layers: ['parcel highlight', 'lidar contours'] },
@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", function () {
             { page: 3, layers: ['parcel highlight', 'DEP wetland', 'lidar contours'] },
             { page: 4, layers: ['parcel highlight', 'zone II',] },
             { page: 5, layers: ['parcel highlight', 'soils'] },
-            { page: 5, layers: ['usgs quad'] }
+            { page: 5, layers: ['usgs'] }
         ]
     };
     

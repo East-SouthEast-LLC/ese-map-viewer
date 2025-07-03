@@ -8,6 +8,8 @@ function applyUrlParams(map) {
         return; 
     }
 
+    console.log("URL parameters found, applying them now...");
+
     const zoom = parseFloat(urlParams.get('zoom'));
     if (!isNaN(zoom)) {
         map.setZoom(zoom);
@@ -30,10 +32,12 @@ function applyUrlParams(map) {
     
     layers.forEach(layerId => {
         const decodedLayerId = decodeURIComponent(layerId);
+        console.log(`Processing layer from URL: "${decodedLayerId}"`); // <-- Console log added
 
         // Special case for USGS layer
-        if (decodedLayerId === 'usgs') {
+        if (decodedLayerId === 'usgs') { // <-- FIX: Changed from 'usgs quad' to 'usgs'
             if (typeof initializeUsgsTileManager === 'function') {
+                console.log("Initializing USGS Tile Manager..."); // <-- Console log added
                 initializeUsgsTileManager();
             }
         } else if (map.getLayer(decodedLayerId)) {
