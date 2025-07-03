@@ -1,4 +1,4 @@
-// town.html
+// docs/decode-url.js
 
 function applyUrlParams(map) {
     const urlParams = new URLSearchParams(window.location.search);
@@ -30,7 +30,14 @@ function applyUrlParams(map) {
     
     layers.forEach(layerId => {
         const decodedLayerId = decodeURIComponent(layerId);
-        if (map.getLayer(decodedLayerId)) {
+
+        // Special case for USGS layer
+        if (decodedLayerId === 'usgs quad') {
+            if (typeof initializeUsgsTileManager === 'function') {
+                initializeUsgsTileManager();
+            }
+        } else if (map.getLayer(decodedLayerId)) {
+            // Standard layer handling
             map.setLayoutProperty(decodedLayerId, 'visibility', 'visible');
 
             // Handle dependent layers
@@ -52,16 +59,16 @@ function applyUrlParams(map) {
                 map.setLayoutProperty('vernal-pools', 'visibility', 'visible');
                 map.setLayoutProperty('vernal-pools-labels', 'visibility', 'visible');
             }
-
-            // Update button to be active by checking its data-layer-id
-            document.querySelectorAll('#menu a').forEach(button => {
-                if (button.dataset.layerId === decodedLayerId) {
-                    button.classList.add('active');
-                }
-            });
         } else {
             console.warn(`[URL] Layer "${decodedLayerId}" not found in the map style.`);
         }
+
+        // Update button to be active for all layer types
+        document.querySelectorAll('#menu a').forEach(button => {
+            if (button.dataset.layerId === decodedLayerId) {
+                button.classList.add('active');
+            }
+        });
     });
 
     const cleanUrl = window.location.origin + window.location.pathname;
