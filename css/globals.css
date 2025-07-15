@@ -751,7 +751,7 @@ MOBILE & TABLET RESPONSIVE STYLES
 =============================================================== */
 @media (max-width: 768px) {
 
-    /* --- 1. hide desktop elements --- */
+    /* this rule can stay the same */
     #header, #footer-sections, #ad-container-vertical, #geocoder-container {
         display: none !important;
     }
@@ -759,11 +759,11 @@ MOBILE & TABLET RESPONSIVE STYLES
     /* --- 2. style the new hamburger button (updated position) --- */
     #hamburger-button {
         display: block;
-        position: absolute;
-        top: 25px;   /* increased from 10px to move it down */
-        left: 25px;  /* increased from 10px to move it right */
+        position: fixed; /* changed to fixed to position relative to the window */
+        top: 25px;       /* 15px map margin + 10px offset */
+        left: 20px;      /* 10px map margin + 10px offset */
         z-index: 1002;
-        background-color: rgba(249, 249, 249, 0.9); /* added slight transparency */
+        background-color: rgba(249, 249, 249, 0.9);
         border: 1px solid rgba(0, 0, 0, 0.2);
         border-radius: 5px;
         width: 40px;
@@ -784,6 +784,7 @@ MOBILE & TABLET RESPONSIVE STYLES
 
     /* --- 4. restyle the layer menu to be a collapsible panel --- */
     #menu {
+        position: fixed; /* changed to fixed to ensure it covers the whole screen */
         left: 0;
         top: 0;
         width: 85%;
