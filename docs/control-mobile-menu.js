@@ -9,15 +9,25 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
+    // this is the main logic to toggle the menu
     hamburgerButton.addEventListener('click', () => {
-        // toggle the 'open' class on the menu
-        menu.classList.toggle('open');
+        const isOpen = menu.classList.toggle('open');
+        hamburgerButton.classList.toggle('active', isOpen);
+
+        menu.style.display = isOpen ? 'flex' : 'none';
     });
 
-    // close the menu if the user clicks on the map
+    // new: prevent map from "swallowing" the click on the button
+    hamburgerButton.addEventListener('mousedown', (e) => {
+        e.stopPropagation(); // this stops the click from propagating to the map
+    });
+    
+    // updated: ensures the menu closes correctly when clicking on the map
     mapContainer.addEventListener('click', () => {
         if (menu.classList.contains('open')) {
             menu.classList.remove('open');
+            hamburgerButton.classList.remove('active'); // also deactivate button
+            menu.style.display = 'none';
         }
     });
 });
