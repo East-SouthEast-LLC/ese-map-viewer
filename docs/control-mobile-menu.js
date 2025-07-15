@@ -5,29 +5,39 @@ document.addEventListener('DOMContentLoaded', () => {
     const menu = document.getElementById('menu');
     const mapContainer = document.getElementById('map');
 
-    if (!hamburgerButton || !menu) {
+    if (!hamburgerButton || !menu || !mapContainer) {
         return;
     }
 
-    // this is the main logic to toggle the menu
-    hamburgerButton.addEventListener('click', () => {
+    // function to position the button relative to the map
+    function positionHamburgerButton() {
+        const mapRect = mapContainer.getBoundingClientRect();
+        
+        // calculate position based on map's location and desired offset
+        const topPosition = mapRect.top + window.scrollY + 10;
+        const leftPosition = mapRect.left + window.scrollX + 10;
+
+        hamburgerButton.style.top = `${topPosition}px`;
+        hamburgerButton.style.left = `${leftPosition}px`;
+    }
+
+    // position the button on initial load
+    positionHamburgerButton();
+    // reposition the button if the window is resized
+    window.addEventListener('resize', positionHamburgerButton);
+
+    // logic to toggle the menu
+    hamburgerButton.addEventListener('click', (e) => {
+        e.stopPropagation();
         const isOpen = menu.classList.toggle('open');
         hamburgerButton.classList.toggle('active', isOpen);
-
-        menu.style.display = isOpen ? 'flex' : 'none';
     });
 
-    // new: prevent map from "swallowing" the click on the button
-    hamburgerButton.addEventListener('mousedown', (e) => {
-        e.stopPropagation(); // this stops the click from propagating to the map
-    });
-    
-    // updated: ensures the menu closes correctly when clicking on the map
+    // logic to close the menu when clicking on the map
     mapContainer.addEventListener('click', () => {
         if (menu.classList.contains('open')) {
             menu.classList.remove('open');
-            hamburgerButton.classList.remove('active'); // also deactivate button
-            menu.style.display = 'none';
+            hamburgerButton.classList.remove('active');
         }
     });
 });

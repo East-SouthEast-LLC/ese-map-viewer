@@ -752,17 +752,15 @@ MOBILE & TABLET RESPONSIVE STYLES
 @media (max-width: 768px) {
 
     /* --- 1. hide desktop-only elements --- */
-    #header, #footer-sections, #ad-container-vertical, #geocoder-container {
+    #ad-container-vertical, #geocoder-container {
         display: none !important;
     }
 
-    /* --- 2. style the hamburger button (now relative to the map) --- */
+    /* --- 2. style the hamburger button (absolutely positioned) --- */
     #hamburger-button {
         display: block;
-        position: absolute; /* this is now relative to the #map container */
-        top: 10px;
-        left: 10px;
-        z-index: 10; /* high enough to be over map layers */
+        position: absolute; /* positioned relative to the page body */
+        z-index: 1002;
         background-color: rgba(249, 249, 249, 0.9);
         border: 1px solid rgba(0, 0, 0, 0.2);
         border-radius: 5px;
@@ -772,20 +770,17 @@ MOBILE & TABLET RESPONSIVE STYLES
         cursor: pointer;
     }
 
-    /* --- 3. make the map a positioning context --- */
+    /* --- 3. style the map --- */
     #map {
-        position: relative; /* this is the crucial change */
         width: calc(100% - 20px) !important;
         height: 85vh !important;
         margin: 15px 10px !important;
         border-radius: 5px;
-        top: 0;
-        left: 0;
     }
 
     /* --- 4. restyle the layer menu as a fixed overlay --- */
     #menu {
-        position: fixed; /* use fixed to ensure it covers the screen correctly */
+        position: fixed;
         left: 0;
         top: 0;
         width: 85%;
@@ -793,13 +788,14 @@ MOBILE & TABLET RESPONSIVE STYLES
         height: 100%;
         max-height: 100vh;
         border-radius: 0;
-        z-index: 1001; /* place it above the button and map */
+        z-index: 1001;
         transform: translateX(-100%);
         transition: transform 0.3s ease-in-out;
+        display: none; /* hide it initially */
     }
 
-    /* --- 5. class to show the menu --- */
     #menu.open {
+        display: flex; /* show the menu when it has the .open class */
         transform: translateX(0);
     }
 }
