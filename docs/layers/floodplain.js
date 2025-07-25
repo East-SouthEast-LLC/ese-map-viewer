@@ -1,104 +1,64 @@
+// docs/layers/floodplain.js
+
 function addFloodplainLayer() {
-    // LiMWA Source + Layer
-    map.addSource('LiMWA', {
-        type: 'vector',
-        url: 'mapbox://ese-toh.7h5nwda9'
-    });
-    
-    map.addLayer({
-        'id': 'LiMWA',
-        'type': 'line',
-        'source': 'LiMWA',
-        'source-layer': 'LiMWA-dtmi75',
-        'layout': { 'visibility': 'none' },
-        'paint': {
-            'line-color': '#E70B0B',
-            'line-width': 3.0
-        }
+    // add the fema national flood hazard layer as a raster tile source.
+    // this service provides the official, effective flood maps for the entire u.s.
+    map.addSource('fema-nfhl', {
+        'type': 'raster',
+        'tiles': [
+            'https://hazards.fema.gov/arcgis/rest/services/public/NFHL/MapServer/export?dpi=96&transparent=true&format=png8&layers=show:1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28&bbox={bbox-epsg-3857}&bboxSR=3857&imageSR=3857&size=256,256&f=image'
+        ],
+        'tileSize': 256
     });
 
-    map.addSource('floodplain', {
-        type: 'vector',
-        url: 'mapbox://ese-toh.a7lml4y4'
-    });
-
+    // add the raster layer to the map to display the floodplains.
     map.addLayer({
         'id': 'floodplain',
-        'type': 'fill',
-        'source': 'floodplain',
-        'source-layer': '25001c-2014-c2ck89',
-        'layout': { 'visibility': 'none' },
+        'type': 'raster',
+        'source': 'fema-nfhl',
         'paint': {
-            'fill-opacity': [
-                'match',
-                ['get', 'ZONE_SUBTY'],
-                '0.2 PCT ANNUAL CHANCE FLOOD HAZARD', 0.4,
-                'AREA OF MINIMAL FLOOD HAZARD', 0.001,
-                /* other */ 0.4
-            ],
-            'fill-color': [
-                'match',
-                ['get', 'FLD_ZONE'],
-                'AE', '#eb8c34',
-                'VE', '#eb3a34',
-                'AO', '#F7FE20',
-                'X', '#2578F9',
-                'A', '#2e4bf0',
-                /* fallback */ '#ff0000'
-            ]
-        }
-    });
-
-    map.addLayer({
-        'id': 'floodplain-line',
-        'type': 'line',
-        'source': 'floodplain',
-        'source-layer': '25001c-2014-c2ck89',
-        'layout': { 'visibility': 'none' },
-        'paint': {
-            'line-width': 0.5, 
-            'line-color': '#000000', 
-            'line-opacity': 0.5 
-        }
-    });
-
-    map.addLayer({
-        'id': 'floodplain-labels',
-        'type': 'symbol',
-        'source': 'floodplain',
-        'source-layer': '25001c-2014-c2ck89',
-        'layout': {
-            'text-field': [
-                'case',
-                ['==', ['get', 'FLD_ZONE'], 'AE'], ['concat', 'AE ', ['get', 'STATIC_BFE']],
-                ['==', ['get', 'FLD_ZONE'], 'VE'], ['concat', 'VE ', ['get', 'STATIC_BFE']],
-                ['==', ['get', 'FLD_ZONE'], 'X'], 'X',
-                ['==', ['get', 'FLD_ZONE'], 'A'], 'A',
-                ''
-            ],
-            'visibility': 'none',
-            'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
-            'text-size': ['interpolate', ['linear'], ['zoom'], 10, 12, 16, 16],
-            'symbol-placement': 'point',
-            'symbol-spacing': 80,
-            'text-rotation-alignment': 'map',
+            'raster-opacity': 0.5
         },
-        'paint': {
-            'text-color': '#202020',
-            'text-opacity': 0.6,
-            'text-halo-color': '#ffffff',
-            'text-halo-width': 1,
-            'text-halo-blur': 0.4
+        'layout': {
+            'visibility': 'none'
         }
-    });
-    
+    }, 'satellite'); // ensures the floodplain layer is placed correctly relative to satellite imagery.
+
+    // keep the mouse pointer functionality for interactivity.
     map.on('mouseenter', 'floodplain', function () {
         map.getCanvas().style.cursor = 'pointer';
     });
-    
     map.on('mouseleave', 'floodplain', function () {
         map.getCanvas().style.cursor = '';
     });
+
+    // handle map clicks to identify flood zone information.
+    map.on('click', 'floodplain', function (e) {
+        // construct the url to query the fema service at the clicked location.
+        const queryUrl = `https://hazards.fema.gov/arcgis/rest/services/public/NFHL/MapServer/identify?geometry=${e.lngLat.lng},${e.lngLat.lat}&geometryType=esriGeometryPoint&sr=4326&layers=all&tolerance=3&mapExtent=${map.getBounds().toArray().flat().join(',')}&imageDisplay=600,550,96&returnGeometry=false&f=json`;
+
+        fetch(queryUrl)
+            .then(response => response.json())
+            .then(data => {
+                if (data.results && data.results.length > 0) {
+                    // find the flood hazard zone result from the query.
+                    const floodZoneInfo = data.results.find(res => res.layerName === 'Flood Hazard Zones');
+                    if (floodZoneInfo) {
+                        const props = floodZoneInfo.attributes;
+                        const popupContent = `
+                            <strong>Flood Zone:</strong> ${props['Zone']} (${props['Zone Subtype'] || 'N/A'})<br>
+                            <strong>Base Flood Elevation:</strong> ${props['BFE'] !== ' ' ? props['BFE'] + ' ft' : 'Not Available'}
+                        `;
+                        new mapboxgl.Popup()
+                            .setLngLat(e.lngLat)
+                            .setHTML(popupContent)
+                            .addTo(map);
+                    }
+                }
+            })
+            .catch(err => console.error("error fetching fema data: ", err));
+    });
 }
 
+// add the layer to the map.
 addFloodplainLayer();
