@@ -37,7 +37,7 @@ function addFloodplainLayer() {
                 /* fallback */ '#ff0000'
             ]
         }
-    }, 'parcel-highlight'); // changed from 'satellite' to ensure it's on top of the base map.
+    }); // removed 'parcel-highlight' to avoid race condition.
     console.log('[debug] floodplain fill layer added.');
     
     // add a boundary line layer for the flood zones.
@@ -52,7 +52,7 @@ function addFloodplainLayer() {
             'line-width': 0.5,
             'line-opacity': 0.5
         }
-    }, 'parcel-highlight'); // changed from 'satellite'
+    }); // removed 'parcel-highlight'
     console.log('[debug] floodplain-line layer added.');
 
     // add a layer for the limwa (limit of moderate wave action) line.
@@ -66,7 +66,7 @@ function addFloodplainLayer() {
             'line-color': '#E70B0B',
             'line-width': 2.0
         }
-    }, 'parcel-highlight'); // changed from 'satellite'
+    }); // removed 'parcel-highlight'
     console.log('[debug] LiMWA layer added.');
 
     // add a labels layer for the flood zones.
