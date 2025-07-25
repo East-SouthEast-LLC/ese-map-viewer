@@ -1,6 +1,8 @@
 // docs/layers/floodplain.js
 
 function addFloodplainLayer() {
+    console.log('[debug] Initializing floodplain layer...');
+
     // add the fema national flood hazard layer as a vector tile source.
     map.addSource('fema-nfhl-vector', {
         'type': 'vector',
@@ -10,6 +12,7 @@ function addFloodplainLayer() {
         'minzoom': 0,
         'maxzoom': 22
     });
+    console.log('[debug] FEMA vector source added.');
 
     // add the primary fill layer for flood hazard zones.
     map.addLayer({
@@ -34,11 +37,12 @@ function addFloodplainLayer() {
                 /* fallback */ '#ff0000'
             ]
         }
-    }, 'satellite'); 
+    }, 'parcel-highlight'); // changed from 'satellite' to ensure it's on top of the base map.
+    console.log('[debug] floodplain fill layer added.');
     
     // add a boundary line layer for the flood zones.
     map.addLayer({
-        'id': 'floodplain-line', // this id matches what toggleable-menu.js expects
+        'id': 'floodplain-line',
         'type': 'line',
         'source': 'fema-nfhl-vector',
         'source-layer': 'S_Fld_Haz_Ar',
@@ -48,7 +52,8 @@ function addFloodplainLayer() {
             'line-width': 0.5,
             'line-opacity': 0.5
         }
-    }, 'satellite');
+    }, 'parcel-highlight'); // changed from 'satellite'
+    console.log('[debug] floodplain-line layer added.');
 
     // add a layer for the limwa (limit of moderate wave action) line.
     map.addLayer({
@@ -61,11 +66,12 @@ function addFloodplainLayer() {
             'line-color': '#E70B0B',
             'line-width': 2.0
         }
-    }, 'satellite');
+    }, 'parcel-highlight'); // changed from 'satellite'
+    console.log('[debug] LiMWA layer added.');
 
     // add a labels layer for the flood zones.
     map.addLayer({
-        'id': 'floodplain-labels', // this id matches what toggleable-menu.js expects
+        'id': 'floodplain-labels',
         'type': 'symbol',
         'source': 'fema-nfhl-vector',
         'source-layer': 'S_Fld_Haz_Ar',
@@ -73,10 +79,8 @@ function addFloodplainLayer() {
             'visibility': 'none',
             'text-field': [
                 'case',
-                // if the base flood elevation is not -9999 (fema's null value), show it.
                 ['!=', ['get', 'STATIC_BFE'], -9999],
                 ['concat', ['get', 'FLD_ZONE'], ' (EL ', ['get', 'STATIC_BFE'], ')'],
-                // otherwise, just show the flood zone name.
                 ['get', 'FLD_ZONE']
             ],
             'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
@@ -89,6 +93,7 @@ function addFloodplainLayer() {
             'text-halo-width': 1.5
         }
     });
+    console.log('[debug] floodplain-labels layer added.');
 
     // handle mouse enter/leave events for the pointer cursor.
     map.on('mouseenter', 'floodplain', function () {
