@@ -1,0 +1,728 @@
+[
+  {
+    "id": "satellite",
+    "displayName": "Satellite",
+    "scriptName": "satellite.js",
+    "drawOrder": 1,
+    "popupConfig": null,
+    "identifyConfig": null,
+    "legendConfig": {
+        "displayName": "Satellite Imagery",
+        "sources": [
+            { "id": "satellite" }
+        ],
+        "items": [
+            {
+                "label": "Satellite View",
+                "color": "#808080",
+                "opacity": 1.0,
+                "isLine": false
+            }
+        ]
+    }
+  },
+  {
+    "id": "parcels",
+    "displayName": "Parcels",
+    "scriptName": "parcels.js",
+    "drawOrder": 90,
+    "popupConfig": {
+      "template": "Address: <strong>{ADDRESS}</strong><br>Webpage: <a href=\"{URL}\" target=\"_blank\"><b><u>Link to Page</u></b></a>"
+    },
+    "identifyConfig": {
+        "template": "<strong>Parcel Address:</strong> {ADDRESS}"
+    },
+    "legendConfig": null
+  },
+  {
+    "id": "parcel highlight",
+    "displayName": "Parcel Highlight",
+    "scriptName": "parcel-highlight.js",
+    "drawOrder": 95,
+    "popupConfig": null,
+    "identifyConfig": null,
+    "legendConfig": {
+        "displayName": "Parcel Highlight",
+        "sources": [
+            { "id": "parcel highlight" }
+        ],
+        "items": [
+            {
+                "label": "MassGIS Parcels",
+                "color": "#a0fa39",
+                "opacity": 1.0,
+                "isLine": true
+            }
+        ]
+    }
+  },
+  {
+    "id": "lidar contours",
+    "displayName": "LIDAR Contours",
+    "scriptName": "lidar-contours.js",
+    "drawOrder": 80,
+    "dependencies": ["lidar-contour-labels"],
+    "popupConfig": null,
+    "identifyConfig": null,
+    "legendConfig": {
+        "displayName": "LIDAR Contours",
+        "sources": [
+            { "id": "lidar contours", "propertyKey": "Elevation" }
+        ],
+        "items": [
+            {
+            "code": "__default__",
+            "label": "2' Contour Line",
+            "color": "#07C327",
+            "opacity": 1.0,
+            "isLine": true
+            }
+        ]
+    }
+  },
+  {
+    "id": "agis",
+    "displayName": "AGIS",
+    "scriptName": "agis.js",
+    "drawOrder": 40,
+    "popupConfig": {
+      "template": "Address <strong>{ADDRESS}</strong><br>Date of photography: <strong>{DATE}</strong><br>Link to Page: <a href=\"{URL}\" target=\"_blank\"><b><u>Link to Page</u></b></a>"
+    },
+    "identifyConfig": {
+        "template": "<strong>Historic Aerial:</strong> Photo from {DATE}"
+    },
+    "legendConfig": {
+        "displayName": "Aerial Photo Coverage",
+        "sources": [
+            { "id": "agis" }
+        ],
+        "items": [
+            { "label": "Historic Aerial Photo", "color": "#3CD935", "opacity": 0.4, "isLine": false }
+        ]
+    }
+  },
+  {
+    "id": "historic",
+    "displayName": "Historic",
+    "scriptName": "historic.js",
+    "drawOrder": 60,
+    "popupConfig": {
+      "template": "Historic District: {District}<br>Status / Reference: <strong>{Status}</strong><br>Documentation: <a href=\"{URL}\" target=\"_blank\"><b><u>Link to Document</u></b></a>"
+    },
+     "identifyConfig": {
+        "template": "<strong>Historic District:</strong> {District}"
+    },
+    "legendConfig": {
+        "displayName": "Historic Districts",
+        "sources": [
+            { "id": "historic", "propertyKey": "Status" }
+        ],
+        "items": [
+            { "code": "Proposed", "label": "Proposed", "color": "#F2BD67", "opacity": 0.4, "isLine": false },
+            { "code": "1024-0018", "label": "Old Kings Highway", "color": "#D75F48", "opacity": 0.4, "isLine": false }
+        ]
+    }
+  },
+  {
+    "id": "floodplain",
+    "displayName": "Floodplain",
+    "scriptName": "floodplain.js",
+    "drawOrder": 50,
+    "dependencies": [
+      "LiMWA",
+      "floodplain-line",
+      "floodplain-labels"
+    ],
+    "popupConfig": {
+      "template": "Flood Zone: <strong>{FLD_ZONE}</strong><br>Elevation: <strong>{STATIC_BFE}</strong>"
+    },
+    "identifyConfig": {
+        "template": "<strong>Flood Zone:</strong> {FLD_ZONE}"
+    },
+    "legendConfig": {
+        "displayName": "FEMA Flood Zones",
+        "sources": [
+            { "id": "floodplain", "propertyKey": "FLD_ZONE" },
+            { "id": "LiMWA" }
+        ],
+        "items": [
+            { "id": "LiMWA", "label": "LiMWA", "color": "#E70B0B", "opacity": 1.0, "isLine": true },
+            { "code": "AE", "label": "Flood Zone AE", "color": "#eb8c34", "opacity": 0.4, "isLine": false },
+            { "code": "VE", "label": "Flood Zone VE", "color": "#eb3a34", "opacity": 0.4, "isLine": false },
+            { "code": "AO", "label": "Flood Zone AO", "color": "#F7FE20", "opacity": 0.4, "isLine": false },
+            { "code": "X", "label": "Flood Zone X", "color": "#2578F9", "opacity": 0.4, "isLine": false },
+            { "code": "A", "label": "Flood Zone A", "color": "#2e4bf0", "opacity": 0.4, "isLine": false }
+        ]
+    }
+  },
+  {
+    "id": "acec",
+    "displayName": "ACEC",
+    "scriptName": "acec.js",
+    "drawOrder": 65,
+    "popupConfig": {
+      "template": "Area of Critical Environmental Concern: <strong>{NAME}</strong><br>DEP ACEC Designation: <a href=\"{LINK}\" target=\"_blank\"><b><u>Link to Document</u></b></a>"
+    },
+    "identifyConfig": {
+        "template": "<strong>ACEC:</strong> {NAME}"
+    },
+    "legendConfig": {
+        "displayName": "ACEC",
+        "sources": [
+            { "id": "acec" }
+        ],
+        "items": [
+            {
+            "label": "Area of Critical Environmental Concern",
+            "color": "#CD06D8",
+            "opacity": 0.4,
+            "isLine": false
+            }
+        ]
+    }
+  },
+  {
+    "id": "DEP wetland",
+    "displayName": "DEP Wetland",
+    "scriptName": "depwetland.js",
+    "drawOrder": 55,
+    "dependencies": ["dep-wetland-line", "dep-wetland-labels"],
+    "popupConfig": {
+      "template": "Wetland Identifier: <strong>{IT_VALDESC}</strong><br>Wetland Code: <strong>{IT_VALC}</strong>"
+    },
+    "identifyConfig": {
+        "template": "<strong>DEP Wetland:</strong> {IT_VALDESC}"
+    },
+    "legendConfig": {
+        "displayName": "DEP Wetlands",
+        "sources": [
+            { "id": "DEP wetland", "propertyKey": "IT_VALC" },
+            { "id": "dep-wetland-line", "propertyKey": "ARC_CODE" }
+        ],
+        "items": [
+            { "code": "BA", "label": "Coastal Bank Bluff or Sea Cliff (BA)", "color": "#F7F124", "opacity": 0.5, "isLine": false },
+            { "code": "BB", "label": "Barrier Beach System (BB)", "color": "#DCD609", "opacity": 0.4, "isLine": false },
+            { "code": "BB-BE", "label": "Barrier Beach-Coastal Beach (BB-BE)", "color": "#D0D041", "opacity": 0.4, "isLine": false },
+            { "code": "BB-D", "label": "Barrier Beach-Coastal Dune (BB-D)", "color": "#99F108", "opacity": 0.4, "isLine": false },
+            { "code": "BB-M", "label": "Barrier Beach-Marsh (BB-M)", "color": "#24AF0B", "opacity": 0.4, "isLine": false },
+            { "code": "BB-OW", "label": "Barrier Beach-Open Water (BB-OW)", "color": "#1BB5CA", "opacity": 0.4, "isLine": false },
+            { "code": "BB-SM", "label": "Barrier Beach-Salt Marsh (BB-SM)", "color": "#24AF0B", "opacity": 0.6, "isLine": false },
+            { "code": "BB-SS", "label": "Barrier Beach-Shrub Swamp (BB-SS)", "color": "#32D34F", "opacity": 0.6, "isLine": false },
+            { "code": "BB-WS1", "label": "Barrier Beach-Wooded Swamp Deciduous (BB-WS1)", "color": "#1F9A35", "opacity": 0.6, "isLine": false },
+            { "code": "BB-WS2", "label": "Barrier Beach-Wooded Swamp Coniferous (BB-WS2)", "color": "#056828", "opacity": 0.6, "isLine": false },
+            { "code": "BE", "label": "Coastal Beach (BE)", "color": "#D7E00F", "opacity": 0.4, "isLine": false },
+            { "code": "BG", "label": "Barrier Beach-Grassland (BG)", "color": "#0C9955", "opacity": 0.5, "isLine": false },
+            { "code": "CB", "label": "Cranberry Bog (CB)", "color": "#BB0418", "opacity": 0.5, "isLine": false },
+            { "code": "D", "label": "Coastal Dune (CD)", "color": "#99F108", "opacity": 0.4, "isLine": false },
+            { "code": "DM", "label": "Deep Marsh (DM)", "color": "#056A56", "opacity": 0.5, "isLine": false },
+            { "code": "M", "label": "Shallow Marsh Meadow or Fen (M)", "color": "#26A04E", "opacity": 0.4, "isLine": false },
+            { "code": "OW", "label": "Open Water (OW)", "color": "#2B8ACB", "opacity": 0.4, "isLine": false },
+            { "code": "RS", "label": "Rocky Intertidal Shore (RS)", "color": "#B5C0C8", "opacity": 0.4, "isLine": false },
+            { "code": "SM", "label": "Salt Marsh (SM)", "color": "#389C3F", "opacity": 0.4, "isLine": false },
+            { "code": "SS", "label": "Shrub Swamp (SS)", "color": "#24CF31", "opacity": 0.4, "isLine": false },
+            { "code": "TF", "label": "Tidal Flat (TF)", "color": "#F3F4CC", "opacity": 0.5, "isLine": false },
+            { "code": "WS1", "label": "Wooded Swamp Deciduous (WS1)", "color": "#1F9A35", "opacity": 0.5, "isLine": false },
+            { "code": "WS2", "label": "Wooded Swamp Coniferous (WS2)", "color": "#056828", "opacity": 0.6, "isLine": false },
+            { "code": "WS3", "label": "Wooded Swamp Mixed Trees (WS3)", "color": "#448842", "opacity": 0.6, "isLine": false },
+            { "code": "0", "label": "Edge of Ocean", "color": "#08ADEF", "opacity": 1.0, "isLine": true },
+            { "code": "1", "label": "Shoreline", "color": "#EBF90A", "opacity": 1.0, "isLine": true },
+            { "code": "2", "label": "Closure", "color": "#EBECDD", "opacity": 1.0, "isLine": true },
+            { "code": "3", "label": "Apparent Wetland Limit", "color": "#F2A5EF", "opacity": 1.0, "isLine": true },
+            { "code": "7", "label": "Hydro Connection", "color": "#0B11F0", "opacity": 1.0, "isLine": true },
+            { "code": "8", "label": "MLW", "color": "#5E87ED", "opacity": 1.0, "isLine": true },
+            { "code": "88", "label": "Edge Interrupted", "color": "#5EE1ED", "opacity": 1.0, "isLine": true }
+        ]
+    }
+  },
+  {
+    "id": "endangered species",
+    "displayName": "Endangered Species",
+    "scriptName": "endangered-species.js",
+    "drawOrder": 70,
+    "dependencies": ["endangered-species-labels", "vernal-pools", "vernal-pools-labels"],
+    "popupConfig": {
+        "template": "Estimated Habitat ID: <strong>{ESTHAB_ID}</strong><br>Priority Habitat ID: <strong>{PRIHAB_ID}</strong>"
+    },
+    "identifyConfig": {
+        "template": "<strong>NHESP Habitat:</strong> Priority & Estimated"
+    },
+    "legendConfig": {
+        "displayName": "Endangered Species",
+        "sources": [
+            { "id": "endangered species", "propertyKey": "EST_PRI" },
+            { "id": "vernal-pools" }
+        ],
+        "items": [
+            { "code": "ESTandPRI", "label": "Priority & Estimated Habitat", "color": "#e7ee1f", "opacity": 0.4, "isLine": false },
+            { "code": "PRI_ONLY", "label": "Priority Habitat Only", "color": "#1DB708", "opacity": 0.4, "isLine": false },
+            { "code": "EST_ONLY", "label": "Estimated Habitat Only", "color": "#A28F06", "opacity": 0.4, "isLine": false },
+            { "id": "vernal-pools", "label": "Vernal Pools", "color": "#0D71F9", "opacity": 0.8, "isLine": false }
+        ]
+    }
+  },
+    {
+    "id": "zone II",
+    "displayName": "Zone II",
+    "scriptName": "zoneii.js",
+    "drawOrder": 75,
+    "dependencies": ["zone-ii-outline", "zone-ii-labels"],
+    "popupConfig": {
+        "template": "Zone II number: <strong>{ZII_NUM}</strong><br>Water Supplier: <strong>{SUPPLIER}</strong><br>Town: <strong>{TOWN}</strong>"
+    },
+    "identifyConfig": {
+        "template": "<strong>Zone II:</strong> Wellhead Protection Area"
+    },
+    "legendConfig": {
+        "displayName": "Zone II",
+        "sources": [
+            { "id": "zone II" }
+        ],
+        "items": [
+            { "label": "Zone II Area", "color": "#2758d6", "opacity": 0.4, "isLine": false }
+        ]
+    }
+  },
+  {
+    "id": "soils",
+    "displayName": "Soils",
+    "scriptName": "soils.js",
+    "drawOrder": 45,
+    "dependencies": ["soils-labels", "soils-outline"],
+    "popupConfig": {
+        "template": "Numeric State Legend: <strong>{MUSYM}</strong><br>Published Map Unit: <strong>{MUS_TXT}</strong><br><strong>{MUS_DESC}</strong>"
+    },
+    "identifyConfig": {
+        "template": "<strong>Soil Unit:</strong> {MUSYM}"
+    },
+    "legendConfig": {
+        "displayName": "NRCS Soils",
+        "sources": [
+            { "id": "soils", "propertyKey": "MUSYM" }
+        ],
+        "items": [
+            { "code": "258A", "label": "258A", "color": "#C88F0D", "opacity": 0.5, "isLine": false },
+            { "code": "430B", "label": "430B", "color": "#EAE23B", "opacity": 0.5, "isLine": false },
+            { "code": "430C", "label": "430C", "color": "#FFE60A", "opacity": 0.5, "isLine": false },
+            { "code": "431B", "label": "431B", "color": "#EBEE1E", "opacity": 0.5, "isLine": false },
+            { "code": "431C", "label": "431C", "color": "#EBEE1E", "opacity": 0.5, "isLine": false },
+            { "code": "432D", "label": "432D", "color": "#EBEE1E", "opacity": 0.5, "isLine": false },
+            { "code": "485C", "label": "485C", "color": "#EEF108", "opacity": 0.5, "isLine": false },
+            { "code": "488C", "label": "488C", "color": "#E4E65A", "opacity": 0.5, "isLine": false },
+            { "code": "489C", "label": "489C", "color": "#E4E65A", "opacity": 0.5, "isLine": false },
+            { "code": "490C", "label": "490C", "color": "#E4E65A", "opacity": 0.5, "isLine": false },
+            { "code": "494C", "label": "494C", "color": "#E4E65A", "opacity": 0.5, "isLine": false },
+            { "code": "610", "label": "610", "color": "#EEEF89", "opacity": 0.5, "isLine": false },
+            { "code": "225B", "label": "225B", "color": "#BC8A26", "opacity": 0.5, "isLine": false },
+            { "code": "11A", "label": "11A", "color": "#444F61", "opacity": 0.5, "isLine": false },
+            { "code": "220A", "label": "220A", "color": "#BA7E06", "opacity": 0.5, "isLine": false },
+            { "code": "220B", "label": "220B", "color": "#BA7E06", "opacity": 0.5, "isLine": false },
+            { "code": "259A", "label": "259A", "color": "#F6EE2E", "opacity": 0.5, "isLine": false },
+            { "code": "259B", "label": "259B", "color": "#F6EE2E", "opacity": 0.5, "isLine": false },
+            { "code": "252A", "label": "252A", "color": "#F5E663", "opacity": 0.5, "isLine": false },
+            { "code": "252B", "label": "252B", "color": "#F5E663", "opacity": 0.5, "isLine": false },
+            { "code": "252C", "label": "252C", "color": "#F5E663", "opacity": 0.5, "isLine": false },
+            { "code": "252D", "label": "252D", "color": "#F5E663", "opacity": 0.5, "isLine": false },
+            { "code": "263B", "label": "263B", "color": "#f5b73b", "opacity": 0.5, "isLine": false },
+            { "code": "263C", "label": "263C", "color": "#f5b73b", "opacity": 0.5, "isLine": false },
+            { "code": "263D", "label": "263D", "color": "#f5b73b", "opacity": 0.5, "isLine": false },
+            { "code": "256A", "label": "256A", "color": "#edd768", "opacity": 0.5, "isLine": false },
+            { "code": "652", "label": "652", "color": "#8c8a80", "opacity": 0.5, "isLine": false },
+            { "code": "611", "label": "611", "color": "#fdff99", "opacity": 0.5, "isLine": false },
+            { "code": "264A", "label": "264A", "color": "#f0f26f", "opacity": 0.5, "isLine": false },
+            { "code": "264B", "label": "264B", "color": "#f0f26f", "opacity": 0.5, "isLine": false },
+            { "code": "264C", "label": "264C", "color": "#f0f26f", "opacity": 0.5, "isLine": false },
+            { "code": "264D", "label": "264D", "color": "#f0f26f", "opacity": 0.5, "isLine": false },
+            { "code": "265A", "label": "265A", "color": "#dee046", "opacity": 0.5, "isLine": false },
+            { "code": "265B", "label": "265B", "color": "#dee046", "opacity": 0.5, "isLine": false },
+            { "code": "265C", "label": "265C", "color": "#dee046", "opacity": 0.5, "isLine": false },
+            { "code": "52A", "label": "52A", "color": "#272D4B", "opacity": 0.5, "isLine": false },
+            { "code": "54A", "label": "54A", "color": "#211F56", "opacity": 0.5, "isLine": false },
+            { "code": "55A", "label": "55A", "color": "#5F5E6D", "opacity": 0.5, "isLine": false },
+            { "code": "253A", "label": "253A", "color": "#e3dc81", "opacity": 0.5, "isLine": false },
+            { "code": "253B", "label": "253B", "color": "#e3dc81", "opacity": 0.5, "isLine": false },
+            { "code": "242C", "label": "242C", "color": "#e3dc81", "opacity": 0.5, "isLine": false },
+            { "code": "242D", "label": "242D", "color": "#e3dc81", "opacity": 0.5, "isLine": false },
+            { "code": "226A", "label": "226A", "color": "#9e951c", "opacity": 0.5, "isLine": false },
+            { "code": "226B", "label": "226B", "color": "#9e951c", "opacity": 0.5, "isLine": false },
+            { "code": "226C", "label": "226C", "color": "#9e951c", "opacity": 0.5, "isLine": false },
+            { "code": "612C", "label": "612C", "color": "#c9c973", "opacity": 0.5, "isLine": false },
+            { "code": "612D", "label": "612D", "color": "#c9c973", "opacity": 0.5, "isLine": false },
+            { "code": "613C", "label": "613C", "color": "#e0e094", "opacity": 0.5, "isLine": false },
+            { "code": "66A", "label": "66A", "color": "#484679", "opacity": 0.5, "isLine": false },
+            { "code": "12A", "label": "12A", "color": "#131230", "opacity": 0.5, "isLine": false },
+            { "code": "13A", "label": "13A", "color": "#524670", "opacity": 0.5, "isLine": false },
+            { "code": "254A", "label": "254A", "color": "#c2b91d", "opacity": 0.5, "isLine": false },
+            { "code": "254B", "label": "254B", "color": "#c2b91d", "opacity": 0.5, "isLine": false },
+            { "code": "254C", "label": "254C", "color": "#c2b91d", "opacity": 0.5, "isLine": false },
+            { "code": "254D", "label": "254D", "color": "#c2b91d", "opacity": 0.5, "isLine": false },
+            { "code": "245A", "label": "245A", "color": "#c2b91d", "opacity": 0.5, "isLine": false },
+            { "code": "245B", "label": "245B", "color": "#c2b91d", "opacity": 0.5, "isLine": false },
+            { "code": "245C", "label": "245C", "color": "#c2b91d", "opacity": 0.5, "isLine": false },
+            { "code": "245D", "label": "245D", "color": "#c2b91d", "opacity": 0.5, "isLine": false },
+            { "code": "299", "label": "299", "color": "#f2e6a7", "opacity": 0.5, "isLine": false },
+            { "code": "299A", "label": "299A", "color": "#f2e6a7", "opacity": 0.5, "isLine": false },
+            { "code": "299B", "label": "299B", "color": "#f2e6a7", "opacity": 0.5, "isLine": false },
+            { "code": "299C", "label": "299C", "color": "#f2e6a7", "opacity": 0.5, "isLine": false },
+            { "code": "299D", "label": "299D", "color": "#f2e6a7", "opacity": 0.5, "isLine": false },
+            { "code": "380B", "label": "380B", "color": "#807c69", "opacity": 0.5, "isLine": false },
+            { "code": "380C", "label": "380C", "color": "#807c69", "opacity": 0.5, "isLine": false },
+            { "code": "381B", "label": "381B", "color": "#6e6d67", "opacity": 0.5, "isLine": false },
+            { "code": "381C", "label": "381C", "color": "#6e6d67", "opacity": 0.5, "isLine": false },
+            { "code": "38A", "label": "38A", "color": "#412D70", "opacity": 0.5, "isLine": false },
+            { "code": "600", "label": "600", "color": "#d1cebe", "opacity": 0.5, "isLine": false },
+            { "code": "435A", "label": "435A", "color": "#f5ef98", "opacity": 0.5, "isLine": false },
+            { "code": "435B", "label": "435B", "color": "#f5ef98", "opacity": 0.5, "isLine": false },
+            { "code": "435C", "label": "435C", "color": "#f5ef98", "opacity": 0.5, "isLine": false },
+            { "code": "435D", "label": "435D", "color": "#f5ef98", "opacity": 0.5, "isLine": false },
+            { "code": "436B", "label": "436B", "color": "#f3f7a8", "opacity": 0.5, "isLine": false },
+            { "code": "436C", "label": "436C", "color": "#f3f7a8", "opacity": 0.5, "isLine": false },
+            { "code": "436D", "label": "436D", "color": "#f3f7a8", "opacity": 0.5, "isLine": false },
+            { "code": "483C", "label": "483C", "color": "#f2f196", "opacity": 0.5, "isLine": false },
+            { "code": "483D", "label": "483D", "color": "#f2f196", "opacity": 0.5, "isLine": false },
+            { "code": "484C", "label": "484C", "color": "#f2e796", "opacity": 0.5, "isLine": false },
+            { "code": "484D", "label": "484D", "color": "#f2e796", "opacity": 0.5, "isLine": false },
+            { "code": "493D", "label": "493D", "color": "#b5b18f", "opacity": 0.5, "isLine": false },
+            { "code": "14A", "label": "14A", "color": "#6A8195", "opacity": 0.5, "isLine": false },
+            { "code": "269A", "label": "269A", "color": "#d1c877", "opacity": 0.5, "isLine": false },
+            { "code": "665", "label": "665", "color": "#e3e1cc", "opacity": 0.5, "isLine": false },
+            { "code": "602", "label": "602", "color": "#45443f", "opacity": 0.5, "isLine": false },
+            { "code": "21A", "label": "21A", "color": "#355D7E", "opacity": 0.5, "isLine": false },
+            { "code": "1", "label": "1", "color": "#378df0", "opacity": 0.5, "isLine": false },
+            { "code": "607", "label": "607", "color": "#2872bd", "opacity": 0.5, "isLine": false },
+            { "code": "608", "label": "608", "color": "#76ace3", "opacity": 0.5, "isLine": false },
+            { "code": "53A", "label": "53A", "color": "#323538", "opacity": 0.5, "isLine": false },
+            { "code": "260A", "label": "260A", "color": "#323538", "opacity": 0.5, "isLine": false },
+            { "code": "431D", "label": "431D", "color": "#787437", "opacity": 0.5, "isLine": false }
+        ]
+    }
+  },
+  {
+    "id": "zoning",
+    "displayName": "Zoning",
+    "scriptName": "zoning.js",
+    "drawOrder": 35,
+    "popupConfig": {
+      "template": "Zoning District: <strong>{TOWNCODE}</strong><br><br>Check with the Town Clerk or Planning Department.<br><strong>This layer is from 2004</strong>"
+    },
+    "identifyConfig": {
+        "template": "<strong>Zoning:</strong> {TOWNCODE}"
+    },
+    "legendConfig": {
+        "displayName": "Zoning Districts",
+        "sources": [
+            { "id": "zoning", "propertyKey": "TOWNCODE" }
+        ],
+        "items": [
+            { "code": "RC3", "label": "RC3", "color": "#f1f748", "opacity": 0.4, "isLine": false },
+            { "code": "F", "label": "F", "color": "#f1f748", "opacity": 0.4, "isLine": false },
+            { "code": "NSP", "label": "NSP", "color": "#f1f748", "opacity": 0.4, "isLine": false },
+            { "code": "S", "label": "S", "color": "#f1f748", "opacity": 0.4, "isLine": false },
+            { "code": "SC", "label": "SC", "color": "#f1f748", "opacity": 0.4, "isLine": false },
+            { "code": "SS", "label": "SS", "color": "#f1f748", "opacity": 0.4, "isLine": false },
+            { "code": "M", "label": "M", "color": "#60cccc", "opacity": 0.4, "isLine": false },
+            { "code": "M/C", "label": "M/C", "color": "#4ed130", "opacity": 0.4, "isLine": false },
+            { "code": "R20", "label": "R20", "color": "#72a5ed", "opacity": 0.4, "isLine": false },
+            { "code": "R20A", "label": "R20A", "color": "#5877bf", "opacity": 0.4, "isLine": false },
+            { "code": "R25", "label": "R25", "color": "#877613", "opacity": 0.4, "isLine": false },
+            { "code": "R30", "label": "R30", "color": "#3d4eeb", "opacity": 0.4, "isLine": false },
+            { "code": "R40", "label": "R40", "color": "#2c97d1", "opacity": 0.4, "isLine": false },
+            { "code": "R40A", "label": "R40A", "color": "#4836cf", "opacity": 0.4, "isLine": false },
+            { "code": "R60", "label": "R60", "color": "#842cd1", "opacity": 0.4, "isLine": false },
+            { "code": "R80", "label": "R80", "color": "#877613", "opacity": 0.4, "isLine": false },
+            { "code": "I", "label": "I", "color": "#5f6069", "opacity": 0.4, "isLine": false },
+            { "code": "GB1", "label": "GB1", "color": "#ab5c46", "opacity": 0.4, "isLine": false },
+            { "code": "GB2", "label": "GB2", "color": "#c24a29", "opacity": 0.4, "isLine": false },
+            { "code": "GB3", "label": "GB3", "color": "#a32807", "opacity": 0.4, "isLine": false },
+            { "code": "SB", "label": "SB", "color": "#d97b09", "opacity": 0.4, "isLine": false }
+        ]
+    }
+  },
+  {
+    "id": "usgs quad",
+    "displayName": "USGS Quad",
+    "scriptName": "usgs-tile-manager.js",
+    "type": "managed",
+    "drawOrder": 5,
+    "popupConfig": null,
+    "identifyConfig": null,
+    "legendConfig": {
+        "id": "usgs-quad-legend",
+        "displayName": "USGS Quads",
+        "items": [
+            {
+                "label": "USGS Maps",
+                "color": "#e3e1cc",
+                "opacity": 0.85
+            }
+        ]
+    }
+  },
+  {
+    "id": "panoramas",
+    "displayName": "Panoramas",
+    "scriptName": "panoramas.js",
+    "drawOrder": 100,
+    "popupConfig": null,
+    "identifyConfig": null,
+    "legendConfig": null
+  },
+  {
+    "id": "conservancy districts",
+    "displayName": "Conservancy Districts",
+    "scriptName": "conservancydistricts.js",
+    "drawOrder": 62,
+    "popupConfig": {
+      "template": "Conservancy District: <strong>{CONS_DIST}</strong><br><br>{CONS_DIST} Elevation: <strong>{CONS_ELEV} {CONS_DATUM}</strong><br>{CONS_DIST} Water Elevation: <strong>{WATER_ELEV} {CONS_DATUM}</strong><br><br>Conservancy District Contour: <strong>{CONT_NAVD} {CONV_DATUM}</strong><br><br>Description: {CONS_DESC}"
+    },
+    "identifyConfig": {
+        "template": "<strong>Conservancy:</strong> {CONS_DIST}"
+    },
+    "legendConfig": {
+        "displayName": "Conservancy Districts",
+        "sources": [
+            { "id": "conservancy districts", "propertyKey": "CONS_TYPE" }
+        ],
+        "items": [
+            { "code": "BOG", "label": "Bog", "color": "#239607", "opacity": 0.4, "isLine": false },
+            { "code": "DITCH", "label": "Ditch", "color": "#072483", "opacity": 0.4, "isLine": false },
+            { "code": "MARSH", "label": "Marsh", "color": "#4FD33F", "opacity": 0.4, "isLine": false },
+            { "code": "SWAMP", "label": "Swamp", "color": "#21A546", "opacity": 0.4, "isLine": false },
+            { "code": "WATER", "label": "Water", "color": "#18A7AA", "opacity": 0.4, "isLine": false }
+        ]
+    }
+  },
+  {
+    "id": "conservation",
+    "displayName": "Conservation",
+    "scriptName": "conservation.js",
+    "drawOrder": 30,
+    "popupConfig": {
+        "template": "CCF Parcel: <strong>{CCF_ID}</strong><br><br>The light green parcels are approximate, the dark green parcels are more accurate."
+    },
+    "identifyConfig": {
+        "template": "<strong>Conservation:</strong> CCF Parcel"
+    },
+    "legendConfig": {
+        "displayName": "Conservation Land",
+        "sources": [
+            { "id": "conservation", "propertyKey": "Last_Updat" }
+        ],
+        "items": [
+            { "code": "CCF_Owned_Parcels_JBedits", "label": "Approximate", "color": "#abe356", "opacity": 0.4, "isLine": false },
+            { "code": "other", "label": "Accurate", "color": "#22c410", "opacity": 0.4, "isLine": false }
+        ]
+    }
+  },
+  {
+    "id": "sewer",
+    "displayName": "Sewer",
+    "scriptName": "sewer.js",
+    "drawOrder": 25,
+    "popupConfig": {
+        "template": "Approximate year constructed: {CONTRACT}<br>Address: <strong>{ADDRESS}</strong><br>Webpage: <a href=\"{URL}\" target=\"_blank\"><b><u>Link to Page</u></b></a>"
+    },
+    "identifyConfig": {
+        "template": "<strong>Sewer Service:</strong> Year ~{CONTRACT}"
+    },
+    "legendConfig": {
+                "displayName": "Sewer Service Area",
+        "sources": [
+            { "id": "sewer", "propertyKey": "CONTRACT" }
+        ],
+        "items": [
+            { "code": "2010", "label": "2010", "color": "#473b02", "opacity": 0.4, "isLine": false },
+            { "code": "2011", "label": "2011", "color": "#756410", "opacity": 0.4, "isLine": false },
+            { "code": "2012", "label": "2012", "color": "#5e4f1e", "opacity": 0.4, "isLine": false },
+            { "code": "2013", "label": "2013", "color": "#86873d", "opacity": 0.4, "isLine": false },
+            { "code": "2014", "label": "2014", "color": "#8c872a", "opacity": 0.4, "isLine": false },
+            { "code": "2015", "label": "2015", "color": "#ced12e", "opacity": 0.4, "isLine": false },
+            { "code": "2016", "label": "2016", "color": "#87713d", "opacity": 0.4, "isLine": false },
+            { "code": "2017", "label": "2017", "color": "#634d19", "opacity": 0.4, "isLine": false },
+            { "code": "2018", "label": "2018", "color": "#4a3503", "opacity": 0.4, "isLine": false },
+            { "code": "2019", "label": "2019", "color": "#8a8506", "opacity": 0.4, "isLine": false },
+            { "code": "2020", "label": "2020", "color": "#e7fa16", "opacity": 0.4, "isLine": false },
+            { "code": "2021", "label": "2021", "color": "#3d3610", "opacity": 0.4, "isLine": false },
+            { "code": "2022", "label": "2022", "color": "#78672c", "opacity": 0.4, "isLine": false }
+        ]
+    }
+  },
+  {
+    "id": "sewer plans",
+    "displayName": "Sewer Plans",
+    "scriptName": "sewer-plans.js",
+    "drawOrder": 26,
+    "dependencies": ["sewer-plans-outline"],
+    "popupConfig": {
+      "template": "Year of plan: <strong>{DATE}</strong><br>Plan ID: <strong>{SHEET}</strong><br>Link to plan: <a href=\"{URL}\" target=\"_blank\"><b><u>Link to plan</u></b></a><br>Disclaimer: Information may be inaccurate."
+    },
+    "identifyConfig": {
+        "template": "<strong>Sewer Plan:</strong> ID {SHEET}"
+    },
+    "legendConfig": {
+        "displayName": "Sewer Plans",
+        "sources": [
+            { "id": "sewer plans" }
+        ],
+        "items": [
+            { "label": "Not on original plan", "color": "#e57373", "opacity": 0.4, "isLine": false, "match": { "property": "ADDED", "value": "Y" } },
+            { "label": "Plan Year: 2014-2019", "color": "#d32f2f", "opacity": 0.4, "isLine": false, "match": { "property": "DATE", "min": 2014, "max": 2019 } },
+            { "label": "Plan Year: 2008-2013", "color": "#b71c1c", "opacity": 0.4, "isLine": false, "match": { "property": "DATE", "min": 2008, "max": 2013 } },
+            { "label": "Plan Year: 2000-2007", "color": "#a31515", "opacity": 0.4, "isLine": false, "match": { "property": "DATE", "min": 2000, "max": 2007 } },
+            { "label": "Plan Year: 1983-1999", "color": "#7f1010", "opacity": 0.4, "isLine": false, "match": { "property": "DATE", "min": 1983, "max": 1999 } },
+            { "label": "Plan Year: 1969-1982", "color": "#4b0707", "opacity": 0.4, "isLine": false, "match": { "property": "DATE", "min": 1969, "max": 1982 } }
+        ]
+    }
+  },
+  {
+    "id": "stories",
+    "displayName": "Stories",
+    "scriptName": "stories.js",
+    "drawOrder": 20,
+    "popupConfig": {
+        "template": "Number of Stories: <strong>{STORIES}</strong><br>Building Description: <strong>{BLD_DESC}</strong><br>Zoning: <strong>{ZONING}</strong>"
+    },
+    "identifyConfig": {
+        "template": "<strong>Building:</strong> {STORIES} Stories"
+    },
+    "legendConfig": {
+        "displayName": "Building Stories",
+        "sources": [
+            { "id": "stories", "propertyKey": "STORIESS" }
+        ],
+        "items": [
+            { "code": "0", "label": "0 Stories", "color": "#e2ffcc", "opacity": 0.4, "isLine": false },
+            { "code": "1", "label": "1 Story", "color": "#fffbb3", "opacity": 0.4, "isLine": false },
+            { "code": "1.5", "label": "1.5 Stories", "color": "#8cf2ff", "opacity": 0.4, "isLine": false },
+            { "code": "2", "label": "2 Stories", "color": "#5e90f2", "opacity": 0.4, "isLine": false },
+            { "code": "2.5", "label": "2.5 Stories", "color": "#3b64b8", "opacity": 0.4, "isLine": false },
+            { "code": "3", "label": "3 Stories", "color": "#3841e8", "opacity": 0.4, "isLine": false }
+        ]
+    }
+  },
+  {
+    "id": "intersection",
+    "displayName": "Intersection",
+    "scriptName": "intersection.js",
+    "drawOrder": 15,
+    "popupConfig": {
+        "template": "Intersection: <strong>{Int_Name}</strong><br>Webpage: <a href=\"{Link}\" target=\"_blank\"><b><u>Link to Page</u></b></a>"
+    },
+    "identifyConfig": {
+        "template": "<strong>Intersection Project:</strong> {Int_Name}"
+    },
+    "legendConfig": {
+        "displayName": "Intersections",
+        "sources": [
+            { "id": "intersection" }
+        ],
+        "items": [
+            { "label": "Intersection Improvement Area", "color": "#14B9F7", "opacity": 0.5, "isLine": false }
+        ]
+    }
+  },
+  {
+    "id": "contours",
+    "displayName": "Contours",
+    "scriptName": "contours.js",
+    "drawOrder": 85,
+    "popupConfig": null,
+    "identifyConfig": null,
+    "legendConfig": {
+        "displayName": "Contours",
+        "sources": [
+            { "id": "contours" }
+        ],
+        "items": [
+            {
+                "label": "Contour Line",
+                "color": "#26b24f",
+                "opacity": 1.0,
+                "isLine": true
+            }
+        ]
+    }
+  },
+  {
+    "id": "private properties upland",
+    "displayName": "Private Properties Upland",
+    "scriptName": "private-properties-upland.js",
+    "drawOrder": 32,
+    "popupConfig": {
+        "template": "Lot Size: <strong>{_LOT_SIZE} S.F. </strong><br>Owner (2024): <strong>{_OWNER1}</strong>"
+    },
+    "identifyConfig": {
+        "template": "<strong>Upland Parcel:</strong> Lot Size {_LOT_SIZE} SF"
+    },
+    "legendConfig": {
+        "displayName": "Private Properties (Upland)",
+        "sources": [
+            { "id": "private properties upland" }
+        ],
+        "items": [
+            {
+                "label": "80k - 100k SF",
+                "color": "#81d4fa",
+                "opacity": 0.5,
+                "isLine": false,
+                "match": { "property": "_LOT_SIZE", "min": 80000, "max": 99999 }
+            },
+            {
+                "label": "100k - 150k SF",
+                "color": "#4fc3f7",
+                "opacity": 0.5,
+                "isLine": false,
+                "match": { "property": "_LOT_SIZE", "min": 100000, "max": 149999 }
+            },
+            {
+                "label": "150k - 200k SF",
+                "color": "#29b6f6",
+                "opacity": 0.5,
+                "isLine": false,
+                "match": { "property": "_LOT_SIZE", "min": 150000, "max": 199999 }
+            },
+            {
+                "label": "200k - 250k SF",
+                "color": "#03a9f4",
+                "opacity": 0.5,
+                "isLine": false,
+                "match": { "property": "_LOT_SIZE", "min": 200000, "max": 249999 }
+            },
+            {
+                "label": "250k - 300k SF",
+                "color": "#039be5",
+                "opacity": 0.5,
+                "isLine": false,
+                "match": { "property": "_LOT_SIZE", "min": 250000, "max": 299999 }
+            },
+            {
+                "label": "300k - 350k SF",
+                "color": "#0288d1",
+                "opacity": 0.5,
+                "isLine": false,
+                "match": { "property": "_LOT_SIZE", "min": 300000, "max": 349999 }
+            },
+            {
+                "label": "350k - 400k SF",
+                "color": "#0277bd",
+                "opacity": 0.5,
+                "isLine": false,
+                "match": { "property": "_LOT_SIZE", "min": 350000, "max": 399999 }
+            },
+            {
+                "label": "400k - 500k SF",
+                "color": "#01579b",
+                "opacity": 0.5,
+                "isLine": false,
+                "match": { "property": "_LOT_SIZE", "min": 400000, "max": 499999 }
+            },
+            {
+                "label": "> 500k SF",
+                "color": "#003f7f",
+                "opacity": 0.5,
+                "isLine": false,
+                "match": { "property": "_LOT_SIZE", "min": 500000, "max": 99999999 }
+            }
+        ]
+    }
+  }
+]

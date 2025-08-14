@@ -1,4 +1,4 @@
-// docs/decode-url.js
+// src/js/utils/decode-url.js
 
 function applyUrlParams(map) {
     const urlParams = new URLSearchParams(window.location.search);
@@ -29,15 +29,13 @@ function applyUrlParams(map) {
     const layers = urlParams.get('layers')?.split(',') || [];
     
     function setDependentLayersVisibility(layerId, visibility) {
-        const dependentLayers = {
-            'floodplain': ['LiMWA', 'floodplain-line', 'floodplain-labels'],
-            'DEP wetland': ['dep-wetland-line', 'dep-wetland-labels'],
-            'soils': ['soils-labels', 'soils-outline'],
-            'zone II': ['zone-ii-outline', 'zone-ii-labels'],
-            'endangered species': ['endangered-species-labels', 'vernal-pools', 'vernal-pools-labels'],
-            'sewer plans': ['sewer-plans-outline'],
-            'lidar contours': ['lidar-contour-labels']
-        };
+        // dynamically generate the dependentLayers object from the global layerConfig
+        const dependentLayers = window.layerConfig
+            .filter(layer => layer.dependencies && layer.dependencies.length > 0)
+            .reduce((acc, layer) => {
+                acc[layer.id] = layer.dependencies;
+                return acc;
+            }, {});
 
         if (dependentLayers[layerId]) {
             dependentLayers[layerId].forEach(depId => {

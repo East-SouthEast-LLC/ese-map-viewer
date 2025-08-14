@@ -48,18 +48,10 @@ if (!customPrintButton || !customPrintBox) {
             map.setLayoutProperty(layerId, 'visibility', visibility);
         }
     
-        const dependentLayers = {
-            'floodplain': ['LiMWA', 'floodplain-line', 'floodplain-labels'],
-            'DEP wetland': ['dep-wetland-line', 'dep-wetland-labels'],
-            'soils': ['soils-labels', 'soils-outline'],
-            'zone II': ['zone-ii-outline', 'zone-ii-labels'],
-            'endangered species': ['endangered-species-labels', 'vernal-pools', 'vernal-pools-labels'],
-            'sewer plans': ['sewer-plans-outline'],
-            'lidar contours': ['lidar-contour-labels']
-        };
-    
-        if (dependentLayers[layerId]) {
-            dependentLayers[layerId].forEach(depId => {
+        // dynamically get dependencies from the global layer config
+        const layerConfig = window.layerConfig.find(l => l.id === layerId);
+        if (layerConfig && layerConfig.dependencies) {
+            layerConfig.dependencies.forEach(depId => {
                 if (map.getLayer(depId)) {
                     map.setLayoutProperty(depId, 'visibility', visibility);
                 }
@@ -165,7 +157,6 @@ if (!customPrintButton || !customPrintBox) {
             return;
         }
 
-        // Track the custom print event
         trackEvent('custom_print_submit', {
             preset: selectedPresetName,
             scale: printData.scale
@@ -183,7 +174,7 @@ if (!customPrintButton || !customPrintBox) {
         if (match) {
             return '(' + match[1] + ') ' + match[2] + '-' + match[3];
         }
-        return null; // Return null if the number doesn't match the format
+        return null; 
     }
 
     function getPageHTML(printData, mapImageSrc, pageNumber, expectedLayers, currentDate) {
@@ -388,4 +379,4 @@ if (!customPrintButton || !customPrintBox) {
             customPrintBox.style.display = 'none';
         }
     });    
-};
+}

@@ -51,7 +51,7 @@ function getLegendForPrint(expectedLayerIds = []) {
     legendData.forEach(layerInfo => {
         // --- CORRECTED LOGIC FOR ALL SPECIAL CASES ---
 
-        // 1. Handle Satellite Imagery
+        // 1. handle satellite imagery
         if (layerInfo.displayName === "Satellite Imagery") {
             if (map.getLayer('satellite') && map.getLayoutProperty('satellite', 'visibility') === 'visible') {
                 allItemsToRender.push(`<div class="legend-section">${layerInfo.displayName}</div>`);
@@ -66,13 +66,13 @@ function getLegendForPrint(expectedLayerIds = []) {
                 );
                 renderedLegendSections.add(layerInfo.displayName);
             }
-            return; // Done with this item, move to the next
+            return; // done with this item, move to the next
         }
 
-        // 2. Handle USGS Quads
+        // 2. handle usgs quads
         if (layerInfo.id === 'usgs-quad-legend') {
-            // The `deinitialize` function in the print script ensures this is false during printing.
-            // This logic correctly prevents it from appearing.
+            // the `deinitialize` function in the print script ensures this is false during printing.
+            // this logic correctly prevents it from appearing.
             if (window.usgsTilesInitialized && map.getZoom() >= 12) {
                 allItemsToRender.push(`<div class="legend-section">${layerInfo.displayName}</div>`);
                 const item = layerInfo.items[0];
@@ -86,10 +86,10 @@ function getLegendForPrint(expectedLayerIds = []) {
                 );
                 renderedLegendSections.add(layerInfo.displayName);
             }
-            return; // Done with this item, move to the next
+            return; // done with this item, move to the next
         }
         
-        // 3. Handle all other vector layers
+        // 3. handle all other vector layers
         if (!layerInfo.sources) {
             return;
         }
@@ -140,7 +140,7 @@ function getLegendForPrint(expectedLayerIds = []) {
         const hasSpecificItem = layerInfo.items.some(item => item.code !== "__default__" && itemsToShow.has(item.label));
         const defaultItem = layerInfo.items.find(item => item.code === "__default__");
         if (hasSpecificItem && defaultItem && itemsToShow.has(defaultItem.label)) {
-            itemsToShow.delete(defaultItem.label);
+             itemsToShow.delete(defaultItem.label);
         }
 
         if (itemsToShow.size > 0) {
@@ -210,13 +210,16 @@ if (!legendButton || !legendBox) {
     console.error("Required elements not found in the DOM.");
 } else {
 
-    fetch('https://east-southeast-llc.github.io/ese-map-viewer/assets/data/legend_config.json')
+    fetch('https://east-southeast-llc.github.io/ese-map-viewer/assets/data/layer_config.json')
         .then(response => response.json())
         .then(data => {
-            legendData = data;
+            // filter out layers that do not have a legendConfig and map to a new array
+            legendData = data
+                .filter(layer => layer.legendConfig)
+                .map(layer => layer.legendConfig);
         })
         .catch(error => {
-            console.error('Error fetching legend data:', error);
+            console.error('error fetching legend data:', error);
             legendBox.innerHTML = "Could not load legend data.";
         });
 
@@ -242,7 +245,7 @@ if (!legendButton || !legendBox) {
                 return; 
             }
 
-            // (The rest of the logic for other layers remains the same)
+            // (the rest of the logic for other layers remains the same)
             const availableSourceIds = (layerInfo.sources || []).map(s => s.id).filter(id => map.getLayer(id));
             
             if (availableSourceIds.length === 0) {

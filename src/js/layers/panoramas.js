@@ -72,9 +72,11 @@ async function addPanoramasLayer() {
             }
         });
 
+        // change the cursor to a pointer when the mouse is over the panoramas layer.
         map.on('mouseenter', 'panoramas', () => {
             map.getCanvas().style.cursor = 'pointer';
         });
+        // change it back to a pointer when it leaves.
         map.on('mouseleave', 'panoramas', () => {
             map.getCanvas().style.cursor = '';
         });

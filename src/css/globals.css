@@ -808,3 +808,8 @@ MOBILE & TABLET RESPONSIVE STYLES
         display: none;
     }
 }
+
+/* cursor override for identify tool */
+.identify-mode-active .mapboxgl-canvas {
+    cursor: help !important;
+}
