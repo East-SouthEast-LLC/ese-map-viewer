@@ -223,13 +223,13 @@ map.on('load', async function () {
             console.log("map 'load' event fired. loading scripts...");
             
             // first, always load the base towns layer
-            await loadScript(`https://east-southeast-llc.github.io/ese-map-viewer-dev/src/js/layers/towns.js`);
+            await loadScript(`https://east-southeast-llc.github.io/ese-map-viewer/src/js/layers/towns.js`);
 
             try {
                 // then, fetch town and layer configurations
                 const [townConfigResponse, layerConfigResponse] = await Promise.all([
-                    fetch('https://east-southeast-llc.github.io/ese-map-viewer-dev/assets/data/town_config.json'),
-                    fetch('https://east-southeast-llc.github.io/ese-map-viewer-dev/assets/data/layer_config.json')
+                    fetch('https://east-southeast-llc.github.io/ese-map-viewer/assets/data/town_config.json'),
+                    fetch('https://east-southeast-llc.github.io/ese-map-viewer/assets/data/layer_config.json')
                 ]);
 
                 const townConfig = await townConfigResponse.json();
@@ -253,7 +253,7 @@ map.on('load', async function () {
                         .sort((a, b) => a.drawOrder - b.drawOrder);
 
                     const loadLayerScript = (scriptName) => {
-                        return loadScript(`https://east-southeast-llc.github.io/ese-map-viewer-dev/src/js/layers/${scriptName}`);
+                        return loadScript(`https://east-southeast-llc.github.io/ese-map-viewer/src/js/layers/${scriptName}`);
                     };
 
                     for (const layer of townLayers) {
@@ -263,27 +263,27 @@ map.on('load', async function () {
                     console.log("all layer scripts loaded.");
 
                     const controlScripts = [
-                        "https://east-southeast-llc.github.io/ese-map-viewer-dev/src/js/components/control/button.js",
-                        "https://east-southeast-llc.github.io/ese-map-viewer-dev/src/js/components/control/print.js",
-                        "https://east-southeast-llc.github.io/ese-map-viewer-dev/src/js/components/control/custom-print.js",
-                        "https://east-southeast-llc.github.io/ese-map-viewer-dev/src/js/components/control/print-area.js",
-                        "https://east-southeast-llc.github.io/ese-map-viewer-dev/src/js/components/control/share.js",
-                        "https://east-southeast-llc.github.io/ese-map-viewer-dev/src/js/components/control/scale.js",
-                        "https://east-southeast-llc.github.io/ese-map-viewer-dev/src/js/components/control/measure.js",
-                        "https://east-southeast-llc.github.io/ese-map-viewer-dev/src/js/components/control/legend.js",
-                        "https://east-southeast-llc.github.io/ese-map-viewer-dev/src/js/components/control/bookmarks.js",
-                        "https://east-southeast-llc.github.io/ese-map-viewer-dev/src/js/components/control/identify.js",
-                        "https://east-southeast-llc.github.io/ese-map-viewer-dev/src/js/components/disclaimer-popup.js",
-                        "https://east-southeast-llc.github.io/ese-map-viewer-dev/src/js/utils/analytics.js",
-                        "https://east-southeast-llc.github.io/ese-map-viewer-dev/src/js/components/mobile-menu.js",
-                        "https://east-southeast-llc.github.io/ese-map-viewer-dev/src/js/utils/decode-url.js",
-                        "https://east-southeast-llc.github.io/ese-map-viewer-dev/src/js/components/popup-manager.js"
+                        "https://east-southeast-llc.github.io/ese-map-viewer/src/js/components/control/button.js",
+                        "https://east-southeast-llc.github.io/ese-map-viewer/src/js/components/control/print.js",
+                        "https://east-southeast-llc.github.io/ese-map-viewer/src/js/components/control/custom-print.js",
+                        "https://east-southeast-llc.github.io/ese-map-viewer/src/js/components/control/print-area.js",
+                        "https://east-southeast-llc.github.io/ese-map-viewer/src/js/components/control/share.js",
+                        "https://east-southeast-llc.github.io/ese-map-viewer/src/js/components/control/scale.js",
+                        "https://east-southeast-llc.github.io/ese-map-viewer/src/js/components/control/measure.js",
+                        "https://east-southeast-llc.github.io/ese-map-viewer/src/js/components/control/legend.js",
+                        "https://east-southeast-llc.github.io/ese-map-viewer/src/js/components/control/bookmarks.js",
+                        "https://east-southeast-llc.github.io/ese-map-viewer/src/js/components/control/identify.js",
+                        "https://east-southeast-llc.github.io/ese-map-viewer/src/js/components/disclaimer-popup.js",
+                        "https://east-southeast-llc.github.io/ese-map-viewer/src/js/utils/analytics.js",
+                        "https://east-southeast-llc.github.io/ese-map-viewer/src/js/components/mobile-menu.js",
+                        "https://east-southeast-llc.github.io/ese-map-viewer/src/js/utils/decode-url.js",
+                        "https://east-southeast-llc.github.io/ese-map-viewer/src/js/components/popup-manager.js"
                     ];
                     
                     await Promise.all(controlScripts.map(loadScript));
                     console.log("all control scripts loaded.");
 
-                    await loadScript("https://east-southeast-llc.github.io/ese-map-viewer-dev/src/js/components/toggleable-menu.js?v=2");
+                    await loadScript("https://east-southeast-llc.github.io/ese-map-viewer/src/js/components/toggleable-menu.js?v=2");
                     setupToggleableMenu();
                     applyUrlParams(map);
                     console.log("application is fully loaded and ready.");

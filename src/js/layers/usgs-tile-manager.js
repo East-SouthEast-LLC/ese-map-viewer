@@ -95,7 +95,7 @@ function initializeUsgsTileManager() {
         return;
     }
 
-    const indexUrl = 'https://east-southeast-llc.github.io/ese-map-viewer-dev/assets/data/usgs_tiles.json';
+    const indexUrl = 'https://east-southeast-llc.github.io/ese-map-viewer/assets/data/usgs_tiles.json';
 
     fetch(indexUrl)
         .then(response => {

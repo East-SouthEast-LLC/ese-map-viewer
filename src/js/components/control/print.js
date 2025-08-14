@@ -63,7 +63,7 @@ document.getElementById('printButton').addEventListener('click', () => {
                 <html>
                 <head>
                     <title>Map Print</title>
-                    <link rel="stylesheet" href="https://east-southeast-llc.github.io/ese-map-viewer-dev/src/css/globals.css?v=3" type="text/css" />
+                    <link rel="stylesheet" href="https://east-southeast-llc.github.io/ese-map-viewer/src/css/globals.css?v=3" type="text/css" />
                 </head>
                 <body class="print-body">
                     ${getStandardPrintPageHTML(mapImageSrc)}

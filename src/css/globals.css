@@ -157,9 +157,9 @@ CONTROL BUTTON STYLES
 /* Individual icon images */
 .mapboxgl-ctrl-point         { background-image: url('https://www.ese-llc.com/s/marker-blue-random.svg'); }
 .mapboxgl-ctrl-print         { background-image: url('https://img.icons8.com/ios-glyphs/30/000000/print.png'); }
-.mapboxgl-ctrl-custom-print  { background-image: url('https://east-southeast-llc.github.io/ese-map-viewer-dev/assets/img/custom-print.png'); }
+.mapboxgl-ctrl-custom-print  { background-image: url('https://east-southeast-llc.github.io/ese-map-viewer/assets/img/custom-print.png'); }
 .mapboxgl-ctrl-measure       { background-image: url('https://www.ese-llc.com/s/marker-blue-measure.svg'); }
-.mapboxgl-ctrl-legend        { background-image: url('https://east-southeast-llc.github.io/ese-map-viewer-dev/assets/img/legend.png'); }
+.mapboxgl-ctrl-legend        { background-image: url('https://east-southeast-llc.github.io/ese-map-viewer/assets/img/legend.png'); }
 .mapboxgl-ctrl-bookmark      { background-image: url('https://img.icons8.com/ios-glyphs/30/bookmark-ribbon.png'); }
 .mapboxgl-ctrl-identify      { background-image: url('https://img.icons8.com/ios-filled/50/info.png'); }
 
