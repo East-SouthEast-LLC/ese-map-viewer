@@ -91,6 +91,5 @@ document.getElementById('shareButton').addEventListener('click', function() {
     // updated to pass the coordinates object to the function
     let shareLink = generateShareLink(map, zoomLevel, currentMarkerCoordinates, visibleLayerIds);
 
-    console.log("Share this link:", shareLink);
     showSharePopup(shareLink);
 });

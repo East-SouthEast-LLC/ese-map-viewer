@@ -31,4 +31,3 @@ const tileData = jgwFiles.map(file => {
 });
 
 fs.writeFileSync('usgs_tiles.json', JSON.stringify(tileData, null, 2));
-console.log(`Successfully created usgs_tiles.json with ${tileData.length} entries.`);

@@ -109,7 +109,6 @@ function initializeUsgsTileManager() {
             });
 
             window.usgsTilesInitialized = true;
-            console.log("USGS Tile Manager Initialized.");
             
             updateVisibleUsgsTiles();
 
@@ -133,7 +132,6 @@ function deinitializeUsgsTileManager() {
     map.off('zoomend', updateVisibleUsgsTiles);
 
     window.usgsTilesInitialized = false;
-    console.log("USGS Tile Manager Deinitialized.");
 }
 
 // Make functions globally available
