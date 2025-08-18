@@ -259,23 +259,23 @@
                     }
                     
                     const controlScripts = [
-                        "https://east-southeast-llc.github.io/ese-map-viewer-dev/src/js/components/control/button.js",
-                        "https://east-southeast-llc.github.io/ese-map-viewer-dev/src/js/components/control/print.js",
-                        "https://east-southeast-llc.github.io/ese-map-viewer-dev/src/js/components/control/custom-print.js",
-                        "https://east-southeast-llc.github.io/ese-map-viewer-dev/src/js/components/control/print-area.js",
-                        "https://east-southeast-llc.github.io/ese-map-viewer-dev/src/js/components/control/share.js",
-                        "https://east-southeast-llc.github.io/ese-map-viewer-dev/src/js/components/control/scale.js",
-                        "https://east-southeast-llc.github.io/ese-map-viewer-dev/src/js/components/control/measure.js",
-                        "https://east-southeast-llc.github.io/ese-map-viewer-dev/src/js/components/control/legend.js",
-                        "https://east-southeast-llc.github.io/ese-map-viewer-dev/src/js/components/control/bookmarks.js",
-                        "https://east-southeast-llc.github.io/ese-map-viewer-dev/src/js/components/control/identify.js",
-                        "https://east-southeast-llc.github.io/ese-map-viewer-dev/src/js/components/control/toggle-off.js",
-                        "https://east-southeast-llc.github.io/ese-map-viewer-dev/src/js/components/control/tooltip.js",
-                        "https://east-southeast-llc.github.io/ese-map-viewer-dev/src/js/components/disclaimer-popup.js",
-                        "https://east-southeast-llc.github.io/ese-map-viewer-dev/src/js/utils/analytics.js",
-                        "https://east-southeast-llc.github.io/ese-map-viewer-dev/src/js/components/mobile-menu.js",
-                        "https://east-southeast-llc.github.io/ese-map-viewer-dev/src/js/utils/decode-url.js",
-                        "https://east-southeast-llc.github.io/ese-map-viewer-dev/src/js/components/popup-manager.js"
+                        "https://east-southeast-llc.github.io/ese-map-viewer/src/js/components/control/button.js",
+                        "https://east-southeast-llc.github.io/ese-map-viewer/src/js/components/control/print.js",
+                        "https://east-southeast-llc.github.io/ese-map-viewer/src/js/components/control/custom-print.js",
+                        "https://east-southeast-llc.github.io/ese-map-viewer/src/js/components/control/print-area.js",
+                        "https://east-southeast-llc.github.io/ese-map-viewer/src/js/components/control/share.js",
+                        "https://east-southeast-llc.github.io/ese-map-viewer/src/js/components/control/scale.js",
+                        "https://east-southeast-llc.github.io/ese-map-viewer/src/js/components/control/measure.js",
+                        "https://east-southeast-llc.github.io/ese-map-viewer/src/js/components/control/legend.js",
+                        "https://east-southeast-llc.github.io/ese-map-viewer/src/js/components/control/bookmarks.js",
+                        "https://east-southeast-llc.github.io/ese-map-viewer/src/js/components/control/identify.js",
+                        "https://east-southeast-llc.github.io/ese-map-viewer/src/js/components/control/toggle-off.js",
+                        "https://east-southeast-llc.github.io/ese-map-viewer/src/js/components/control/tooltip.js",
+                        "https://east-southeast-llc.github.io/ese-map-viewer/src/js/components/disclaimer-popup.js",
+                        "https://east-southeast-llc.github.io/ese-map-viewer/src/js/utils/analytics.js",
+                        "https://east-southeast-llc.github.io/ese-map-viewer/src/js/components/mobile-menu.js",
+                        "https://east-southeast-llc.github.io/ese-map-viewer/src/js/utils/decode-url.js",
+                        "https://east-southeast-llc.github.io/ese-map-viewer/src/js/components/popup-manager.js"
                     ];
                     
                     await Promise.all(controlScripts.map(loadScript));

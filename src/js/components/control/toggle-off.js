@@ -51,7 +51,5 @@ if (!toggleOffButton) {
         if (typeof window.updateLegend === 'function') {
             window.updateLegend();
         }
-        
-        console.log("All layers toggled off.");
     });
 }
