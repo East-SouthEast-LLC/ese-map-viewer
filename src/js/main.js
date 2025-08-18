@@ -65,7 +65,7 @@
                 <button class="mapboxgl-ctrl-point-off" id="pointOffButton" aria-label="Point Off" data-tooltip="Remove the point from the map"></button>
                 <button class="mapboxgl-ctrl-custom-print" id="customPrintButton" aria-label="Custom Print" data-tooltip="Create a custom multi-page printout"></button>
                 <button class="mapboxgl-ctrl-clear" id="clearButton" aria-label="eight" data-tooltip="Clear measurements"></button>
-                <button class="mapboxgl-ctrl-nine" id="nineButton" aria-label="nine" data-tooltip="Placeholder"></button>
+                <button class="mapboxgl-ctrl-toggle-off" id="toggleOffButton" aria-label="Toggle All Layers Off" data-tooltip="Turn off all active layers"></button>
                 <button class="mapboxgl-ctrl-ten" id="tenButton" aria-label="ten" data-tooltip="Placeholder"></button>
             </div>
             <button class="mapboxgl-ctrl-share" id="shareButton" data-tooltip="Share the map with a URL">Share Map</button>
@@ -269,6 +269,8 @@
                         "https://east-southeast-llc.github.io/ese-map-viewer/src/js/components/control/legend.js",
                         "https://east-southeast-llc.github.io/ese-map-viewer/src/js/components/control/bookmarks.js",
                         "https://east-southeast-llc.github.io/ese-map-viewer/src/js/components/control/identify.js",
+                        "https://east-southeast-llc.github.io/ese-map-viewer/src/js/components/control/toggle-off.js",
+                        "https://east-southeast-llc.github.io/ese-map-viewer/src/js/components/control/tooltip.js",
                         "https://east-southeast-llc.github.io/ese-map-viewer/src/js/components/disclaimer-popup.js",
                         "https://east-southeast-llc.github.io/ese-map-viewer/src/js/utils/analytics.js",
                         "https://east-southeast-llc.github.io/ese-map-viewer/src/js/components/mobile-menu.js",
