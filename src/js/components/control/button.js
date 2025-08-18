@@ -7,7 +7,6 @@ function setPinPosition(lat, lng) {
     if (window.markerCoordinates) {
         window.markerCoordinates.lat = lat;
         window.markerCoordinates.lng = lng;
-        console.log("pin position updated:", window.markerCoordinates);
     }
 }
 

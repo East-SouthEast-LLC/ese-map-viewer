@@ -219,9 +219,7 @@
         });
         document.getElementById('geocoder').appendChild(geocoder.onAdd(map));
 
-map.on('load', async function () {
-            console.log("map 'load' event fired. loading scripts...");
-            
+        map.on('load', async function () {            
             // first, always load the base towns layer
             await loadScript(`https://east-southeast-llc.github.io/ese-map-viewer/src/js/layers/towns.js`);
 
@@ -260,8 +258,6 @@ map.on('load', async function () {
                         await loadLayerScript(layer.scriptName);
                     }
                     
-                    console.log("all layer scripts loaded.");
-
                     const controlScripts = [
                         "https://east-southeast-llc.github.io/ese-map-viewer/src/js/components/control/button.js",
                         "https://east-southeast-llc.github.io/ese-map-viewer/src/js/components/control/print.js",
@@ -281,18 +277,31 @@ map.on('load', async function () {
                     ];
                     
                     await Promise.all(controlScripts.map(loadScript));
-                    console.log("all control scripts loaded.");
 
                     await loadScript("https://east-southeast-llc.github.io/ese-map-viewer/src/js/components/toggleable-menu.js?v=2");
                     setupToggleableMenu();
                     applyUrlParams(map);
-                    console.log("application is fully loaded and ready.");
+                    
+                    // wait for the map to finish its first complete render cycle.
+                    map.once('idle', () => {
+                        if (typeof hideSkeleton === 'function') {
+                            hideSkeleton();
+                        }
+                    });
 
                 } else {
                     console.error("town data not found for id:", window.townId);
+                    // if town data fails, hide skeleton immediately
+                    if (typeof hideSkeleton === 'function') {
+                        hideSkeleton();
+                    }
                 }
             } catch (error) {
                 console.error("failed to load initial configurations:", error);
+                // if any other error occurs, hide skeleton immediately
+                if (typeof hideSkeleton === 'function') {
+                    hideSkeleton();
+                }
             }
             
             map.on('click', 'panoramas', function(e) {

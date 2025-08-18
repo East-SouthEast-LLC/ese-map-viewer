@@ -813,3 +813,93 @@ MOBILE & TABLET RESPONSIVE STYLES
 .identify-mode-active .mapboxgl-canvas {
     cursor: help !important;
 }
+
+/* skeleton loader styles */
+.is-loading #skeleton-loader {
+    display: flex;
+    opacity: 1;
+}
+
+/* hide main content when loading, but keep the site header visible */
+.is-loading #map,
+.is-loading #menu,
+.is-loading #ad-container-vertical,
+.is-loading #geocoder-container,
+.is-loading #disclaimer-popup {
+    visibility: hidden;
+}
+
+#skeleton-loader {
+    position: fixed;
+    top: 165px;
+    height: calc(100vh - 165px);
+    left: 0;
+    width: 100%; /* use 100% instead of 100vw to respect box-sizing */
+    z-index: 9999;
+    background-color: #f9f9f9;
+    display: none;
+    opacity: 1;
+    transition: opacity 0.5s ease-in-out;
+    box-sizing: border-box;
+    /* use padding to create the space on the left and right */
+    padding-left: 0;
+    padding-right: 2.5vw;
+    padding-top: 0;
+    padding-bottom: 10px;
+    display: flex;
+    gap: 10px;
+}
+
+
+#skeleton-loader.fade-out {
+    opacity: 0;
+}
+
+.skeleton-col {
+    background-color: #ffffff;
+    border-radius: 5px;
+    padding: 10px;
+}
+
+.skeleton-menu {
+    width: 160px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.skeleton-main {
+    flex-grow: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+.skeleton-bone {
+    background-color: #e9e9e9;
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* shimmer animation */
+.skeleton-bone::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+    animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+    100% {
+        left: 100%;
+    }
+}
+
+.skeleton-menu .skeleton-bone {
+    height: 20px;
+}

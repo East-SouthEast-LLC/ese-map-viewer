@@ -17,6 +17,8 @@
   <script src="https://cdn.jsdelivr.net/npm/@turf/turf"></script>
   <script src="https://unpkg.com/geotiff@2.0.7/dist-browser/geotiff.js"></script>
 
+  <script src="https://east-southeast-llc.github.io/ese-map-viewer-dev/src/js/components/skeleton.js"></script>
+
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-FYWY78FPHV"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -26,20 +28,33 @@
       gtag('config', 'G-FYWY78FPHV');
   </script>
 </head>
-<body>
+<body class="is-loading">
 
+  <div id="skeleton-loader">
+    <div class="skeleton-col" style="width: 120px; flex-shrink: 0;">
+      <div class="skeleton-bone" style="height: 100%;"></div>
+    </div>
+    <div class="skeleton-col skeleton-menu">
+      <div class="skeleton-bone"></div><div class="skeleton-bone"></div><div class="skeleton-bone"></div>
+      <div class="skeleton-bone"></div><div class="skeleton-bone"></div><div class="skeleton-bone"></div>
+      <div class="skeleton-bone"></div><div class="skeleton-bone"></div><div class="skeleton-bone"></div>
+      <div class="skeleton-bone"></div>
+    </div>
+    <div class="skeleton-col skeleton-main">
+      <div class="skeleton-bone" style="height: 100%;"></div>
+    </div>
+  </div>
   <div id="disclaimer-popup" class="disclaimer-popup-container">
     <h2>Welcome to the ESE Map Viewer</h2>
-    
     <p class="disclaimer-text">
         This map is for illustrative purposes only and is not adequate for legal boundary determination, regulatory interpretation, or property conveyance. For official information, please consult the appropriate municipal and state agencies. For any questions regarding property lines, a licensed land surveyor should be consulted.
     </p>
-    
     <div class="disclaimer-actions">
       <a href="https://www.ese-llc.com/map-viewer-instructions" target="_blank" class="disclaimer-link disclaimer-btn">View Full Instructions</a>
       <button id="acknowledge-disclaimer-btn" class="disclaimer-button-red disclaimer-btn">Acknowledge</button>
     </div>
   </div>
+
   <div id="ad-container-vertical">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
     <ins class="adsbygoogle"
