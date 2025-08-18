@@ -169,7 +169,7 @@ CONTROL BUTTON STYLES
 
 .mapboxgl-ctrl-point-off     { background-image: url('https://www.ese-llc.com/s/marker-blue-off.svg'); }
 .mapboxgl-ctrl-clear         { background-image: url('https://www.ese-llc.com/s/marker-blue-measure-cancel.svg'); }
-.mapboxgl-ctrl-ten           { background-image: none; }
+.mapboxgl-ctrl-toggle-off    { background-image: url('https://img.icons8.com/ios-glyphs/30/invisible.png'); }
 
 /* ============================================================
 SHARE BUTTON 
@@ -836,7 +836,7 @@ MOBILE & TABLET RESPONSIVE STYLES
     left: 0;
     width: 100%; /* use 100% instead of 100vw to respect box-sizing */
     z-index: 9999;
-    background-color: #f9f9f9;
+    background-color: #ffffff;
     display: none;
     opacity: 1;
     transition: opacity 0.5s ease-in-out;
@@ -876,7 +876,7 @@ MOBILE & TABLET RESPONSIVE STYLES
 }
 
 .skeleton-bone {
-    background-color: #e9e9e9;
+    background-color: #ece9e9;
     border-radius: 4px;
     position: relative;
     overflow: hidden;

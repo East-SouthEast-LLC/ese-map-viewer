@@ -470,13 +470,18 @@ With all these pieces in place, your new control is fully integrated. When you l
     ```
 7.  **Move to Production**:
     * Navigate to your local `ese-map-viewer` repository.
-    * Pull the changes from the development repository's `main` branch into a local branch.
+    * Pull the changes from the development repository's `main` branch into your temporary feature branch. This is done in two steps to provide a clear merge message and automatically handle potential conflicts.
         ```bash
         # create a temporary branch to hold dev changes
         git checkout main
         git pull origin main
         git checkout -b your-feature-name main
-        git pull https://github.com/East-SouthEast-LLC/ese-map-viewer-dev.git main
+        
+        # step a: fetch the latest code from the dev repository
+        git fetch https://github.com/East-SouthEast-LLC/ese-map-viewer-dev.git main
+
+        # step b: merge the fetched code, favoring dev changes for any conflicts
+        git merge FETCH_HEAD -X theirs --no-ff -m "merge main from dev repository"
         ```
     * **Crucially**, perform a find-and-replace across all files (except for this README.md) to change all instances of the repository path from `ese-map-viewer-dev` to `ese-map-viewer`.
     * Commit these path changes.
@@ -492,6 +497,5 @@ With all these pieces in place, your new control is fully integrated. When you l
         git push origin main
         ```
     * Finally, update the code blocks on the live Squarespace pages with the new content from `src/pages/town-template.html` if it was changed.
-
 <!-- add note about always doing new updates in the development repo and then you will never have to update the dev repo from the main repo. this will allow you to keep all the console logs you want in the dev server, etc -->
 <!-- add note about deleting console.logs from prod code -->
