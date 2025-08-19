@@ -300,10 +300,8 @@ if (!customPrintButton || !customPrintBox) {
             // handle usgs quad pages by awaiting the tile manager.
             if (isUsgsPage) {
                 if (typeof initializeUsgsTileManager === 'function') {
-                    console.log("custom print: usgs page detected. awaiting tile rendering...");
                     // this now returns a promise that resolves only when tiles are fully rendered.
                     await initializeUsgsTileManager();
-                    console.log("custom print: usgs tiles rendered. proceeding with capture.");
                 }
             } else {
                 // for standard vector/raster layers, turn them on and wait for map to be idle.

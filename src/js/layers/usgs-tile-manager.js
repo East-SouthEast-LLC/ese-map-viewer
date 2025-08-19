@@ -73,7 +73,6 @@ async function updateVisibleUsgsTiles() {
     // if new tiles were added, wait for them to be fully rendered before resolving the promise.
     // this is critical for preventing race conditions during printing.
     if (tilesToLoad > 0) {
-        console.log("usgs tile manager: waiting for new tiles to render...");
         await new Promise(resolve => {
             map.once('idle', () => {
                 // now that it's idle, wait for the next render to ensure it's painted
@@ -82,7 +81,6 @@ async function updateVisibleUsgsTiles() {
                 map.triggerRepaint();
             });
         });
-        console.log("usgs tile manager: tiles rendered.");
     }
 }
 
@@ -152,7 +150,6 @@ async function initializeUsgsTileManager() {
         });
 
         window.usgsTilesInitialized = true;
-        console.log("USGS Tile Manager Initialized.");
         
         // perform the initial tile update and wait for it to complete.
         await updateVisibleUsgsTiles();
