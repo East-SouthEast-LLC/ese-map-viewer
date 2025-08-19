@@ -49,7 +49,12 @@ The project's architecture is designed for scalability and ease of maintenance, 
 * **`/assets/data/town_config.json`**: This file defines which layers and map settings are used for each town.
 * **`/assets/data/layer_config.json`**: The "brain" of the application. This central file contains a detailed object for each layer, specifying its ID, display name, script file, draw order, dependencies, and configurations for popups, identify behavior, and the legend.
 * **`/src/js/layers/`**: This directory contains individual, lightweight JavaScript files for each map layer. They now primarily contain the `map.addSource` and `map.addLayer` logic, with most styling and behavior defined in `layer_config.json`.
-* **`/src/js/components/`**: This directory contains the logic for all UI components, such as the layer menu, toolkit controls, popups, and the disclaimer.
+* **`/src/js/components/`**: This directory contains the logic for all UI components. Each component is self-contained.
+    * `/control/`: Contains scripts for individual toolkit buttons (e.g., `marker.js`, `print.js`, `measure.js`).
+    * `/panorama-viewer.js`: Contains all logic for displaying and interacting with 360-degree panoramas.
+    * Other files handle the toggleable menu, popups, and the disclaimer.
+* **`/src/js/utils/`**: This directory holds reusable helper functions.
+    * `/map-helpers.js`: Contains general utility functions that interact with the map, such as `listVisibleLayers`.
 * **`/assets/data/pano_correction_data.json`**: This file contains the georeferencing data (position and orientation) for each panorama image.
 * **`/src/css/globals.css`**: The single, comprehensive stylesheet for the entire application, including print-specific styles.
 
@@ -71,11 +76,11 @@ To improve the user's perception of performance, the application displays a skel
 
 ### Panorama Viewer
 
-The application supports viewing 360-degree panoramic images directly on the map.
-* **Dynamic Layer**: The `panoramas.js` script fetches location data from `pano_correction_data.json`, converts the MA State Plane coordinates to WGS 84 using `proj4js`, and plots them on the map as clickable points.
-* **Modal Viewer**: When a user clicks a panorama point, `main.js` opens a modal window containing an `iframe`.
-* **Cross-Domain Solution**: To avoid CORS issues, the `iframe` loads a dedicated page (`/pano-viewer`), which contains the Pannellum viewer. This ensures both the viewer page and the images are on the same domain.
-* **Orientation Correction**: The viewer page script fetches the `pano_correction_data.json` file to read the camera's orientation data and applies pitch and roll corrections, ensuring the panoramas are displayed correctly without tilting.
+The application supports viewing 360-degree panoramic images directly on the map. The logic for this feature is now fully encapsulated in its own component for better modularity.
+* **Component-Based Logic**: The panorama viewer is a self-contained component located at `src/js/components/panorama-viewer.js`. This script handles all aspects of the panorama feature, including fetching location data, creating the modal viewer, and correcting camera orientation.
+* **Initialization**: The main application controller, `main.js`, loads the panorama component and calls the `initializePanoramaViewer()` function. This function attaches the necessary `click` event listener to the panorama layer, activating the feature on the map.
+* **Cross-Domain Solution**: To avoid CORS issues, the viewer opens an `iframe` that loads a dedicated page (`/pano-viewer`), ensuring both the viewer and the images are on the same domain.
+* **Orientation Correction**: The `pano-viewer.html` page script fetches camera orientation data from `pano_correction_data.json` to apply pitch and roll corrections, ensuring the panoramas are displayed correctly without tilting.
 
 ### Dynamic USGS Tile Loader
 

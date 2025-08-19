@@ -1,7 +1,5 @@
 // /src/js/components/control/button.js
 
-// 'placingPoint', 'marker', and 'markerCoordinates' are now managed in town-loader.js
-
 function setPinPosition(lat, lng) {
     // check if the global markercoordinates object exists before setting
     if (window.markerCoordinates) {
