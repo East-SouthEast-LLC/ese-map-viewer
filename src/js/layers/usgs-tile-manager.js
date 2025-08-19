@@ -1,10 +1,15 @@
-// This script manages the dynamic loading and unloading of USGS image tiles.
+// src/js/layers/usgs-tile-manager.js
 
-// Global state to hold all tile metadata and track loaded tiles
+// global state to hold all tile metadata and track loaded tiles
 let allUsgsTiles = [];
 const loadedUsgsTiles = new Set();
 window.usgsTilesInitialized = false;
 
+/**
+ * calculates the geographic bounding box of a tile from its jgw (world file) data.
+ * @param {object} tile - the tile metadata object.
+ * @returns {object} an object with north, south, east, and west bounds.
+ */
 function getTileBounds(tile) {
     const [pixelWidth, , , pixelHeight, originLng, originLat] = tile.jgw;
     const { width, height } = tile;
@@ -17,20 +22,27 @@ function getTileBounds(tile) {
     return { west: minLng, south: minLat, east: maxLng, north: maxLat };
 }
 
-function updateVisibleUsgsTiles() {
+/**
+ * checks which usgs tiles are visible in the current map view,
+ * dynamically adding or removing them as needed.
+ * returns a promise that resolves only after any newly added tiles are fully rendered.
+ */
+async function updateVisibleUsgsTiles() {
     if (!window.usgsTilesInitialized) return;
 
     const currentZoom = map.getZoom();
 
+    // performance optimization: do not show tiles at low zoom levels.
     if (currentZoom < 12) {
         loadedUsgsTiles.forEach(tileName => {
             removeTileFromMap(`usgs-tile-source-${tileName}`);
         });
         loadedUsgsTiles.clear();
-        return;
+        return; // return a resolved promise implicitly
     }
 
     const mapBounds = map.getBounds();
+    let tilesToLoad = 0;
 
     allUsgsTiles.forEach(tile => {
         const tileBounds = tile.bounds;
@@ -43,19 +55,40 @@ function updateVisibleUsgsTiles() {
             mapBounds.getNorth() > tileBounds.south;
 
         if (isVisible) {
+            // if the tile should be visible but isn't loaded, add it.
             if (!loadedUsgsTiles.has(tile.name)) {
+                tilesToLoad++;
                 addTileToMap(tile, sourceId);
                 loadedUsgsTiles.add(tile.name);
             }
         } else {
+            // if the tile is loaded but no longer visible, remove it.
             if (loadedUsgsTiles.has(tile.name)) {
                 removeTileFromMap(sourceId);
                 loadedUsgsTiles.delete(tile.name);
             }
         }
     });
+
+    // if new tiles were added, wait for them to be fully rendered before resolving the promise.
+    // this is critical for preventing race conditions during printing.
+    if (tilesToLoad > 0) {
+        await new Promise(resolve => {
+            map.once('idle', () => {
+                // now that it's idle, wait for the next render to ensure it's painted
+                map.once('render', resolve);
+                // trigger a repaint just in case, to be certain a render event will fire
+                map.triggerRepaint();
+            });
+        });
+    }
 }
 
+/**
+ * adds a single usgs tile image source and raster layer to the map.
+ * @param {object} tile - the tile metadata object.
+ * @param {string} sourceId - the unique id to use for the new map source and layer.
+ */
 function addTileToMap(tile, sourceId) {
     const imageUrl = `https://www.ese-llc.com/s/${tile.name}.jpg`;
     
@@ -77,9 +110,13 @@ function addTileToMap(tile, sourceId) {
         type: 'raster',
         source: sourceId,
         paint: { 'raster-opacity': 0.85, 'raster-fade-duration': 0 }
-    }, 'satellite');
+    }, 'satellite'); // ensures tiles appear below labels and vector data
 }
 
+/**
+ * removes a tile's layer and source from the map to free up resources.
+ * @param {string} sourceId - the id of the source and layer to remove.
+ */
 function removeTileFromMap(sourceId) {
     if (map.getLayer(sourceId)) {
         map.removeLayer(sourceId);
@@ -89,37 +126,48 @@ function removeTileFromMap(sourceId) {
     }
 }
 
-function initializeUsgsTileManager() {
+/**
+ * initializes the tile manager. fetches the tile index file, sets up event listeners,
+ * and performs the initial tile load. returns a promise that resolves when complete.
+ */
+async function initializeUsgsTileManager() {
+    // if already initialized, just update the visible tiles.
     if (window.usgsTilesInitialized) {
-        updateVisibleUsgsTiles();
+        await updateVisibleUsgsTiles();
         return;
     }
 
     const indexUrl = 'https://east-southeast-llc.github.io/ese-map-viewer/assets/data/usgs_tiles.json';
 
-    fetch(indexUrl)
-        .then(response => {
-            if (!response.ok) throw new Error('Network response was not ok');
-            return response.json();
-        })
-        .then(data => {
-            allUsgsTiles = data;
-            allUsgsTiles.forEach(tile => {
-                tile.bounds = getTileBounds(tile);
-            });
+    try {
+        const response = await fetch(indexUrl);
+        if (!response.ok) throw new Error('Network response was not ok');
+        const data = await response.json();
 
-            window.usgsTilesInitialized = true;
-            
-            updateVisibleUsgsTiles();
-
-            map.on('moveend', updateVisibleUsgsTiles);
-            map.on('zoomend', updateVisibleUsgsTiles);
-        })
-        .catch(error => {
-            console.error("Failed to load USGS tile index:", error);
+        allUsgsTiles = data;
+        allUsgsTiles.forEach(tile => {
+            tile.bounds = getTileBounds(tile);
         });
+
+        window.usgsTilesInitialized = true;
+        
+        // perform the initial tile update and wait for it to complete.
+        await updateVisibleUsgsTiles();
+
+        // set up listeners to update tiles whenever the map view changes.
+        map.off('moveend', updateVisibleUsgsTiles);
+        map.off('zoomend', updateVisibleUsgsTiles);
+        map.on('moveend', updateVisibleUsgsTiles);
+        map.on('zoomend', updateVisibleUsgsTiles);
+    } catch (error) {
+        console.error("Failed to load USGS tile index:", error);
+    }
 }
 
+/**
+ * completely deactivates the usgs tile manager, removing all loaded tiles
+ * and event listeners from the map.
+ */
 function deinitializeUsgsTileManager() {
     if (!window.usgsTilesInitialized) return;
 
@@ -134,6 +182,6 @@ function deinitializeUsgsTileManager() {
     window.usgsTilesInitialized = false;
 }
 
-// Make functions globally available
+// make functions globally available so other scripts can call them
 window.initializeUsgsTileManager = initializeUsgsTileManager;
 window.deinitializeUsgsTileManager = deinitializeUsgsTileManager;

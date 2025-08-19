@@ -202,7 +202,6 @@
                     ];
                     
                     await Promise.all(controlScripts.map(loadScript));
-                    ("all control scripts loaded.");
                     
                     initializePanoramaViewer();
 
