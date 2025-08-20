@@ -241,5 +241,125 @@
       "usgs quad",
       "panoramas"
     ]
+  },
+  {
+    "townID": "yarmouth",
+    "townName": "Yarmouth",
+    "baseShareUrl": "https://ese-llc.com/yarmouth",
+    "map": {
+      "center": [-70.2033, 41.6594],
+      "zoom": 11.7
+    },
+    "layers": [
+      "satellite",
+      "parcels",
+      "parcel highlight",
+      "contours",
+      "floodplain",
+      "acec",
+      "DEP wetland",
+      "endangered species",
+      "zone II",
+      "soils",
+      "zoning",
+      "usgs quad",
+      "panoramas"
+    ]
+  },
+  {
+    "townID": "mashpee",
+    "townName": "Mashpee",
+    "baseShareUrl": "https://ese-llc.com/mashpee",
+    "map": {
+      "center": [-70.500, 41.620],
+      "zoom": 12
+    },
+    "layers": [
+      "satellite",
+      "parcels",
+      "parcel highlight",
+      "contours",
+      "floodplain",
+      "acec",
+      "DEP wetland",
+      "endangered species",
+      "zone II",
+      "soils",
+      "zoning",
+      "usgs quad",
+      "panoramas"
+    ]
+  },
+  {
+    "townID": "falmouth",
+    "townName": "Falmouth",
+    "baseShareUrl": "https://ese-llc.com/falmouth",
+    "map": {
+      "center": [-70.590, 41.590],
+      "zoom": 12
+    },
+    "layers": [
+      "satellite",
+      "parcels",
+      "parcel highlight",
+      "contours",
+      "floodplain",
+      "acec",
+      "DEP wetland",
+      "endangered species",
+      "zone II",
+      "soils",
+      "zoning",
+      "usgs quad",
+      "panoramas"
+    ]
+  },
+  {
+    "townID": "sandwich",
+    "townName": "Sandwich",
+    "baseShareUrl": "https://ese-llc.com/sandwich",
+    "map": {
+      "center": [-70.500, 41.720],
+      "zoom": 12
+    },
+    "layers": [
+      "satellite",
+      "parcels",
+      "parcel highlight",
+      "contours",
+      "floodplain",
+      "acec",
+      "DEP wetland",
+      "endangered species",
+      "zone II",
+      "soils",
+      "zoning",
+      "usgs quad",
+      "panoramas"
+    ]
+  },
+  {
+    "townID": "bourne",
+    "townName": "Bourne",
+    "baseShareUrl": "https://ese-llc.com/bourne",
+    "map": {
+      "center": [-70.500, 41.720],
+      "zoom": 12
+    },
+    "layers": [
+      "satellite",
+      "parcels",
+      "parcel highlight",
+      "contours",
+      "floodplain",
+      "acec",
+      "DEP wetland",
+      "endangered species",
+      "zone II",
+      "soils",
+      "zoning",
+      "usgs quad",
+      "panoramas"
+    ]
   }
 ]

@@ -355,7 +355,7 @@ Open `src/js/main.js` and find the `geocoderContainer.innerHTML` section. You'll
 
 **Before:**
 ```html
-// ... inside buildToolkit() in main.js
+<!-- ... inside buildToolkit() in main.js -->
 <div> 
     <!-- ... other buttons ... -->
     <button class="mapboxgl-ctrl-four" id="fourButton" aria-label="four" data-tooltip="Placeholder"></button>
@@ -441,6 +441,36 @@ const controlScripts = [
 #### Step 5: Test Your New Control
 
 With all these pieces in place, your new control is fully integrated. When you load the map, `main.js` will create the button, load your script, and your new tool should be ready to use.
+
+### How to Add New Panoramic Images
+
+This guide details the streamlined process for renaming, processing, and uploading new panoramic images using the Pano Sync Processor web application. This tool automates the previously manual workflow.
+
+**Instructions:**
+
+1.  **Navigate to the App:** Open your web browser and go to either [pano.pdcarlson.dev](https://pano.pdcarlson.dev) or [ese-llc.com/pano-data-processor](https://ese-llc.com/pano-data-processor).
+
+2.  **Upload Your Files:**
+    * Drag and drop (or select) all the panoramic image files as well as the CSV file from your project folder (e.g., the output from the NAVIS scanner).
+    * Upload the existing `pano_correction_data.json` file, which is located in the `/assets/data/` directory of the `ese-map-viewer` repository.
+
+3.  **Set the Naming Prefix:**
+    * In the prefix input box, enter a name for the project following this exact format: `PROJECT_NAME_YYYYMMDD`.
+
+4.  **Process and Download:**
+    * Click the "Process Files" button.
+    * Once the processing is complete, a download link will appear. Click it to download a `.zip` file containing your updated JSON file and renamed images.
+
+5.  **Update the Repository:**
+    * Unzip the downloaded file.
+    * Replace the old `pano_correction_data.json` in your local `ese-map-viewer` repository with the new one from the `.zip` file.
+    * Commit the changes to GitHub with a descriptive message (e.g., "Add pano data for PROJECT_NAME") and push/sync your changes.
+
+6.  **Upload Images to Squarespace:**
+    * Upload all the newly renamed panoramic images from the `.zip` file to the Squarespace assets.
+    * **Important:** Ensure the images are uploaded so that their final URL path is `ese-llc/s/FILENAME.jpg`. This can typically be done by uploading them via a link on any page.
+
+Once the repository changes are pushed and the images are uploaded to Squarespace, the new panoramas will appear on the map viewer.
 
 ## 6. Git Development Practices
 
