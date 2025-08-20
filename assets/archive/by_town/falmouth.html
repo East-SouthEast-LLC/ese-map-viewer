@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Show and hide layers</title>
+<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+<script src="https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.js"></script>
+<link href="https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.css" rel="stylesheet" />
+
+<style>
+	body { margin: 0; padding: 0; }
+	#map { position: relative; margin-top: -590px; border:none; top: 0; left 0; height: 80vh; width: 95vw; }
+	#geocoder { position: relative; top: -50; left: 0; width: 80px;}
+	#ScaleControl { position: relative; top: 0; left: 0; width: 80px;}
+</style>
+</head>
+<body>
+
+<script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.5.1/mapbox-gl-geocoder.min.js"></script>
+<link
+rel="stylesheet"
+href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.5.1/mapbox-gl-geocoder.css"
+type="text/css"
+/>
+<!-- Promise polyfill script required to use Mapbox GL Geocoder in IE 11 -->
+<script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.auto.min.js"></script>
+<style>
+#menu {
+background: #fff;
+position: relative;
+z-index: 1;
+top: 0px;
+left: 0px;
+border-radius: 3px;
+width: 144px;
+border: 1px solid rgba(0, 0, 0, 0.4);
+font-family: 'Open Sans', sans-serif;
+}
+#menu a {
+font-size: 13px;
+color: #404040;
+display: block;
+margin: 0;
+padding: 0;
+padding: 1px;
+text-decoration: none;
+border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+text-align: center;
+}
+#menu a:last-child {
+border: none;
+}
+#menu a:hover {
+background-color: #f8f8f8;
+color: #404040;
+}
+#menu a.active {
+background-color: #3887be;
+color: #ffffff;
+}
+#menu a.active:hover {
+background: #3074a4;
+}
+</style>
+<nav id="menu"></nav>
+<div id="map"></div>
+<div id="geocoder"></div>
+
+
+
+<script>
+	mapboxgl.accessToken = 'pk.eyJ1IjoiZXNlLXRvaCIsImEiOiJja2Vhb24xNTEwMDgxMzFrYjVlaTVjOXkxIn0.IsPo5lOndNUc3lDLuBa1ZA';
+var map = new mapboxgl.Map({
+container: 'map',
+style: 'mapbox://styles/ese-toh/ckh2ss32s06i119paer9mt67h',
+center: [-70.590, 41.590],
+zoom: 12
+});
+map.on('load', function() {
+// add source and layer for raster
+map.addSource('satellite', {
+type: 'raster',
+url: 'mapbox://mapbox.satellite'
+});
+map.addLayer({
+'id': 'satellite',
+'type': 'raster',
+'source': 'satellite',
+'layout': {
+// make layer visible by default
+'visibility': 'none'
+},
+'source-layer': 'satellite'
+});
+});
+
+// enumerate ids of the layers
+var toggleableLayerIds = ['satellite','parcels','parcel highlight','contours','agis','historic','floodplain','acec','DEP wetland','priority habitat','estimated habitat','vernal pools','zone II','soils','conservancy districts','zoning','conservation','sewer','stories','intersection','towns'];
+
+// set up the corresponding toggle button for each layer
+for (var i = 0; i < toggleableLayerIds.length; i++) {
+var id = toggleableLayerIds[i];
+ 
+var link = document.createElement('a');
+link.href = '#';
+link.className = '';
+link.textContent = id;
+
+link.onclick = function(e) {
+var clickedLayer = this.textContent;
+e.preventDefault();
+e.stopPropagation();
+var visibility = map.getLayoutProperty(clickedLayer, 'visibility');
+// toggle layer visibility by changing the layout object's visibility property
+if (visibility === 'visible') {
+map.setLayoutProperty(clickedLayer, 'visibility', 'none');
+this.className = '';
+} else {
+this.className = 'active';
+map.setLayoutProperty(clickedLayer, 'visibility', 'visible');
+}
+
+var satelliteVisibility = map.getLayoutProperty('satellite', 'visibility');
+map.moveLayer ('satellite','floodplain');
+map.moveLayer ('parcels', 'satellite');
+ // Toggle the visibility of LiMWA based on floodplain status
+    var floodplainVisibility = map.getLayoutProperty('floodplain', 'visibility');
+    if (floodplainVisibility === 'visible') {
+      map.setLayoutProperty('LiMWA', 'visibility', 'visible');
+    } else {
+      map.setLayoutProperty('LiMWA', 'visibility', 'none');
+    }
+	var wetlandVisibility = map.getLayoutProperty('DEP wetland', 'visibility');
+    if (wetlandVisibility === 'visible') {
+      map.setLayoutProperty('DEP wetland line', 'visibility', 'visible');
+    } else {
+      map.setLayoutProperty('DEP wetland line', 'visibility', 'none');
+    }
+
+
+};
+var layers = document.getElementById('menu');
+layers.appendChild(link);
+}
+map.addControl(new mapboxgl.ScaleControl({
+	maxWidth: 200,
+	unit: 'imperial'
+}), 'bottom-right'
+);
+map.addControl(
+new MapboxGeocoder({
+accessToken: mapboxgl.accessToken,
+
+mapboxgl: mapboxgl
+})
+);
+</script>
+<script src="https://www.ese-llc.com/s/parcels.js"></script>
+<script src="https://www.ese-llc.com/s/floodplain.js"></script>
+<script src="https://www.ese-llc.com/s/LiMWA.js"></script>
+<script src="https://www.ese-llc.com/s/parcel-highlight.js"></script>
+<script src="https://www.ese-llc.com/s/acec.js"></script>
+<script src="https://www.ese-llc.com/s/historic.js"></script>
+<script src="https://www.ese-llc.com/s/zoneii.js"></script>
+<script src="https://www.ese-llc.com/s/soils.js"></script>
+<script src="https://www.ese-llc.com/s/agis.js"></script>
+<script src="https://www.ese-llc.com/s/conservation.js"></script>
+<script src="https://www.ese-llc.com/s/sewer.js"></script>
+<script src="https://www.ese-llc.com/s/stories.js"></script>
+<script src="https://www.ese-llc.com/s/intersection.js"></script>
+<script src="https://www.ese-llc.com/s/depwetland.js"></script>
+<script src="https://www.ese-llc.com/s/depwetlandline.js"></script>
+<script src="https://www.ese-llc.com/s/vernalpools.js"></script>
+<script src="https://www.ese-llc.com/s/estimatedhabitat.js"></script>
+<script src="https://www.ese-llc.com/s/priorityhabitat.js"></script>
+<script src="https://www.ese-llc.com/s/conservancydistricts.js"></script>
+<script src="https://www.ese-llc.com/s/zoning.js"></script>
+<script src="https://www.ese-llc.com/s/contours.js"></script>
+<script src="https://www.ese-llc.com/s/towns.js"></script>
+reload()
+
+
+</body>
+</html>

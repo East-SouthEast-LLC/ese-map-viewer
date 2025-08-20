@@ -1,0 +1,3543 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Show and hide layers</title>
+<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+<script src="https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.js"></script>
+<link href="https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/@turf/turf"></script>
+
+<style>
+	body { margin: 0; padding: 0; }
+	#map { position: relative; margin-top: -590px; border: none; top: 0; left 0; height: 80vh; width: 90vw; }
+
+/* Geocoder container */
+#geocoder-container {
+    position: absolute;
+    top: 10px;
+    right: 40px;
+    z-index: 1;
+    display: flex;
+    flex-direction: column; /* Stack geocoder and buttons vertically */
+    gap: 5px; /* Space between geocoder and buttons */
+    width: auto; /* Adjust width as needed */
+    max-width: 250px; /* Constrain width of container */
+}
+
+/* Geocoder styling */
+#geocoder {
+    width: 100%; /* Make the geocoder width dynamic */
+    max-width: 250px; /* Limit to 280px for a maximum width */
+}
+
+/* Make buttons align horizontally within the container */
+#geocoder-container div {
+    display: flex;
+    flex-direction: row; /* Align buttons horizontally */
+    gap: 5px; /* Space between buttons */
+}
+
+#distance-display {
+    font-size: 12px;
+    color: #333;
+    background: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    margin-top: 5px;
+    text-align: left;
+    display: grid;
+    grid-template-columns: 1fr auto; /* Two columns: 1st column takes available space, 2nd column auto width */
+    gap: 10px; /* Space between columns */
+    max-width: 240px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+#distance-display div {
+    display: flex;
+    justify-content: space-between;
+}
+
+#distance-display .distance-value {
+    text-align: right; /* Align distances to the right */
+}
+
+.marker-label {
+    font-size: 14px;
+    color: black;
+    background-color: white;
+    padding: 3px 5px;
+    border-radius: 3px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    font-weight: bold;  /* You can adjust the style as needed */
+}
+
+/* General button styling for both buttons */
+.mapboxgl-ctrl-print, .mapboxgl-ctrl-point, .mapboxgl-ctrl-measure, .mapboxgl-ctrl-septicMap, .mapboxgl-ctrl-one {
+    background-size: 60%;
+    background-position: center;
+    background-repeat: no-repeat;
+    width: 40px;
+    height: 40px;
+    border: none;
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+    margin-right: 5px;
+}
+
+/* Hover effect for all buttons */
+.mapboxgl-ctrl-print:hover, .mapboxgl-ctrl-point:hover, .mapboxgl-ctrl-measure:hover, .mapboxgl-ctrl-septicMap:hover, .mapboxgl-ctrl-one:hover {
+    background-color: #f0f0f0;
+}
+.mapboxgl-ctrl-point-center:hover, .mapboxgl-ctrl-two:hover, .mapboxgl-ctrl-three:hover, .mapboxgl-ctrl-four:hover, .mapboxgl-ctrl-five:hover {
+    background-color: #f0f0f0;
+}
+.mapboxgl-ctrl-point-off:hover, .mapboxgl-ctrl-seven:hover, .mapboxgl-ctrl-clear:hover, .mapboxgl-ctrl-nine:hover, .mapboxgl-ctrl-ten:hover {
+    background-color: #f0f0f0;
+}
+
+/* button PRINT */
+.mapboxgl-ctrl-print {
+    background-image: url('https://img.icons8.com/ios-glyphs/30/000000/print.png'); /* Print icon */
+}
+
+/* button BLUE MARKER RANDOM */
+.mapboxgl-ctrl-point {
+    background-image: url('https://www.ese-llc.com/s/marker-blue-random.svg'); /* Pointing hand icon */
+}
+
+/* Measure button custom styling */
+.mapboxgl-ctrl-measure {
+    background-image: url('https://www.ese-llc.com/s/marker-blue-measure.svg');
+}
+
+/* Septic Map button custom styling */
+.mapboxgl-ctrl-septicMap {
+    background-image: url('https://img.icons8.com/ios-filled/50/000000/map09n47.png'); /* Water icon (example) */
+}
+
+/* Measure button custom styling */
+.mapboxgl-ctrl-one {
+    background-image: url('https://img.icons8.com/ios-filled/50/000000/ruler0692n.png'); /* Ruler icon (example) */
+}
+
+/* General button styling for both buttons */
+.mapboxgl-ctrl-point-center, .mapboxgl-ctrl-two, .mapboxgl-ctrl-three, .mapboxgl-ctrl-four, .mapboxgl-ctrl-five {
+    background-size: 60%;
+    background-position: center;
+    background-repeat: no-repeat;
+    width: 40px;
+    height: 40px;
+    border: none;
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+    margin-right: 5px;
+}
+
+/* button BLUE MARKER CENTER */
+.mapboxgl-ctrl-point-center {
+    background-image: url('https://www.ese-llc.com/s/marker-blue-center.svg'); /* Ruler icon (example) */
+}
+
+/* two button custom styling */
+.mapboxgl-ctrl-two {
+    background-image: url('https://img.icons8.com/ios-filled/50/000000/ruler0692n.png'); /* Ruler icon (example) */
+}
+
+/* three button custom styling */
+.mapboxgl-ctrl-three {
+    background-image: url('https://img.icons8.com/ios-filled/50/000000/ruler0692n.png'); /* Ruler icon (example) */
+}
+
+/* four button custom styling */
+.mapboxgl-ctrl-four {
+    background-image: url('https://img.icons8.com/ios-filled/50/000000/ruler0692n.png'); /* Ruler icon (example) */
+}
+
+/* five button custom styling */
+.mapboxgl-ctrl-five {
+    background-image: url('https://www.ese-llc.com/s/markerfdksaflkdjhf.svg'); /* Ruler icon (example) */
+}
+
+/* General button styling for both buttons */
+.mapboxgl-ctrl-point-off, .mapboxgl-ctrl-seven, .mapboxgl-ctrl-clear, .mapboxgl-ctrl-nine, .mapboxgl-ctrl-ten {
+    background-size: 60%;
+    background-position: center;
+    background-repeat: no-repeat;
+    width: 40px;
+    height: 40px;
+    border: none;
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+    margin-right: 5px;
+}
+
+/* button BLUE MARKER OFF */
+.mapboxgl-ctrl-point-off {
+    background-image: url('https://www.ese-llc.com/s/marker-blue-off.svg'); /* Ruler icon (example) */
+}
+
+/* seven button custom styling */
+.mapboxgl-ctrl-seven {
+    background-image: url('https://img.icons8.com/ios-filled/50/000000/ruler0692n.png'); /* Ruler icon (example) */
+}
+
+/* eight button custom styling */
+.mapboxgl-ctrl-clear {
+    background-image: url('https://www.ese-llc.com/s/marker-blue-measure-cancel.svg');
+	}
+
+/* nine button custom styling */
+.mapboxgl-ctrl-nine {
+    background-image: url('https://img.icons8.com/ios-filled/50/000000/ruler0692n.png'); /* Ruler icon (example) */
+}
+
+/* ten button custom styling */
+.mapboxgl-ctrl-ten {
+    background-image: url('https://www.ese-llc.com/s/markersigma.svg'); /* Ruler icon (example) */
+}
+
+.mapboxgl-ctrl-share {
+    width: 240px;
+    height: 40px;
+    background-color: white; 
+    color: black;
+    font-size: 14px;
+    border: none;
+    border-radius: 5px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+    text-align: center;
+    line-height: 40px;
+}
+
+.custom-tooltip {
+    position: absolute;
+    background: rgba(0, 0, 0, 0.85);
+    color: white;
+    padding: 0px 4px;
+    border-radius: 5px;
+    font-size: 10px;
+    white-space: nowrap;
+    z-index: 1000;
+    pointer-events: none;
+    transform: translateX(-50%);
+    opacity: 0; /* Start hidden */
+    transition: opacity 0.3s ease; /* Smooth transition */
+}
+
+
+#distanceWindow div:nth-child(2) {
+    text-align: right;
+}
+
+</style>
+</head>
+<body>
+
+<script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.5.1/mapbox-gl-geocoder.min.js"></script>
+<link
+rel="stylesheet"
+href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.5.1/mapbox-gl-geocoder.css"
+type="text/css"
+/>
+<!-- Promise polyfill script required to use Mapbox GL Geocoder in IE 11 -->
+<script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.auto.min.js"></script>
+<style>
+#menu {
+background: #fff;
+position: relative;
+z-index: 1;
+top: 0px;
+left: 0px;
+border-radius: 3px;
+width: 144px;
+border: 1px solid rgba(0, 0, 0, 0.4);
+font-family: 'Open Sans', sans-serif;
+}
+#menu a {
+font-size: 13px;
+color: #404040;
+display: block;
+margin: 0;
+padding: 0;
+padding: 1px;
+text-decoration: none;
+border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+text-align: center;
+}
+#menu a:last-child {
+border: none;
+}
+#menu a:hover {
+background-color: #f8f8f8;
+color: #404040;
+}
+#menu a.active {
+background-color: #3887be;
+color: #ffffff;
+}
+#menu a.active:hover {
+background: #3074a4;
+}
+
+</style>
+<nav id="menu"></nav>
+<div id="map"></div>
+<div id="geocoder-container">
+    <div id="geocoder" data-tooltip="Search for a location"></div>
+    <div> <!-- Wrapper for buttons -->
+        <button class="mapboxgl-ctrl-point" id="pointButton" aria-label="Point" data-tooltip="Drop a point on the map"></button>
+        <button class="mapboxgl-ctrl-print" id="printButton" aria-label="Print" data-tooltip="Print map"></button>
+        <button class="mapboxgl-ctrl-measure" id="distanceButton" aria-label="Measure" data-tooltip="Measure distances (on/off)"></button>
+        <button class="mapboxgl-ctrl-septicMap" id="septicMapButton" aria-label="Septic Map" data-tooltip="Placeholder"></button>
+        <button class="mapboxgl-ctrl-one" id="measureButton" aria-label="Measure" data-tooltip="Placeholder"></button>
+    </div>
+    <div> <!-- Wrapper for buttons -->
+        <button class="mapboxgl-ctrl-point-center" id="pointCButton" aria-label="Point Center" data-tooltip="Center the point or centerpoint"></button>
+        <button class="mapboxgl-ctrl-two" id="twoButton" aria-label="two" data-tooltip="Placeholder"></button>
+        <button class="mapboxgl-ctrl-three" id="threeButton" aria-label="three" data-tooltip="Placeholder"></button>
+        <button class="mapboxgl-ctrl-four" id="fourButton" aria-label="four" data-tooltip="Placeholder"></button>
+        <button class="mapboxgl-ctrl-five" id="fiveButton" aria-label="five" data-tooltip="Placeholder"></button>
+    </div>
+    <div> <!-- Wrapper for buttons -->
+        <button class="mapboxgl-ctrl-point-off" id="pointOffButton" aria-label="Point Off" data-tooltip="Remove the point from the map"></button>
+        <button class="mapboxgl-ctrl-seven" id="sevenButton" aria-label="seven" data-tooltip="Placeholder"></button>
+        <button class="mapboxgl-ctrl-clear" id="clearButton" aria-label="eight" data-tooltip="Clear measurements"></button>
+        <button class="mapboxgl-ctrl-nine" id="nineButton" aria-label="nine" data-tooltip="Placeholder"></button>
+        <button class="mapboxgl-ctrl-ten" id="tenButton" aria-label="ten" data-tooltip="Placeholder"></button>
+    </div>
+    <button class="mapboxgl-ctrl-share" id="shareButton" data-tooltip="Share the map with a URL">Share Map</button>
+    <!-- Place #distance-display inside #geocoder-container if you want it visually near the controls -->
+    <div id="distance-display"></div>
+	    <!-- Parcel filter UI (hidden by default) -->
+<div id="parcel-controls" style="display: none; background-color: #f9f9f9; padding: 15px; border-radius: 10px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">
+    <!-- Minimum Lot Size Section -->
+    <div style="margin-bottom: 10px;">
+        <label for="lowerLotSizeSlider"><strong>Minimum Lot Size:</strong></label>
+    </div>
+    
+    <div style="margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between;">
+        <!-- Arrow Up Button for Lower Slider (Smaller Arrows) -->
+        <button id="lowerLotSizeIncrease" style="padding: 3px 8px; cursor: pointer; font-size: 12px; flex-shrink: 0;">&#9650;</button>
+        
+        <!-- Slider -->
+        <input type="range" id="lowerLotSizeSlider" min="0" max="4000000" step="10000" value="80000" style="flex-grow: 1; margin: 0 8px;">
+        
+        <!-- Arrow Down Button for Lower Slider (Smaller Arrows) -->
+        <button id="lowerLotSizeDecrease" style="padding: 3px 8px; cursor: pointer; font-size: 12px; flex-shrink: 0;">&#9660;</button>
+    </div>
+    
+    <div style="margin-bottom: 10px;" id="lowerParcelCount">Min Lot Size: 80,000 SF</div>
+    
+    <!-- Maximum Lot Size Section -->
+    <div style="margin-bottom: 10px;">
+        <label for="upperLotSizeSlider"><strong>Maximum Lot Size:</strong></label>
+    </div>
+    
+    <div style="margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between;">
+        <!-- Arrow Up Button for Upper Slider (Smaller Arrows) -->
+        <button id="upperLotSizeIncrease" style="padding: 3px 8px; cursor: pointer; font-size: 12px; flex-shrink: 0;">&#9650;</button>
+        
+        <!-- Slider -->
+        <input type="range" id="upperLotSizeSlider" min="0" max="4000000" step="10000" value="4000000" style="flex-grow: 1; margin: 0 8px;">
+        
+        <!-- Arrow Down Button for Upper Slider (Smaller Arrows) -->
+        <button id="upperLotSizeDecrease" style="padding: 3px 8px; cursor: pointer; font-size: 12px; flex-shrink: 0;">&#9660;</button>
+    </div>
+    
+    <div style="margin-bottom: 10px;" id="upperParcelCount">Max Lot Size: 4,000,000 SF</div>
+    
+    <!-- Include CNS Parcels Toggle -->
+    <div style="margin-bottom: 10px;">
+        <label style="font-weight: normal;">
+            <input type="checkbox" id="cnsToggle" style="margin-right: 10px;"> Include CNS Parcels
+        </label>
+    </div>
+
+    <!-- Number of Parcels Display -->
+    <div style="text-align: center; margin-top: 10px;">
+        <strong>Total Parcels:</strong> <span id="parcelCount">0</span>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+</div>
+
+
+<script>
+	mapboxgl.accessToken = 'pk.eyJ1IjoiZXNlLXRvaCIsImEiOiJja2Vhb24xNTEwMDgxMzFrYjVlaTVjOXkxIn0.IsPo5lOndNUc3lDLuBa1ZA';
+var map = new mapboxgl.Map({
+container: 'map',
+style: 'mapbox://styles/ese-toh/ckh2ss32s06i119paer9mt67h',
+zoom: 11.7,
+center: [-70.002, 41.922]
+});
+
+        // Add Geocoder
+        const geocoder = new MapboxGeocoder({
+            accessToken: mapboxgl.accessToken,
+            mapboxgl: mapboxgl
+        });
+        document.getElementById('geocoder').appendChild(geocoder.onAdd(map));
+		// Capture Geocoder result
+		geocoder.on('result', function (event) {
+		if (event.result && event.result.center) {
+			setPinPosition(event.result.center[1], event.result.center[0]); // MapBox gives [lng, lat]
+		}
+	});
+
+// Updated Print Button Functionality
+document.getElementById('printButton').addEventListener('click', () => {
+    map.once('render', () => {
+        const canvas = map.getCanvas(); // Capture the map canvas
+        const frameElement = document.querySelector('.frame'); // Reference to frame element
+
+        // Call the adjustLabelsForPrint function
+        adjustLabelsForPrint(map, frameElement);
+
+        const win = window.open('', '_blank');
+        const currentDate = new Date().toLocaleDateString(); // Format the date as needed
+        if (win) {
+            win.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Map Print</title>
+                    <style>
+                        @media print {
+                            @page {
+                                size: 8.5in 11in; /* Letter size, portrait orientation */
+                                margin: 0; /* No additional margins */
+                            }
+                            body {
+                                margin: 0;
+                                padding: 0;
+                                display: flex;
+                                justify-content: center;
+                                align-items: center;
+                                height: 100%;
+                            }
+                        }
+                        body {
+                            background-color: transparent;
+                            margin: 0;
+                            padding: 0;
+                            box-sizing: border-box;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            position: relative;
+                            width: 8.5in;
+                            height: 11in;
+                        }
+                        .frame {
+                            width: calc(100% - 1in); /* 1/2" margins on both sides */
+                            position: absolute;
+                            left: 0.5in;
+                            right: 0.5in;
+                        }
+                        .top-frame {
+                            height: 8.0in;
+                            border: 4px solid black; /* Frame border */
+                            border-bottom: none; /* Remove bottom border */
+                            position: relative;
+                        }
+                        .middle-line {
+                            width: 100%;
+                            height: 0px; /* Line thickness */
+                            border-top: 4px solid black; /* Set color and thickness */
+                            position: absolute;
+                            top: 8in; /* Place it below the top frame */
+                            left: 0;
+                            z-index: 10; /* Ensure it appears above all other elements */
+                            margin: 0; /* Remove margin to avoid any spacing issues */
+                        }
+                        .bottom-frame {
+                            height: 2.0in;
+                            border: 4px solid black; /* Frame border */
+                            border-top: none; /* Remove top border */
+                            display: flex;
+                            align-items: center;
+                            position: relative;
+                        }
+                        .map-container {
+                            width: 100%;
+                            height: 100%;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                        }
+                        .map-container img {
+                            width: 100%;
+                            height: 100%;
+                            object-fit: cover; /* Ensure the map scales properly */
+                        }
+                        .image-container {
+                            width: 2in;
+                            height: 100%;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            margin-right: 4px; /* Optional space for alignment */
+                        }
+                        .image-container img {
+                            width: 100%;
+                            height: 100%;
+                            object-fit: contain;
+                        }
+                        .inner-frame {
+                            width: 2in;
+                            height: 2in;
+                            position: absolute;
+                            right: 0; /* Position it to the right */
+                            top: 0;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            text-align: center;
+                            padding: 4px;
+                            border: 0px; /* Border set to 0px */
+                            flex-direction: column; /* Stack text vertically */
+                        }
+                        .inner-frame span {
+                            display: block;
+                            margin-bottom: 4px; /* Space between lines */
+                        }
+                        .gis-map {
+                            font-family: 'BankGothicMd', sans-serif;
+                            font-style: italic;
+                            font-size: 14px;
+                        }
+                        .date, .scale, .base-map {
+                            font-family: Arial, sans-serif;
+                        }
+						.disclaimer {
+							font-size: 9px;
+						}
+                        .date {
+                            font-size: 11px;
+                        }
+                        .scale {
+                            font-size: 11px;
+                        }
+						.sources {
+							font-size: 10px;
+						}
+						.massgis {
+							font-size: 10px;
+						}
+                        .base-map {
+                            font-size: 10px;
+                        }
+                        .inner-frame a {
+                            color: black;
+                            text-decoration: none;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="frame">
+                        <div class="top-frame">
+                            <div class="map-container">
+							    <!-- Embed map image with markers -->
+                                <img src="${canvas.toDataURL()}" alt="Map Image" />
+                            </div>
+                        </div>
+                        <div class="middle-line"></div>
+                        <div class="bottom-frame">
+                            <div class="image-container">
+                                <img src="https://static1.squarespace.com/static/536cf42ee4b0465238027de5/t/67a783e42bb54b7b434b79f1/1739031525647/ESE-GIS.jpg" alt="Company Logo" />
+                            </div>
+                            <div class="inner-frame">
+                                <span class="gis-map">GIS Map</span>
+								<span class="disclaimer">This map is for illustrative purposes only and is not adequate for legal boundary determination or regulatory interpretation.</span>
+                                <span class="date">${currentDate}</span></br>
+								<span class="sources">Map sources include:</span>
+								<span class="massgis">Bureau of Geographic Information (MassGIS), Commonwealth of Massachusetts, Executive Office of Technology and Security Services</span>								
+                                <span class="base-map">
+                                    © <a href="https://www.mapbox.com/about/maps">Mapbox</a> </br>
+                                    © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> </br>
+                                    <strong><a href="https://apps.mapbox.com/feedback/" target="_blank">Improve this map, www.apps.mapbox.com/feedback</a></strong>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </body>
+                </html>
+            `);
+
+            win.document.title = 'Map Print';
+            win.document.close();
+
+            win.onload = () => {
+                win.print();
+                win.close();
+            };
+        } else {
+            alert("Popup blocked! Please allow popups for this site.");
+        }
+    });
+
+    // Ensure the map fully renders before capturing it
+    map.resize();
+    map.triggerRepaint();
+});
+
+// Point button functionality (this could be a toggle or other action)
+document.getElementById('pointButton').addEventListener('click', function() {
+    // Add your pointer functionality here
+    console.log("Pointer button clicked!");
+});
+
+document.querySelectorAll('[data-tooltip]').forEach(el => {
+    el.addEventListener('mouseenter', function () {
+        let tooltip = document.createElement('div');
+        tooltip.className = 'custom-tooltip';
+        tooltip.innerText = this.getAttribute('data-tooltip');
+        document.body.appendChild(tooltip);
+
+        let rect = this.getBoundingClientRect();
+        tooltip.style.left = `${rect.left + window.scrollX + rect.width / 2}px`;  // Center horizontally
+        tooltip.style.top = `${rect.top + window.scrollY - tooltip.offsetHeight + 5}px`; // Position above
+
+        // Delay showing the tooltip by 500ms (0.5 seconds)
+        this.tooltipTimeout = setTimeout(() => {
+            tooltip.style.opacity = 1; // Show tooltip after delay
+        }, 500);
+
+    });
+
+    el.addEventListener('mouseleave', function () {
+        clearTimeout(this.tooltipTimeout); // Clear any existing timeout when leaving
+        document.querySelector('.custom-tooltip')?.remove();
+    });
+});
+// *************************************************************** measurements
+// Hide distance display on page load
+document.getElementById('distance-display').style.display = 'none';
+// Global array to store marker positions and labels
+let markerPositions = [];
+let markerCounter = 65; // Start with 'A'
+let distanceButtonClicked = false; // Flag to prevent multiple clicks
+
+const distanceButton = document.getElementById('distanceButton');
+const clearButton = document.getElementById('clearButton');
+
+distanceButton.addEventListener('click', () => {
+    if (distanceButtonClicked) {
+        // If the button is clicked again, stop adding markers and change the cursor back
+        map.off('click', addLabel); // Remove the click event listener
+        map.getCanvas().style.cursor = ''; // Reset cursor to default
+        distanceButtonClicked = false;
+
+        // Calculate total distance and display at the bottom in bold
+        const totalDistance = calculateTotalDistance();
+        const distanceDiv = document.getElementById("distance-display");
+        distanceDiv.innerHTML += `<br><strong>Total Distance: ${totalDistance} feet</strong>`;
+
+        return; // Stop further execution
+    }
+
+    distanceButtonClicked = true; // Mark the button as clicked
+
+    // Change the cursor to crosshairs when the user can click to add labels
+    map.getCanvas().style.cursor = 'crosshair';
+
+    // Enable map clicks to add labels
+    map.on('click', addLabel);
+});
+
+function addLabel(event) {
+    const { lng, lat } = event.lngLat;
+
+    // Create a new label for the marker (A, B, C, etc.)
+    const label = String.fromCharCode(markerCounter);  // Convert number to letter (65 -> 'A')
+    markerCounter++;  // Increment for the next label
+
+    // Create the label element
+    const labelElement = document.createElement('div');
+    labelElement.className = 'marker-label'; // Add a class for styling
+    labelElement.textContent = label; // Set the label text
+
+    // Create a new Mapbox marker to place the label
+    new mapboxgl.Marker({ element: labelElement })
+        .setLngLat([lng, lat]) // Position the marker on the map
+        .addTo(map);
+
+    // Store label position with label text in the array
+    markerPositions.push({ label, lat, lng });
+
+    // Draw a dashed line between consecutive labels
+    if (markerPositions.length > 1) {
+        const lastPosition = markerPositions[markerPositions.length - 2];
+        drawDashedLine(lastPosition, { label, lat, lng });
+    }
+
+    // Update distance display
+    updateDistanceDisplay();
+}
+
+
+function drawDashedLine(start, end) {
+    const line = new mapboxgl.LngLatBounds(
+        [start.lng, start.lat],
+        [end.lng, end.lat]
+    );
+
+    // Draw a dashed line between the two labels
+    map.addLayer({
+        id: `line-${start.label}-${end.label}`,
+        type: 'line',
+        source: {
+            type: 'geojson',
+            data: {
+                type: 'Feature',
+                geometry: {
+                    type: 'LineString',
+                    coordinates: [
+                        [start.lng, start.lat],
+                        [end.lng, end.lat],
+                    ],
+                },
+            },
+        },
+        paint: {
+            'line-color': '#ff0000',
+            'line-width': 2,
+            'line-dasharray': [4, 4], // Dashed line
+        },
+    });
+}
+
+function updateDistanceDisplay() {
+    const distanceDiv = document.getElementById("distance-display");
+    let distancesHTML = "<strong>Measurements are approximate.</strong><br>"; // Add the note here
+
+    // Calculate distances between all labels
+    for (let i = 0; i < markerPositions.length - 1; i++) {
+        const start = markerPositions[i];
+        const end = markerPositions[i + 1];
+        const distance = calculateDistance(start.lat, start.lng, end.lat, end.lng);
+        distancesHTML += `${start.label} → ${end.label}: ${distance} feet<br>`;
+    }
+
+    // Display the distances in the div
+    distanceDiv.innerHTML = distancesHTML;
+    distanceDiv.style.display = "block"; // Ensure visibility
+}
+
+
+// Helper function to calculate the distance (in feet) between two lat/lng points
+function calculateDistance(lat1, lng1, lat2, lng2) {
+    const R = 3963; // Earth radius in miles
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLng = (lng2 - lng1) * Math.PI / 180;
+    const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(lat1 * Math.PI / 180) *
+            Math.cos(lat2 * Math.PI / 180) *
+            Math.sin(dLng / 2) * Math.sin(dLng / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distance = R * c * 5280; // Convert miles to feet
+    return distance.toFixed(2); // Round to 2 decimal places
+}
+
+// Calculate total distance of all segments
+function calculateTotalDistance() {
+    let totalDistance = 0;
+
+    for (let i = 0; i < markerPositions.length - 1; i++) {
+        const start = markerPositions[i];
+        const end = markerPositions[i + 1];
+        totalDistance += parseFloat(calculateDistance(start.lat, start.lng, end.lat, end.lng));
+    }
+
+    return totalDistance.toFixed(2); // Round to 2 decimal places
+}
+
+clearButton.addEventListener('click', () => {
+    // Clear the markerPositions array
+    markerPositions = [];
+    markerCounter = 65; // Reset marker labeling to 'A'
+
+    // Remove all labels from the map
+    const allLabels = document.querySelectorAll('.marker-label');
+    allLabels.forEach(label => label.remove());
+
+    // Remove all dashed lines from the map
+    const allLines = map.getStyle().layers.filter(layer => layer.id.startsWith('line-'));
+    allLines.forEach(line => {
+        map.removeLayer(line.id);
+        map.removeSource(line.id);
+    });
+
+    // Hide the distance display
+    const distanceDiv = document.getElementById('distance-display');
+    distanceDiv.style.display = 'none';
+
+    // Reset the distance button flag to allow reactivating it in the future
+    distanceButtonClicked = false;
+
+    // Reset the cursor to default after clearing the labels
+    map.getCanvas().style.cursor = '';
+
+    // Disable the map click event after clearing
+    map.off('click', addLabel);
+});
+
+// *************************************************************** Parcel highlight
+// Function to check layer visibility and toggle the controls panel
+function updateParcelControlsVisibility() {
+    const visibility = map.getLayoutProperty('private upland', 'visibility');
+
+    if (visibility === 'visible') {
+        document.getElementById('parcel-controls').style.display = 'block';
+        updateParcelFilter(); // Ensure parcel count updates when opened
+    } else {
+        document.getElementById('parcel-controls').style.display = 'none';
+    }
+}
+
+// Listen for changes in style or visibility of the 'private upland' layer
+map.on('styledata', updateParcelControlsVisibility);
+map.on('idle', updateParcelControlsVisibility); // Ensures it updates if toggled manually
+
+
+
+
+// Add the slider and CNS toggle to the UI
+const controlsContainer = document.getElementById('parcel-controls');
+let allParcels = []; // Store all parcels in memory
+
+// Load the full parcel dataset from an external GeoJSON file
+fetch('path-to-your-parcels.geojson') // Replace with actual file URL
+    .then(response => response.json())
+    .then(data => {
+        allParcels = data.features; // Store all parcels in memory
+        updateParcelFilter(); // Ensure count updates when data loads
+    })
+    .catch(error => console.error('Error loading parcels:', error));
+
+function updateParcelFilter() {
+    const lowerLotSize = parseInt(document.getElementById('lowerLotSizeSlider').value);
+    const upperLotSize = parseInt(document.getElementById('upperLotSizeSlider').value);
+    const includeCNS = document.getElementById('cnsToggle').checked;
+
+    if (!map.getLayer('private upland')) {
+        console.error("Layer 'private upland' not found.");
+        return;
+    }
+
+    let filter = [
+        "all",
+        [">=", ["get", "_LOT_SIZE"], lowerLotSize],
+        ["<=", ["get", "_LOT_SIZE"], upperLotSize]
+    ];
+
+    if (!includeCNS) {
+        filter.push(["!=", ["get", "_ZONING"], "CNS"]);
+    }
+
+    map.setFilter('private upland', filter);
+
+    // --- Count Parcels ---
+    const features = map.querySourceFeatures('private upland', { sourceLayer: 'WELLFLEET_private_upland_2024-8zr5ug' });
+
+    let countWithin = 0;
+    let countBelow = 0;
+    let countAbove = 0;
+
+    features.forEach(feature => {
+        const lotSize = feature.properties._LOT_SIZE;
+        const zoning = feature.properties._ZONING;
+
+        if (!includeCNS && zoning === 'CNS') return; // Ignore CNS parcels if toggle is off
+
+        if (lotSize < lowerLotSize) {
+            countBelow++;
+        } else if (lotSize > upperLotSize) {
+            countAbove++;
+        } else {
+            countWithin++;
+        }
+    });
+
+    // --- Update UI ---
+    document.getElementById('parcelCount').innerText = countWithin.toLocaleString();
+    document.getElementById('countBelow').innerText = `Below: ${countBelow.toLocaleString()}`;
+    document.getElementById('countAbove').innerText = `Above: ${countAbove.toLocaleString()}`;
+}
+
+
+
+// Show slider when 'private upland' layer is active
+map.on('styledata', () => {
+    if (map.getLayer('private upland')) {
+        controlsContainer.style.display = 'block';
+        updateParcelFilter(); // Update count on activation
+    } else {
+        controlsContainer.style.display = 'none';
+    }
+});
+
+// Function to update displayed Min and Max lot sizes
+function updateMinLotSize() {
+    document.getElementById('lowerParcelCount').innerText = `Min Lot Size: ${document.getElementById('lowerLotSizeSlider').value.toLocaleString()} SF`;
+}
+
+function updateMaxLotSize() {
+    document.getElementById('upperParcelCount').innerText = `Max Lot Size: ${document.getElementById('upperLotSizeSlider').value.toLocaleString()} SF`;
+}
+
+// Event listeners for sliders
+document.getElementById('lowerLotSizeSlider').addEventListener('input', () => {
+    updateMinLotSize();
+    updateParcelFilter();
+});
+document.getElementById('upperLotSizeSlider').addEventListener('input', () => {
+    updateMaxLotSize();
+    updateParcelFilter();
+});
+document.getElementById('cnsToggle').addEventListener('change', updateParcelFilter);
+
+// Event listeners for increment/decrement buttons
+function adjustSlider(sliderId, adjustment, updateFunc) {
+    let slider = document.getElementById(sliderId);
+    let newValue = parseInt(slider.value) + adjustment;
+    if (newValue >= 0 && newValue <= 4000000) {
+        slider.value = newValue;
+        updateFunc();
+        updateParcelFilter();
+    }
+}
+
+document.getElementById('lowerLotSizeIncrease').addEventListener('click', () => adjustSlider('lowerLotSizeSlider', 10000, updateMinLotSize));
+document.getElementById('lowerLotSizeDecrease').addEventListener('click', () => adjustSlider('lowerLotSizeSlider', -10000, updateMinLotSize));
+document.getElementById('upperLotSizeIncrease').addEventListener('click', () => adjustSlider('upperLotSizeSlider', 10000, updateMaxLotSize));
+document.getElementById('upperLotSizeDecrease').addEventListener('click', () => adjustSlider('upperLotSizeSlider', -10000, updateMaxLotSize));
+
+// Ensure the controls are hidden initially
+controlsContainer.style.display = 'none';
+
+// Initially hide the controls
+document.getElementById('parcel-controls').style.display = 'none';
+
+// Show controls when 'private upland' layer is active
+map.on('styledata', () => {
+    if (map.getLayer('private upland')) {
+        document.getElementById('parcel-controls').style.display = 'block';  // Show controls
+        updateParcelFilter();  // Update the parcel count when the layer is on
+    } else {
+        document.getElementById('parcel-controls').style.display = 'none';  // Hide controls when the layer is not active
+    }
+});
+
+
+
+
+
+// *************************************************************** pinPosition
+const pinPosition = { lat: null, lng: null }; // Structured as an object
+let placingPoint = false; // Flag to track point placement mode
+let marker = null;
+const markerCoordinates = { lat: null, lng: null };  // coordinates stored in a const object
+const zoom = {z: null}; // zoom level
+
+function setPinPosition(lat, lng) {
+    pinPosition.lat = lat;
+    pinPosition.lng = lng;
+    console.log("Pin position updated:", pinPosition);
+}
+
+function getPinPosition() {
+    return pinPosition;
+}
+
+function getMarkerCoordinates() {
+    if (window.marker) {
+        let { lng, lat } = window.marker.getLngLat();
+        return { lng, lat };
+    }
+    return null; // No marker exists
+}
+document.getElementById('tenButton').addEventListener('click', function () {
+    let zoom = obtainZoom(); // Get the zoom level once the map is loaded
+    console.log("Zoom level: ", zoom);
+});
+
+function obtainZoom() {
+    zoom.z = map.getZoom(); // Get the zoom level and store it
+    return zoom.z; // Return the zoom level
+}
+
+// Button click: Activate point placement mode & change cursor
+document.getElementById('pointButton').addEventListener('click', function () {
+    placingPoint = true;
+    map.getCanvas().style.cursor = 'crosshair'; // Change cursor to crosshair
+    console.log("Click on the map to drop a point.");
+});
+
+// Map click: Drop marker, update position & reset cursor
+map.on('click', function (event) {
+    if (placingPoint) {
+        let { lat, lng } = event.lngLat;
+
+        // Update pinPosition
+        setPinPosition(lat, lng);
+
+        // Remove old marker if exists
+        if (marker) marker.remove();
+
+        // Add new marker
+        marker = new mapboxgl.Marker()
+            .setLngLat([lng, lat])
+            .addTo(map);
+
+        // Reset placement mode and cursor
+        placingPoint = false;
+        map.getCanvas().style.cursor = ''; // Revert to default cursor
+    }
+});
+
+// Function to get map state, including center, zoom, and visible layers
+function getMapState(map, layerIds, frameElement) {
+    // Use the getMapCenter(map)
+    let center = getMarkerCoordinates()
+    let zoom = map.getZoom(); // Get the zoom level
+    
+    // Get visible layers using your custom function
+    let visibleLayers = listVisibleLayers(map, layerIds);
+
+    return {
+        zoom: zoom,
+        center: { lat: center[1], lng: center[0] }, // Switch lat/lng for consistency
+        layers: visibleLayers
+    };
+}
+
+
+// Add event listener to the Center button
+document.getElementById('pointCButton').addEventListener('click', function() {
+    const center = dropPinAtCenter();
+    console.log({
+        lat: center.lat,
+        lng: center.lng
+    });
+});
+
+
+function dropPinAtCenter() {
+    if (marker) {
+        // A marker exists, center the map on it
+        let { lng, lat } = marker.getLngLat();
+        markerCoordinates.lng = lng;  // update the coordinate values
+        markerCoordinates.lat = lat;
+        map.flyTo({ center: markerCoordinates, essential: true });
+    } else {
+        // No marker exists, create one at the map's center
+        let center = map.getCenter();
+        marker = new mapboxgl.Marker().setLngLat(center).addTo(map);
+        markerCoordinates.lng = center.lng;
+        markerCoordinates.lat = center.lat;
+    }
+
+    console.log(`Marker Coordinates: ${markerCoordinates.lng}, ${markerCoordinates.lat}`);
+    return markerCoordinates;
+}
+
+function getMarkerCoordinates() {
+    if (marker) {
+        let { lng, lat } = marker.getLngLat();
+        console.log("Marker coordinates:", { lng, lat });
+        return { lng, lat };
+    }
+    console.log("No marker is currently placed.");
+    return null;
+}
+
+// *************************************************************** Add event listener to the Point (marker) Off Button
+document.getElementById('pointOffButton').addEventListener('click', function() {
+    // If there's an existing marker, remove it
+    if (marker) {
+        marker.remove();
+        marker = null;  // Nullify the marker reference to ensure it's cleared
+    }
+
+    // Nullify the coordinates
+    const markerCoordinates = { lat: null, lng: null };
+    console.log("Marker removed. Coordinates nullified:", markerCoordinates);
+});
+
+
+// List Visible Layers - the major Label IDs
+function listVisibleLayers(map, layerIds) {
+  if (!Array.isArray(layerIds)) {
+    console.error("layerIds must be an array.");
+    return [];
+  }
+
+  const visibleLayers = [];
+  layerIds.forEach(layerId => {
+    // Check if the layer exists in the map style
+    if (map.getLayer(layerId)) {
+      const visibility = map.getLayoutProperty(layerId, 'visibility');
+      if (visibility === 'visible') {
+        visibleLayers.push(layerId);  // Add visible layers to the array
+      }
+    } else {
+      console.warn(`Layer "${layerId}" not found in the current map style.`);
+    }
+  });
+  return visibleLayers;
+}
+
+
+function generateShareLink(map, zoomLevel, layerIds) {
+    let baseUrl = window.location.origin + window.location.pathname; // Current page URL
+    // Encode each layer name to avoid issues with special characters and spaces
+    let encodedLayerIds = layerIds.map(layerId => encodeURIComponent(layerId));
+    // Construct the URL
+    let shareUrl = `${baseUrl}?zoom=${zoomLevel}&lat=${markerCoordinates.lat}&lng=${markerCoordinates.lng}&layers=${encodedLayerIds.join(',')}`;
+    
+    return shareUrl;
+}
+
+
+
+
+// Add event listener to the SHARE button
+document.getElementById('shareButton').addEventListener('click', function() {
+    // If a marker exists, center the map on it
+    if (window.marker) {
+        map.flyTo({ center: window.marker.getLngLat(), essential: true });
+    }
+
+    // Drop a new pin at the center (overwriting the existing one)
+    let markerCoordinates = dropPinAtCenter();
+    let zoomLevel = obtainZoom();  // Get the zoom level
+
+    // Get visible layers dynamically using the listVisibleLayers function
+    let allLayerIds = ['satellite', 'parcels', 'parcel highlight', 'contours', 'agis', 'historic', 'floodplain', 'acec', 'DEP wetland', 'endangered species', 'zone II', 'soils', 'conservancy districts', 'zoning', 'conservation', 'sewer', 'stories', 'intersection', 'towns', 'placeholder', 'another placeholder']; // All available layers
+    let visibleLayerIds = listVisibleLayers(map, allLayerIds); // Get only the visible layers
+
+    // Generate the shareable link with the visible layers
+    let shareLink = generateShareLink(map, zoomLevel, visibleLayerIds);
+
+    console.log("Share this link:", shareLink); // Output the link to console (or show it to the user)
+    showSharePopup(shareLink); // Show the share popup
+});
+
+// Function to create and display the share link popup
+function showSharePopup(shareLink) {
+    // Create the modal container
+    let modal = document.createElement("div");
+    modal.style.position = "fixed";
+    modal.style.top = "50%";
+    modal.style.left = "50%";
+    modal.style.transform = "translate(-50%, -50%)";
+    modal.style.padding = "20px";
+    modal.style.background = "#fff";
+    modal.style.boxShadow = "0px 4px 10px rgba(0,0,0,0.2)";
+    modal.style.borderRadius = "10px";
+    modal.style.textAlign = "center";
+    modal.style.zIndex = "1000";
+
+    // Create the link display
+    let linkDisplay = document.createElement("input");
+    linkDisplay.type = "text";
+    linkDisplay.value = shareLink;
+    linkDisplay.style.width = "100%";
+    linkDisplay.style.marginBottom = "10px";
+    linkDisplay.style.padding = "5px";
+    linkDisplay.style.textAlign = "center";
+    linkDisplay.readOnly = true;
+
+    // Create the copy button
+    let copyButton = document.createElement("button");
+    copyButton.innerText = "Copy Link";
+    copyButton.style.marginRight = "10px";
+    copyButton.onclick = function () {
+        navigator.clipboard.writeText(shareLink).then(() => {
+        //    alert("Link copied to clipboard!");
+        });
+        document.body.removeChild(modal); // Close popup
+    };
+
+    // Create the close button
+    let closeButton = document.createElement("button");
+    closeButton.innerText = "Close";
+    closeButton.onclick = function () {
+        document.body.removeChild(modal); // Close popup
+    };
+    if (marker) {
+        marker.remove();
+        marker = null;  // Nullify the marker reference to ensure it's cleared
+    }
+    // Add elements to modal
+    modal.appendChild(linkDisplay);
+    modal.appendChild(copyButton);
+    modal.appendChild(closeButton);
+
+    // Add modal to document
+    document.body.appendChild(modal);
+}
+
+function getFrameCoordinates(map) {
+    // Get the map bounds (visible area in coordinates)
+    const bounds = map.getBounds();
+
+    // Get the map size in pixels
+    const mapContainer = map.getContainer();
+    const mapWidth = mapContainer.clientWidth;
+    const mapHeight = mapContainer.clientHeight;
+
+    // Define positions in the viewport (normalized for frame points)
+    const positions = {
+        upperRight: { x: mapWidth, y: 0 }, // Top-right corner
+        middle: { x: mapWidth / 2, y: mapHeight / 2 }, // Center
+        lowerLeft: { x: 0, y: mapHeight }, // Bottom-left corner
+    };
+
+    // Convert viewport positions to geographical coordinates
+    const coordinates = {
+        upperRight: map.unproject([positions.upperRight.x, positions.upperRight.y]).toArray(),
+        middle: map.unproject([positions.middle.x, positions.middle.y]).toArray(),
+        lowerLeft: map.unproject([positions.lowerLeft.x, positions.lowerLeft.y]).toArray(),
+    };
+
+    return coordinates;
+}
+
+function getPrintingFrameCoordinates(map, frameElement) {
+    if (!frameElement) {
+        console.error("frameElement is not defined or is invalid.");
+        return null;
+    }
+
+    // Ensure the map container is valid
+    if (!map || !map.getContainer()) {
+        console.error("Map container is not defined.");
+        return null;
+    }
+
+    // Get the printing frame dimensions and offsets
+    const frameRect = frameElement.getBoundingClientRect();
+    const mapRect = map.getContainer().getBoundingClientRect();
+
+    // Calculate relative positions of the frame within the map
+    const frameTopLeft = [frameRect.left - mapRect.left, frameRect.top - mapRect.top];
+    const frameBottomRight = [
+        frameRect.right - mapRect.left,
+        frameRect.bottom - mapRect.top,
+    ];
+
+    // Define positions in the printing frame (Middle point)
+    const positions = {
+        middle: {
+            x: (frameTopLeft[0] + frameBottomRight[0]) / 2,
+            y: (frameTopLeft[1] + frameBottomRight[1]) / 2,
+        },
+    };
+
+    // Convert printing frame positions to geographical coordinates (map.unproject)
+    const coordinates = {
+        middle: map.unproject([positions.middle.x, positions.middle.y]).toArray(),
+    };
+
+    return coordinates;
+}
+
+
+//function getMapCenter(map) {
+//    const center = map.getCenter(); // Gets the map's current center as a LngLat object
+//    return {
+//        lat: center.lat,
+//        lng: center.lng
+//    };
+//}
+
+// get centroids in frame
+function getCentroidsInFrame(map, layerId, frameElement) {
+    // Step 1: Get the printing frame coordinates (returns pixel coordinates)
+    const frameCoordinates = getPrintingFrameCoordinates(map, frameElement);
+
+    // Step 2: Query all features in the specified layer within visible bounds
+    const features = map.queryRenderedFeatures({
+        layers: [layerId], // Specify the layer (e.g., 'floodplain')
+    });
+
+    // Step 3: Process each feature to calculate centroids
+    const centroids = features.map(feature => {
+        const coordinates = feature.geometry.coordinates;
+
+        // Skip unsupported geometries
+        if (feature.geometry.type !== 'Polygon' && feature.geometry.type !== 'MultiPolygon') {
+            console.warn(`Unsupported geometry type: ${feature.geometry.type}`);
+            return null;
+        }
+
+        // Calculate centroid based on geometry type
+        let centroid;
+        if (feature.geometry.type === 'Polygon') {
+            centroid = getPolygonCentroid(coordinates);
+        } else if (feature.geometry.type === 'MultiPolygon') {
+            centroid = getMultiPolygonCentroid(coordinates);
+        }
+
+        // Ensure centroid calculation succeeded
+        if (!centroid) {
+            console.warn("Centroid calculation failed for feature:", feature.id);
+            return null;
+        }
+
+        // Step 4: Check if centroid is within the printing frame bounds
+        const [centroidX, centroidY] = centroid;
+        const centroidPixel = map.project([centroidX, centroidY]); // Convert to pixel coordinates
+
+        const isWithinFrame =
+            centroidPixel.x >= frameCoordinates.lowerLeft[0] &&
+            centroidPixel.x <= frameCoordinates.upperRight[0] &&
+            centroidPixel.y >= frameCoordinates.lowerLeft[1] &&
+            centroidPixel.y <= frameCoordinates.upperRight[1];
+
+        if (isWithinFrame) {
+            return { centroid, featureId: feature.id };
+        }
+
+        return null; // Skip features outside the printing frame
+    }).filter(Boolean); // Remove null entries
+
+    return centroids;
+}
+
+// Helper function to calculate the centroid of a simple Polygon
+function getPolygonCentroid(coordinates) {
+    const flatCoords = coordinates[0]; // Use the first ring (outer boundary)
+    const xSum = flatCoords.reduce((sum, coord) => sum + coord[0], 0);
+    const ySum = flatCoords.reduce((sum, coord) => sum + coord[1], 0);
+    const centroidX = xSum / flatCoords.length;
+    const centroidY = ySum / flatCoords.length;
+
+    return [centroidX, centroidY];
+}
+
+// Helper function to calculate the centroid of a MultiPolygon
+function getMultiPolygonCentroid(coordinates) {
+    // Return the centroid of the first polygon in the MultiPolygon
+    return getPolygonCentroid(coordinates[0]);
+}
+
+// *************************************************************** satellite
+map.on('load', function() {
+// add source and layer for raster
+map.addSource('satellite', {
+type: 'raster',
+url: 'mapbox://mapbox.satellite'
+});
+map.addLayer({
+'id': 'satellite',
+'type': 'raster',
+'source': 'satellite',
+'layout': {
+// make layer visible by default
+'visibility': 'none'
+},
+'source-layer': 'satellite'
+});
+});
+
+// *************************************************************** contours
+map.on('load', function() {
+map.addSource('contours', {
+type: 'vector',
+url: 'mapbox://ese-toh.djcjlqsr'
+});
+map.addLayer({
+'id': 'contours',
+'type': 'line',
+'source': 'contours',
+'source-layer': 'CONT-ELBOW-9gwgnx',
+'layout': {
+// make layer invisible by default
+'visibility': 'none',
+'line-join': 'round',
+'line-cap': 'round'
+//'symbol-placement': 'line',
+//'text-field': ['concat', ['to-string', ['get', 'Elevation']], 'ft']
+},
+'paint': {
+'line-color': [
+	'match',
+	['get', 'Elevation'],
+	'-2', //
+	'#08ADEF',
+	/* other */ '#07C327'
+	],
+'line-width': 0.5
+}
+});
+});
+map.on('load', function () {
+  // Add the contour labels layer
+  map.addLayer({
+    id: 'contour-labels',
+    type: 'symbol',
+    source: 'contours', // Ensure this source exists
+    'source-layer': 'CONT-ELBOW-9gwgnx', // Ensure this layer exists in the source
+    layout: {
+      'symbol-placement': 'line', // Align labels along the line
+      'symbol-spacing': 100, // Add more labels by reducing spacing (default is 250)
+      'text-field': ['concat', ['to-string', ['get', 'Elevation']]],
+      'text-font': ['Open Sans Regular', 'Arial Unicode MS Regular'], // Font
+      'text-size': 10, // Text size
+      visibility: 'none', // Initially invisible
+    },
+    paint: {
+      'text-color': '#07C327', // Label color
+      'text-halo-color': '#ffffff', // Halo for readability
+      'text-halo-width': 1,
+    },
+  });
+});
+
+// *************************************************************** historic
+map.on('load', function() {
+map.addSource('historic', {
+type: 'vector',
+url: 'mapbox://ese-toh.90pe1azb'
+});
+map.addLayer({
+'id': 'historic',
+'type': 'fill',
+'source': 'historic',
+'source-layer': 'TOC_Historic-d4lyva',
+'layout': {
+// make layer invisible by default
+'visibility': 'none'
+},
+'paint': {
+'fill-color': [
+	'match',
+	['get', 'Status'],
+	'Proposed',
+	'#F2BD67',
+	'1024-0018',
+	'#D75F48',
+	/* other */ '#5c580f'
+	],
+'fill-opacity': 0.4
+}
+});
+});
+        map.on('click', 'historic', function (e) {
+             new mapboxgl.Popup()
+            .setLngLat(e.lngLat)
+            .setHTML("Historic District: "+e.features[0].properties.District +'<br>' +"Status / Reference: "+'<strong>'+e.features[0].properties.Status + '</strong><br>' +
+"Documentation: "+'<a href=\"'+ e.features[0].properties.URL +'" target="_blank"><b><u>Link to Document</u></b></a>')
+            .addTo(map);
+     //(e.features[0].properties.PID + " - " + e.features[0].properties.LINK)  <strong>97 Tilipi Run</strong><p>Parcel ID:14A3-2-B<p>
+    });
+    map.on('mouseenter', 'historic', function () {
+        map.getCanvas().style.cursor = 'pointer';
+    });
+    map.on('mouseleave', 'historic', function () {
+        map.getCanvas().style.cursor = '';
+    });
+
+// *************************************************************** acec
+map.on('load', function() {
+map.addSource('acec', {
+type: 'vector',
+url: 'mapbox://ese-toh.2wnv388a'
+});
+map.addLayer({
+'id': 'acec',
+'type': 'fill',
+'source': 'acec',
+'source-layer': 'ACEC-2023-02-26-4wucwh',
+'layout': {
+// make layer invisible by default
+'visibility': 'none'
+},
+'paint': {
+'fill-color': '#CD06D8',
+'fill-opacity': 0.35
+}
+});
+});
+        map.on('click', 'acec', function (e) {
+             new mapboxgl.Popup()
+            .setLngLat(e.lngLat)
+            .setHTML("Area of Critical Environmental Concern: "+'<strong>'+e.features[0].properties.NAME +'</strong><br>'+"DEP ACEC Designation: "+'<a href=\"'+ e.features[0].properties.LINK +'" target="_blank"><b><u>Link to Document</u></b></a>')
+            .addTo(map);
+     //(e.features[0].properties.PID + " - " + e.features[0].properties.LINK)  <strong>97 Tilipi Run</strong><p>Parcel ID:14A3-2-B<p>
+    });
+    map.on('mouseenter', 'acec', function () {
+        map.getCanvas().style.cursor = 'pointer';
+    });
+    map.on('mouseleave', 'acec', function () {
+        map.getCanvas().style.cursor = '';
+    });
+
+// *************************************************************** zone II
+map.on('load', function() {
+    map.addSource('zone II', {
+        type: 'vector',
+        url: 'mapbox://ese-toh.9xot04xz'
+    });
+
+    // Fill layer
+    map.addLayer({
+        'id': 'zone II',
+        'type': 'fill',
+        'source': 'zone II',
+        'source-layer': 'zoneII-01dowh',
+        'layout': {
+            // make layer invisible by default
+            'visibility': 'none'
+        },
+        'paint': {
+            'fill-color': '#2758d6',
+            'fill-opacity': 0.4
+        }
+    });
+
+    // Stroke layer (to make the outline thicker)
+    map.addLayer({
+        'id': 'zone II-outline',
+        'type': 'line',
+        'source': 'zone II',
+        'source-layer': 'zoneII-01dowh',
+        'layout': {
+            'visibility': 'none'
+        },
+        'paint': {
+            'line-color': '#1a3e8c', // Darker blue for contrast
+            'line-width': 3, // Adjust this to make it thicker
+            'line-opacity': 1
+        }
+    });
+// *************************************************************** Zone II Labels
+map.addLayer({
+    'id': 'zone II-labels',
+    'type': 'symbol',
+    'source': 'zone II',
+    'source-layer': 'zoneII-01dowh',
+    'layout': {
+        'text-field': ['format', 'Zone II: ', {}, ['get', 'ZII_NUM'], {}], // Prefix "Zone II: " before the number
+        'text-size': 10, // Smaller font size for the labels
+        'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
+        'symbol-placement': 'point', // Position the label as a point
+        'text-anchor': 'center', // Centered text
+        'visibility': 'none', // Default to hidden
+        'symbol-spacing': 30, // Reduced spacing for more frequent labels
+    },
+    'paint': {
+        'text-color': '#000000', // Black text color
+        'text-halo-color': '#ffffff', // White halo around text
+        'text-halo-width': 2 // Make the halo wider for readability
+    }
+});
+});
+map.on('click', 'zone II', function (e) {
+    new mapboxgl.Popup()
+        .setLngLat(e.lngLat)
+        .setHTML("Zone II number: "+'<strong>'+e.features[0].properties.ZII_NUM + '</strong><br>' + 
+                 "Water Supplier: "+'<strong>'+e.features[0].properties.SUPPLIER + '</strong><br>' + 
+                 "Town: "+'<strong>'+e.features[0].properties.TOWN + '</strong><br>')
+        .addTo(map);
+});
+map.on('mouseenter', 'zone II', function () {
+    map.getCanvas().style.cursor = 'pointer';
+});
+map.on('mouseleave', 'zone II', function () {
+    map.getCanvas().style.cursor = '';
+});
+map.on('click', 'zone II', function (e) {
+    new mapboxgl.Popup()
+        .setLngLat(e.lngLat)
+        .setHTML("Zone II number: "+'<strong>'+e.features[0].properties.ZII_NUM + '</strong><br>' + 
+                 "Water Supplier: "+'<strong>'+e.features[0].properties.SUPPLIER + '</strong><br>' + 
+                 "Town: "+'<strong>'+e.features[0].properties.TOWN + '</strong><br>')
+        .addTo(map);
+});
+
+// *************************************************************** towns
+map.on('load', function() {
+map.addSource('towns', {
+type: 'vector',
+url: 'mapbox://ese-toh.9kac7735'
+});
+map.addLayer({
+'id': 'towns',
+'type': 'line',
+'source': 'towns',
+'source-layer': 'TOWNS-d0onvn',
+'layout': {
+// make layer invisible by default
+'visibility': 'visible'
+},
+'paint': {
+'line-color': '#08f8fc',
+'line-width': 1
+},
+});
+});
+
+// *************************************************************** endangered species
+map.on('load', function() {
+    map.addSource('endangered species', {
+        type: 'vector',
+        url: 'mapbox://ese-toh.8m58l8et'
+    });
+
+    map.addLayer({
+        'id': 'endangered species',
+        'type': 'fill',
+        'source': 'endangered species',
+        'source-layer': 'estimated_habitat-7mod86',
+        'layout': {
+            // make layer invisible by default
+            'visibility': 'none'
+        },
+        'paint': {
+            'fill-color': [
+                'case',
+                ['==', ['get', 'EST_PRI'], 'ESTandPRI'], '#e7ee1f',  // Yellow for ESTandPRI
+                ['==', ['get', 'EST_PRI'], 'PRI_ONLY'], '#1DB708',   // Green for PRIonly
+                ['==', ['get', 'EST_PRI'], 'EST_ONLY'], '#A28F06',   // Yellow for ESTonly - There is not much
+                '#FFFFFF'  // Default color (in case of no match)
+            ],
+            'fill-opacity': 0.3
+        }
+    });
+	// endangered species labels
+map.addLayer({
+    'id': 'endangered species-labels',
+    'type': 'symbol',
+    'source': 'endangered species',
+    'source-layer': 'estimated_habitat-7mod86', 
+    'layout': {
+        'text-field': [
+            'case',
+            ['all', ['has', 'ESTHAB_ID'], ['has', 'PRIHAB_ID']], // If both exist
+            ['concat', ['get', 'ESTHAB_ID'], '\n', ['get', 'PRIHAB_ID']], // Add line break
+            ['coalesce', ['get', 'ESTHAB_ID'], ['get', 'PRIHAB_ID']] // Otherwise, show whichever exists
+        ],
+        'visibility': 'none',
+        'text-size': 14, // Adjusting font size for readability
+        'symbol-placement': 'point', // Treat each symbol as a point
+        'symbol-spacing': 80, // Closer labels for more density
+        'text-rotation-alignment': 'map', // Rotate with the map
+    },
+    'paint': {
+        'text-color': '#000000', // Text color
+        'text-halo-color': '#ffffff', // White halo for text
+        'text-halo-width': 2, // Make halo wider to improve readability
+    },
+    'filter': [
+        'any',
+        ['has', 'ESTHAB_ID'], 
+        ['has', 'PRIHAB_ID']
+    ] // Show labels if either ID exists
+});
+
+
+});
+map.on('click', 'endangered species', function (e) {   
+    new mapboxgl.Popup()
+        .setLngLat(e.lngLat)
+        .setHTML(
+            "Estimated Habitat ID: " + '<strong>' + e.features[0].properties.ESTHAB_ID + '</strong><br>' +
+            "Priority Habitat ID: " + '<strong>' + e.features[0].properties.PRIHAB_ID + '</strong><br>'
+        )
+        .addTo(map);
+});
+map.on('mouseenter', 'endangered species', function () {
+    map.getCanvas().style.cursor = 'pointer';
+});
+map.on('mouseleave', 'endangered species', function () {
+    map.getCanvas().style.cursor = '';
+});
+
+
+// *************************************************************** Vernal pools
+map.on('load', function() {
+map.addSource('vernal pools', {
+type: 'vector',
+url: 'mapbox://ese-toh.7p4glkq9'
+});
+map.addLayer({
+'id': 'vernal pools',
+'type': 'circle',
+'source': 'vernal pools',
+'source-layer': 'nhesp-cvp-5xj2xr',
+'layout': {
+// make layer invisible by default
+'visibility': 'none'
+},
+'paint': {
+'circle-color': '#0D71F9',
+'circle-radius': {
+'base': 1.5,
+'stops': [
+[12, 3],
+[22, 180]
+]
+}
+}
+});
+map.addLayer({
+    'id': 'vernal pools-labels',
+    'type': 'symbol',
+    'source': 'vernal pools',
+    'source-layer': 'nhesp-cvp-5xj2xr',
+    'layout': {
+        'text-field': ['concat', 'VP: ', ['get', 'cvp_num']], // Prefix VP: before number
+        'visibility': 'none',
+        'text-size': 14,
+        'text-anchor': 'left', // Anchors text to the left of the label point
+        'text-offset': [1, 0], // Moves label to the right of the circle
+        'symbol-placement': 'point'
+    },
+    'paint': {
+        'text-color': '#000000',
+        'text-halo-color': '#ffffff',
+        'text-halo-width': 2
+    },
+    'filter': ['!=', ['get', 'cvp_num'], null] // Exclude null values
+});
+
+
+});
+      map.on('click', 'vernal pools', function (e) {  
+          new mapboxgl.Popup()
+            .setLngLat(e.lngLat)
+            .setHTML("Vernal Pool ID: "+'<strong>'+e.features[0].properties.cvp_num + '</strong><br>'+"Certified: "+'<strong>'+e.features[0].properties.certified + '</strong><br>'+"Criteria: "+'<strong>'+e.features[0].properties.criteria + '</strong><br>' )
+            .addTo(map);
+     //(e.features[0].properties.PID + " - " + e.features[0].properties.LINK)  <strong>97 Tilipi Run</strong><p>Parcel ID:14A3-2-B<p>
+    });
+    map.on('mouseenter', 'vernal pools', function () {
+        map.getCanvas().style.cursor = 'pointer';
+    });
+    map.on('mouseleave', 'vernal pools', function () {
+        map.getCanvas().style.cursor = '';
+    });
+
+// *************************************************************** soils 
+map.on('load', function() {
+map.addSource('soils', {
+type: 'vector',
+url: 'mapbox://ese-toh.5udsb6bq'
+});
+map.addLayer({
+'id': 'soils',
+'type': 'fill',
+'source': 'soils',
+'source-layer': 'SOI_BARN-ae2ugp',
+'layout': {
+'visibility': 'none'
+},
+'paint': {
+'fill-opacity': [
+	'match',
+	['get', 'SLOPE'],
+	'0',
+	0.6,
+	'A',
+	0.45,
+	'B',
+	0.50,
+	'C',
+	0.55,
+	'D',
+	0.60,
+	/* other */ 0.04
+	],
+'fill-color': [
+	'match',
+	['get', 'MUSYM'],
+	'258A',
+	'#C88F0D',
+	'430B',
+	'#EAE23B',
+	'430C',
+	'#FFE60A',
+	'431B',
+	'#EBEE1E',
+	'431C',
+	'#EBEE1E',
+	'432D',
+	'#EBEE1E',
+	'485C',
+	'#EEF108',
+	'488C',
+	'#E4E65A',
+	'489C',
+	'#E4E65A',
+	'490C',
+	'#E4E65A',
+	'494C',
+	'#E4E65A',
+	'610',
+	'#EEEF89',
+	'225B',
+	'#BC8A26',
+	'11A',
+	'#444F61',
+	'220A',
+	'#BA7E06',
+	'220B',
+	'#BA7E06',
+	'259A',
+	'#F6EE2E',
+	'259B',
+	'#F6EE2E',
+	'252A',
+	'#F5E663',
+	'252B',
+	'#F5E663',
+	'252C',
+	'#F5E663',
+	'252D',
+	'#F5E663',
+	'263B',
+	'#f5b73b',
+	'263C',
+	'#f5b73b',
+	'263D',
+	'#f5b73b',
+	'256A',
+	'#edd768',
+	'652',
+	'#8c8a80',
+	'611',
+	'#fdff99',
+	'264A',
+	'#f0f26f',
+	'264B',
+	'#f0f26f',
+	'264C',
+	'#f0f26f',
+	'264D',
+	'#f0f26f',
+	'265A',
+	'#dee046',
+	'265B',
+	'#dee046',
+	'265C',
+	'#dee046',
+	'52A',
+	'#272D4B',
+	'54A',
+	'#211F56',
+	'55A',
+	'#5F5E6D',
+	'253A',
+	'#e3dc81',
+	'253B',
+	'#e3dc81',
+	'242C',
+	'#e3dc81',
+	'242D',
+	'#e3dc81',
+	'226A',
+	'#9e951c',
+	'226B',
+	'#9e951c',
+	'226C',
+	'#9e951c',
+	'612C',
+	'#c9c973',
+	'612D',
+	'#c9c973',
+	'613C',
+	'#e0e094',
+	'66A',
+	'#484679',
+	'12A',
+	'#131230',
+	'13A',
+	'#524670',
+	'254A',
+	'#c2b91d',
+	'254B',
+	'#c2b91d',
+	'254C',
+	'#c2b91d',
+	'254D',
+	'#c2b91d',
+	'245A',
+	'#c2b91d',
+	'245B',
+	'#c2b91d',
+	'245C',
+	'#c2b91d',
+	'245D',
+	'#c2b91d',
+	'299',
+	'#f2e6a7',
+	'299A',
+	'#f2e6a7',
+	'299B',
+	'#f2e6a7',
+	'299C',
+	'#f2e6a7',
+	'299D',
+	'#f2e6a7',
+	'380B',
+	'#807c69',
+	'380C',
+	'#807c69',
+	'381B',
+	'#6e6d67',
+	'381C',
+	'#6e6d67',
+	'38A',
+	'#412D70',
+	'600',
+	'#d1cebe',
+	'435A',
+	'#f5ef98',
+	'435B',
+	'#f5ef98',
+	'435C',
+	'#f5ef98',
+	'435D',
+	'#f5ef98',
+	'436B',
+	'#f3f7a8',
+	'436C',
+	'#f3f7a8',
+	'436D',
+	'#f3f7a8',
+	'483C',
+	'#f2f196',
+	'483D',
+	'#f2f196',
+	'484C',
+	'#f2e796',
+	'484D',
+	'#f2e796',
+	'493D',
+	'#b5b18f',
+	'14A',
+	'#6A8195',
+	'269A',
+	'#d1c877',
+	'665',
+	'#e3e1cc',
+	'602',
+	'#45443f',
+	'21A',
+	'#355D7E',
+	'1',
+	'#378df0',
+	'607',
+	'#2872bd',
+	'608',
+	'#76ace3',
+	'53A',
+	'#323538',
+	'260A',
+	'#323538',
+	'431D',
+	'#787437',
+	/* other */ '#273613'
+	],
+        },
+});
+    // Add soil boundary outline layer
+    map.addLayer({
+        'id': 'soils-outline',
+        'type': 'line',
+        'source': 'soils',
+        'source-layer': 'SOI_BARN-ae2ugp',
+        'layout': {
+            'visibility': 'none'
+        },
+        'paint': {
+            'line-color': '#7f5702', // Outline color (black)
+            'line-width': .1 // Outline width
+        }
+    });
+	  // Soils Label Layer
+  map.addLayer({
+    'id': 'soils-labels',
+    'type': 'symbol',
+    'source': 'soils',
+    'source-layer': 'SOI_BARN-ae2ugp',
+    'layout': {
+      'text-field': ['get', 'MUSYM'],
+      'text-size': 9, // small label size
+      'text-font': ['Open Sans Regular', 'Arial Unicode MS Regular'], // tight font
+      'text-anchor': 'center',
+      'text-allow-overlap': true, // allow overlap
+      'visibility': 'none'
+    },
+    'paint': {
+      'text-color': '#000000', // black text for visibility
+      'text-halo-color': '#FFFFFF', // white halo for contrast
+      'text-halo-width': 1 // slight halo to make text stand out
+    }
+  });
+});
+        map.on('click', 'soils', function (e) {
+          new mapboxgl.Popup()
+            .setLngLat(e.lngLat)
+            .setHTML("Numeric State Legend: "+'<strong>'+e.features[0].properties.MUSYM + '</strong><br>' + "Published Map Unit: "+'<strong>'+e.features[0].properties.MUS_TXT + '</strong><br>' + '<strong>'+e.features[0].properties.MUS_DESC + '</strong><br>' )
+            .addTo(map);
+     //(e.features[0].properties.PID + " - " + e.features[0].properties.LINK)  <strong>97 Tilipi Run</strong><p>Parcel ID:14A3-2-B<p>
+    });
+    map.on('mouseenter', 'soils', function () {
+        map.getCanvas().style.cursor = 'pointer';
+    });
+    map.on('mouseleave', 'soils', function () {
+        map.getCanvas().style.cursor = '';
+    });
+
+// *************************************************************** DEP wetland
+map.on('load', function() {
+map.addSource('DEP wetland', {
+type: 'vector',
+url: 'mapbox://ese-toh.75g1xaec'
+});
+map.addLayer({
+'id': 'DEP wetland',
+'type': 'fill',
+'source': 'DEP wetland',
+'source-layer': 'BARNSTABLEwetlandsDEP_POLY-arr54b',
+'layout': {
+'visibility': 'none'
+},
+'paint': {
+'fill-opacity': [
+	'match',
+	['get', 'IT_VALC'],
+	'BA',
+	0.5,
+	'BB',
+	0.4,
+	'BB-BE',
+	0.4,
+	'BB-D',
+	0.4,
+	'BB-M',
+	0.4,
+	'BB-OW',
+	0.4,
+	'BB-SM',
+	0.6,
+	'BB-SS',
+	0.6,
+	'BB-WS1',
+	0.6,
+	'BB-WS2',
+	0.6,
+	'BE',
+	0.4,
+	'BG',
+	0.5,
+	'CB',
+	0.5,
+	'D',
+	0.4,
+	'DM',
+	0.5,
+	'M',
+	0.4,
+	'OW',
+	0.4,
+	'RS',
+	0.4,
+	'SM',
+	0.4,
+	'SS',
+	0.4,
+	'TF',
+	0.5,
+	'WS1',
+	0.5,
+	'WS2',
+	0.6,
+	'WS3',
+	0.6,
+	/* other */ 0.001
+	],
+'fill-color': [
+	'match',
+	['get', 'IT_VALC'],
+	'BA',
+	'#F7F124',
+	'BB',
+	'#DCD609',
+	'BB-BE',
+	'#D0D041',
+	'BB-D',
+	'#99F108',
+	'BB-M',
+	'#24AF0B',
+	'BB-OW',
+	'#1BB5CA',
+	'BB-SM',
+	'#24AF0B',
+	'BB-SS',
+	'#32D34F',
+	'BB-WS1',
+	'#1F9A35',
+	'BB-WS2',
+	'#056828',
+	'BE',
+	'#D7E00F',
+	'BG',
+	'#0C9955',
+	'CB',
+	'#BB0418',
+	'D',
+	'#99F108',
+	'DM',
+	'#056A56',
+	'M',
+	'#26A04E',
+	'OW',
+	'#2B8ACB',
+	'RS',
+	'#B5C0C8',
+	'SM',
+	'#389C3F',
+	'SS',
+	'#24CF31',
+	'TF',
+	'#F3F4CC',
+	'WS1',
+	'#1F9A35',
+	'WS2',
+	'#056828',
+	'WS3',
+	'#448842',
+	/* other */ '#5c580f'
+	],
+        },
+});
+// DEP wetlands labels
+map.addLayer({
+    'id': 'DEP wetland-labels', // Ensure this is unique
+    'type': 'symbol',
+    'source': 'DEP wetland', // Check if this matches your source name
+    'source-layer': 'BARNSTABLEwetlandsDEP_POLY-arr54b', // Check if this matches your source layer
+    'layout': {
+        'text-field': [
+            'case',
+            ['==', ['get', 'IT_VALC'], 'BA'], 'BA',
+            ['==', ['get', 'IT_VALC'], 'BB'], 'BB',
+            ['==', ['get', 'IT_VALC'], 'BB-BE'], 'BB-BE',
+            ['==', ['get', 'IT_VALC'], 'BB-D'], 'BB-D',
+            ['==', ['get', 'IT_VALC'], 'BB-M'], 'BB-M',
+            ['==', ['get', 'IT_VALC'], 'BB-OW'], 'BB-OW',
+            ['==', ['get', 'IT_VALC'], 'BB-SM'], 'BB-SM',
+            ['==', ['get', 'IT_VALC'], 'BB-SS'], 'BB-SS',
+            ['==', ['get', 'IT_VALC'], 'BB-WS1'], 'BB-WS1',
+            ['==', ['get', 'IT_VALC'], 'BB-WS2'], 'BB-WS2',
+            ['==', ['get', 'IT_VALC'], 'BE'], 'BE',
+            ['==', ['get', 'IT_VALC'], 'BG'], 'BG',
+            ['==', ['get', 'IT_VALC'], 'CB'], 'CB',
+            ['==', ['get', 'IT_VALC'], 'D'], 'D',
+            ['==', ['get', 'IT_VALC'], 'DM'], 'DM',
+            ['==', ['get', 'IT_VALC'], 'M'], 'M',
+            ['==', ['get', 'IT_VALC'], 'OW'], 'OW',
+            ['==', ['get', 'IT_VALC'], 'RS'], 'RS',
+            ['==', ['get', 'IT_VALC'], 'SM'], 'SM',
+            ['==', ['get', 'IT_VALC'], 'SS'], 'SS',
+            ['==', ['get', 'IT_VALC'], 'TF'], 'TF',
+            ['==', ['get', 'IT_VALC'], 'WS1'], 'WS1',
+            ['==', ['get', 'IT_VALC'], 'WS2'], 'WS2',
+            ['==', ['get', 'IT_VALC'], 'WS3'], 'WS3',
+            'Unknown' // Default to "Unknown" instead of empty string
+        ],
+        'visibility': 'none', // Ensure this is intentional
+        'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'], // Bold font for better visibility
+        'text-size': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+            10, 12,
+            16, 16
+        ],
+        'symbol-placement': 'point',
+        'symbol-spacing': 80,
+        'text-rotation-alignment': 'map'
+    },
+    'paint': {
+        'text-color': '#202020',
+        'text-opacity': 0.8,
+        'text-halo-color': '#ffffff',
+        'text-halo-width': 1,
+        'text-halo-blur': 0.4
+    }
+});
+
+});
+        map.on('click', 'DEP wetland', function (e) {
+          new mapboxgl.Popup()
+            .setLngLat(e.lngLat)
+            .setHTML("Wetland Identifier: "+'<strong>'+e.features[0].properties.IT_VALDESC + '</strong><br>' +
+"Wetland Code: "+'<strong>'+e.features[0].properties.IT_VALC + '</strong><br>' )
+            .addTo(map);
+     //(e.features[0].properties.PID + " - " + e.features[0].properties.LINK)  <strong>97 Tilipi Run</strong><p>Parcel ID:14A3-2-B<p>
+    });
+    map.on('mouseenter', 'DEP wetland', function () {
+        map.getCanvas().style.cursor = 'pointer';
+    });
+    map.on('mouseleave', 'DEP wetland', function () {
+        map.getCanvas().style.cursor = '';
+    });
+
+// *************************************************************** DEP wetland line
+map.on('load', function() {
+map.addSource('DEP wetland line', {
+type: 'vector',
+url: 'mapbox://ese-toh.2zhgmmx7'
+});
+map.addLayer({
+'id': 'DEP wetland line',
+'type': 'line',
+'source': 'DEP wetland line',
+'source-layer': 'BARNSTABLEwetlandsDEP_ARC-1hjeg7',
+'layout': {
+// make layer invisible by default
+'visibility': 'none',
+'line-join': 'round',
+'line-cap': 'round'
+},
+'paint': {
+'line-color': [
+	'match',
+	['get', 'ARC_CODE'],
+	'0', //EDGE OF OCEAN
+	'#08ADEF',
+	'1', //SHORELINE
+	'#EBF90A',
+	'2', //CLOSURE
+	'#EBECDD',
+	'3', //APPARENT WETLAND LIMIT
+	'#F2A5EF',
+	'7', //HYDRO CONNECTION
+	'#0B11F0',
+	'8', //MLW
+	'#5E87ED',
+	'88', //EDGE INTERUPTED
+	'#5EE1ED',
+	/* other */ '#ff0000'
+	],
+'line-width': {
+'base': 2.0,
+'stops': [
+[12, 2],
+[22, 5]
+]
+},
+}
+});
+});
+        map.on('click', 'DEP wetland line', function (e) {
+          new mapboxgl.Popup()
+            .setLngLat(e.lngLat)
+            .setHTML("Wetland Identifier: "+'<strong>'+e.features[0].properties.ARC_CODE_D + '</strong><br>')
+            .addTo(map);
+     //(e.features[0].properties.PID + " - " + e.features[0].properties.LINK)  <strong>97 Tilipi Run</strong><p>Parcel ID:14A3-2-B<p>
+    });
+    map.on('mouseenter', 'DEP wetland line', function () {
+        map.getCanvas().style.cursor = 'pointer';
+    });
+    map.on('mouseleave', 'DEP wetland line', function () {
+        map.getCanvas().style.cursor = '';
+    });
+
+// *************************************************************** floodplain
+map.on('load', function() {
+	map.addSource('LiMWA', {
+		type: 'vector',
+		url: 'mapbox://ese-toh.7h5nwda9'
+	});
+	map.addLayer({
+		'id': 'LiMWA',
+		'type': 'line',
+		'source': 'LiMWA',
+		'source-layer': 'LiMWA-dtmi75',
+		'layout': {
+			'visibility': 'none'
+//			'line-join': 'round',
+//			'line-cap': 'round'
+		},
+		'paint': {
+			'line-color': '#E70B0B',
+			'line-width': 3.0
+		},
+});
+	map.addSource('floodplain', {
+		type: 'vector',
+		url: 'mapbox://ese-toh.a7lml4y4'
+	});
+
+	map.addLayer({
+		'id': 'floodplain',
+		'type': 'fill',
+		'source': 'floodplain',
+		'source-layer': '25001c-2014-c2ck89',
+		'layout': {
+			'visibility': 'none'
+		},
+		'paint': {
+			'fill-opacity': [
+				'match',
+				['get', 'ZONE_SUBTY'],
+				'0.2 PCT ANNUAL CHANCE FLOOD HAZARD', 0.4,
+				'AREA OF MINIMAL FLOOD HAZARD', 0.001,
+				/* other */ 0.4
+			],
+			'fill-color': [
+				'match',
+				['get', 'FLD_ZONE'],
+				'AE', '#eb8c34',
+				'VE', '#eb3a34',
+				'AO', '#F7FE20',
+				'X', '#2578F9',
+				'A', '#2e4bf0',
+				/* other */ '#ff0000'
+			],
+		// Add boundary (stroke) properties here
+//        'stroke-width': 2, // Adjust stroke width as needed
+//        'stroke-color': '#000000', // Set stroke (boundary) color to black
+//        'stroke-opacity': 1 // Set stroke opacity to 1 (fully visible)
+        },
+});
+
+// Stroke (boundary) layer for floodplain
+map.addLayer({
+    'id': 'floodplain-boundary',
+    'type': 'line',
+    'source': 'floodplain',
+    'source-layer': '25001c-2014-c2ck89',
+    'layout': {
+        'visibility': 'none'
+    },
+    'paint': {
+        'line-width': 0.5, // Set stroke width
+        'line-color': '#000000', // Set stroke color (black in this case)
+        'line-opacity': 0.5 // Set stroke opacity (fully visible)
+    }
+});
+
+// floodplain labels
+map.addLayer({
+    'id': 'floodplain-labels',
+    'type': 'symbol',
+    'source': 'floodplain',
+    'source-layer': '25001c-2014-c2ck89',
+    'layout': {
+        'text-field': [
+            'case',
+            ['==', ['get', 'FLD_ZONE'], 'AE'],
+            ['concat', 'AE ', ['get', 'STATIC_BFE']],
+            ['==', ['get', 'FLD_ZONE'], 'VE'],
+            ['concat', 'VE ', ['get', 'STATIC_BFE']],
+            ['==', ['get', 'FLD_ZONE'], 'X'],
+            'X',
+            ['==', ['get', 'FLD_ZONE'], 'A'],
+            'A',
+            '' // Default to no label if no match
+        ],
+        'visibility': 'none',
+        'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'], // Bold font for better visibility
+        'text-size': [
+            'interpolate', 
+            ['linear'], 
+            ['zoom'],
+            10, 12, 
+            16, 16
+        ], // Slightly larger text at higher zooms
+        'symbol-placement': 'point', // Treat each symbol as a point
+        'symbol-spacing': 80, // Closer labels for more density
+        'text-rotation-alignment': 'map', // Rotate with the map
+    },
+    'paint': {
+        'text-color': [
+            'match',
+            ['get', 'FLD_ZONE'],
+            'AE', '#202020',
+            'VE', '#202020',
+            'X', '#202020',
+            'A', '#202020',
+            /* other */ '#aa0000'
+        ],
+        'text-opacity': 0.6, // Make labels more visible but not overwhelming
+        'text-halo-color': '#ffffff', // Add a subtle halo
+        'text-halo-width': 1, // Increase halo width for better visibility
+        'text-halo-blur': 0.4 // Slightly larger blur for smoother edges
+    }
+});
+
+// floodplain
+});
+   map.on('click', 'floodplain', function (e) {
+        new mapboxgl.Popup()
+            .setLngLat(e.lngLat)
+            .setHTML("Flood Zone: "+'<strong>'+e.features[0].properties.FLD_ZONE + '</strong><br>' +
+"Elevation:"+'<strong>'+e.features[0].properties.STATIC_BFE + '</strong><br>' + '<br>' + "The thick red line is the LiMWA.")
+            .addTo(map);
+     //(e.features[0].properties.PID + " - " + e.features[0].properties.LINK)  <strong>97 Tilipi Run</strong><p>Parcel ID:14A3-2-B<p>
+    });
+    map.on('mouseenter', 'floodplain', function () {
+        map.getCanvas().style.cursor = 'pointer';
+    });
+    map.on('mouseleave', 'floodplain', function () {
+        map.getCanvas().style.cursor = '';
+    });
+
+// *************************************************************** parcels
+map.on('load', function() {
+map.addSource('parcels', {
+type: 'vector',
+url: 'mapbox://ese-toh.5ehygl9z'
+});
+map.addLayer({
+'id': 'parcels',
+'type': 'fill',
+'source': 'parcels',
+'source-layer': 'CC-2020-11-02-c73syu',
+'layout': {
+// make layer invisible by default
+'visibility': 'none'
+},
+'paint': {
+'fill-opacity': 0.1,
+'fill-color': '#FEFEFE',
+'fill-outline-color': '#000000'
+},
+});
+});
+        map.on('click', 'parcels', function (e) {
+          new mapboxgl.Popup()
+            .setLngLat(e.lngLat)
+            .setHTML("Address: "+'<strong>'+e.features[0].properties.ADDRESS + '</strong><br>' +
+"Webpage: "+'<a href=\"'+ e.features[0].properties.URL +'" target="_blank"><b><u>Link to Page</u></b></a>')
+            .addTo(map);
+     //(e.features[0].properties.PID + " - " + e.features[0].properties.LINK)  <strong>97 Tilipi Run</strong><p>Parcel ID:14A3-2-B<p>
+    });
+    map.on('mouseenter', 'parcels', function () {
+        map.getCanvas().style.cursor = 'pointer';
+    });
+    map.on('mouseleave', 'parcels', function () {
+        map.getCanvas().style.cursor = '';
+    });
+
+// *************************************************************** conservancy districts
+map.on('load', function() {
+map.addSource('conservancy districts', {
+type: 'vector',
+url: 'mapbox://ese-toh.7jk998tu'
+});
+map.addLayer({
+'id': 'conservancy districts',
+'type': 'fill',
+'source': 'conservancy districts',
+'source-layer': 'CONS_DIST-2updta',
+'layout': {
+// make layer invisible by default
+'visibility': 'none'
+},
+'paint': {
+'fill-opacity': 0.4,
+'fill-color': [
+	'match',
+	['get', 'CONS_TYPE'],
+	'BOG',
+	'#239607',
+	'DITCH',
+	'#072483',
+	'MARSH',
+	'#4FD33F',
+	'SWAMP',
+	'#21A546',
+	'WATER',
+	'#18A7AA',
+	/* other */ '#ff0000'
+	],
+'fill-outline-color': '#257618'
+}
+});
+  // Conservancy districts label layer
+  map.addLayer({
+    'id': 'conservancy-districts-labels',
+    'type': 'symbol',
+    'source': 'conservancy districts',
+    'source-layer': 'CONS_DIST-2updta',
+    'layout': {
+      'text-field': ['get', 'CONS_DIST'],
+      'text-size': 10, // Small label size
+      'text-font': ['Open Sans Regular', 'Arial Unicode MS Regular'], // Tight font
+      'text-anchor': 'center',
+      'text-allow-overlap': true, // Allow overlap if necessary
+      'visibility': 'none'
+    },
+    'paint': {
+      'text-color': '#000000', // Black text for visibility
+      'text-halo-color': '#FFFFFF', // White halo for contrast
+      'text-halo-width': 1 // Slight halo around the text for contrast
+    }
+  });
+});
+        map.on('click', 'conservancy districts', function (e) {
+          new mapboxgl.Popup()
+            .setLngLat(e.lngLat)
+            .setHTML("Conservancy District: " + '<strong>'+e.features[0].properties.CONS_DIST + '</strong><br>' +
+'<br>' +
+e.features[0].properties.CONS_DIST + " Elevation: "+'<strong>'+e.features[0].properties.CONS_ELEV+" "+e.features[0].properties.CONS_DATUM+'</strong><br>' +
+e.features[0].properties.CONS_DIST + " Water Elevation: "+'<strong>'+e.features[0].properties.WATER_ELEV+" "+e.features[0].properties.CONS_DATUM+'</strong><br>' +
+'<br>' +
+"Conservancy District Contour: " +'<strong>'+e.features[0].properties.CONT_NAVD+" "+e.features[0].properties.CONV_DATUM + '</strong><br>'+ '<br>'+
+"Description: "+e.features[0].properties.CONS_DESC)
+            .addTo(map);
+    });
+    map.on('mouseenter', 'conservancy districts', function () {
+        map.getCanvas().style.cursor = 'pointer';
+    });
+    map.on('mouseleave', 'conservancy districts', function () {
+        map.getCanvas().style.cursor = '';
+    });
+
+// *************************************************************** zoning
+map.on('load', function() {
+map.addSource('zoning', {
+type: 'vector',
+url: 'mapbox://ese-toh.axftqzuv'
+});
+map.addLayer({
+'id': 'zoning',
+'type': 'fill',
+'source': 'zoning',
+'source-layer': 'Zoning-3yb43g',
+'layout': {
+// make layer invisible by default
+'visibility': 'none'
+},
+'paint': {
+'fill-opacity': 0.4,
+'fill-color': [
+	'match',
+	['get', 'TOWNCODE'],
+//nps
+	'RC3',
+	'#f1f748',
+	'F',
+	'#f1f748',
+	'NSP',
+	'#f1f748',
+	'S',
+	'#f1f748',
+	'SC',
+	'#f1f748',
+	'SS',
+	'#f1f748',
+//municipal
+	'M',
+	'#60cccc',
+	'M/C',
+	'#4ed130',
+//residential
+	'R20',
+	'#72a5ed',
+	'R20A',
+	'#5877bf',
+	'R25',
+	'#877613',
+	'R30',
+	'#3d4eeb',
+	'R40',
+	'#2c97d1',
+	'R40A',
+	'#4836cf',
+	'R60',
+	'#842cd1',
+	'R80',
+	'#877613',
+//industrial
+	'I',
+	'#5f6069',
+//business
+	'GB1',
+	'#ab5c46',
+	'GB2',
+	'#c24a29',
+	'GB3',
+	'#a32807',
+	'SB',
+	'#d97b09',
+//to be sorted
+	'A',
+	'#bdad55',
+	'B',
+	'#bdad55',
+	'B1',
+	'#bdad55',
+	'B2',
+	'#21A546',
+	'B3',
+	'#bdad55',
+	'B4',
+	'#bdad55',
+	'BL-1',
+	'#bdad55',
+	'BL-2',
+	'#bdad55',
+	'C',
+	'#bdad55',
+	'C1',
+	'#bdad55',
+	'C2',
+	'#bdad55',
+	'C3',
+	'#bdad55',
+	'CD',
+	'#bdad55',
+	'CH',
+	'#21A546',
+	'CH1',
+	'#bdad55',
+	'CH2',
+	'#bdad55',
+	'CV',
+	'#bdad55',
+	'D',
+	'#bdad55',
+	'E',
+	'#bdad55',
+	'EB',
+	'#bdad55',
+	'FLEX',
+	'#bdad55',
+	'G',
+	'#bdad55',
+	'GB',
+	'#bdad55',
+	'GC',
+	'#bdad55',
+	'GC I',
+	'#bdad55',
+	'GC II',
+	'#bdad55',
+	'GC III',
+	'#bdad55',
+	'GD',
+	'#bdad55',
+	'H',
+	'#bdad55',
+	'HB',
+	'#bdad55',
+	'HD',
+	'#bdad55',
+	'HG',
+	'#bdad55',
+	'HO',
+	'#bdad55',
+	'HVB',
+	'#bdad55',
+	'I1',
+	'#bdad55',
+	'IL',
+	'#bdad55',
+	'IN',
+	'#bdad55',
+	'IND',
+	'#bdad55',
+	'IND L',
+	'#bdad55',
+	'LB',
+	'#bdad55',
+	'LI',
+	'#bdad55',
+	'MAR',
+	'#bdad55',
+	'MB',
+	'#bdad55',
+	'MB-A1',
+	'#bdad55',
+	'MB-A2',
+	'#bdad55',
+	'MB-B',
+	'#bdad55',
+	'MRD',
+	'#bdad55',
+	'MRL',
+	'#bdad55',
+	'MRL1',
+	'#bdad55',
+	'MS',
+	'#bdad55',
+	'MU',
+	'#bdad55',
+	'NZ',
+	'#bdad55',
+	'OM',
+	'#bdad55',
+	'R',
+	'#bdad55',
+	'R1',
+	'#bdad55',
+	'R-1',
+	'#bdad55',
+	'R2',
+	'#bdad55',
+	'R-2',
+	'#bdad55',
+	'R3',
+	'#bdad55',
+	'R5',
+	'#bdad55',
+	'R87',
+	'#bdad55',
+	'RA',
+	'#bdad55',
+	'RAH',
+	'#bdad55',
+	'RB',
+	'#bdad55',
+	'RC',
+	'#bdad55',
+	'RC-1',
+	'#bdad55',
+	'RC-2',
+	'#bdad55',
+	'RD',
+	'#bdad55',
+	'RD-1',
+	'#bdad55',
+	'Res1',
+	'#bdad55',
+	'Res2',
+	'#bdad55',
+	'Res3',
+	'#bdad55',
+	'ResB',
+	'#bdad55',
+	'RF',
+	'#bdad55',
+	'RF-1',
+	'#bdad55',
+	'RF-2',
+	'#bdad55',
+	'RG',
+	'#bdad55',
+	'RH1',
+	'#bdad55',
+	'RH2',
+	'#bdad55',
+	'RH3',
+	'#bdad55',
+	'RL',
+	'#bdad55',
+	'RM',
+	'#bdad55',
+	'RR',
+	'#bdad55',
+	'RS40',
+	'#bdad55',
+	'S&D',
+	'#bdad55',
+	'SD-1',
+	'#bdad55',
+	'SDD',
+	'#bdad55',
+	'SF',
+	'#bdad55',
+	'TCC',
+	'#bdad55',
+	'TD',
+	'#bdad55',
+	'UB',
+	'#bdad55',
+	'VB',
+	'#bdad55',
+	'VB-A',
+	'#bdad55',
+	'VB-B',
+	'#bdad55',
+	'VC',
+	'#bdad55',
+	/* other */ '#ff0000'
+	],
+'fill-outline-color': '#257618'
+}
+});
+});
+        map.on('click', 'zoning', function (e) {
+          new mapboxgl.Popup()
+            .setLngLat(e.lngLat)
+            .setHTML("Zoning District: " + '<strong>'+e.features[0].properties.TOWNCODE + '</strong><br>' +
+'<br>' + "Check with the Town Clerk or Planning Department." + '<br>' + '<strong>' + "This layer is from 2004" + '</strong>')
+            .addTo(map);
+    });
+    map.on('mouseenter', 'zoning', function () {
+        map.getCanvas().style.cursor = 'pointer';
+    });
+    map.on('mouseleave', 'zoning', function () {
+        map.getCanvas().style.cursor = '';
+    });
+
+// *************************************************************** agis
+map.on('load', function() {
+map.addSource('agis', {
+type: 'vector',
+url: 'mapbox://ese-toh.chkrbtah'
+});
+map.addLayer({
+'id': 'agis',
+'type': 'fill',
+'source': 'agis',
+'source-layer': 'aGIS-6x9985',
+'layout': {
+'visibility': 'none'
+},
+'paint': {
+'fill-opacity': 0.4,
+'fill-color': [
+	'match',
+	['get', 'DATE'],
+	'-',
+	'#FFFFFF',
+	/* other */ '#3CD935'
+	],
+        },
+});
+});
+        map.on('click', 'agis', function (e) {
+          new mapboxgl.Popup()
+            .setLngLat(e.lngLat)
+            .setHTML("Address " + '<strong>'+e.features[0].properties.ADDRESS + '</strong><br>' + "Date of photography: " + '<strong>'+e.features[0].properties.DATE + '</strong><br>' + "Link to Page: "+'<a href=\"'+ e.features[0].properties.URL +'" target="_blank"><b><u>Link to Page</u></b></a>')
+            .addTo(map);
+    });
+    map.on('mouseenter', 'agis', function () {
+        map.getCanvas().style.cursor = 'pointer';
+    });
+    map.on('mouseleave', 'agis', function () {
+        map.getCanvas().style.cursor = '';
+    });
+
+// *************************************************************** conservation
+map.on('load', function() {
+map.addSource('conservation', {
+type: 'vector',
+url: 'mapbox://ese-toh.cu9m7vny'
+});
+map.addLayer({
+'id': 'conservation',
+'type': 'fill',
+'source': 'conservation',
+'source-layer': 'ccf-2021-02-25-6ghyhf',
+'layout': {
+'visibility': 'none'
+},
+'paint': {
+'fill-opacity': 0.4,
+'fill-color': [
+	'match',
+	['get', 'Last_Updat'],
+	'CCF_Owned_Parcels_JBedits',
+	'#abe356',
+	/* other */ '#22c410'
+	],
+        },
+});
+});
+        map.on('click', 'conservation', function (e) {
+          new mapboxgl.Popup()
+            .setLngLat(e.lngLat)
+            .setHTML("CCF Parcel: " + '<strong>'+e.features[0].properties.CCF_ID + '</strong><br>' +
+'<br>' + "The light green parcels are approximate, the dark green parcels are more accurate.")
+            .addTo(map);
+    });
+    map.on('mouseenter', 'conservation', function () {
+        map.getCanvas().style.cursor = 'pointer';
+    });
+    map.on('mouseleave', 'conservation', function () {
+        map.getCanvas().style.cursor = '';
+    });
+
+// *************************************************************** town parcels
+map.on('load', function() {
+map.addSource('town parcels', {
+type: 'vector',
+url: 'mapbox://ese-toh.3t2puzyv'
+});
+map.addLayer({
+'id': 'town parcels',
+'type': 'fill',
+'source': 'town parcels',
+'source-layer': 'TownParcels2018-4he0y3',
+'layout': {
+'visibility': 'none'
+},
+'paint': {
+'fill-opacity': 0.4,
+'fill-color': [
+	'match',
+	['get', 'Use'],
+	'Conservation',
+	'#abe356',
+	/* other */ '#3df2dd'
+	],
+        },
+});
+});
+        map.on('click', 'town parcels', function (e) {
+          new mapboxgl.Popup()
+            .setLngLat(e.lngLat)
+            .setHTML("Address: " + '<strong>'+e.features[0].properties.ADDRESS + '</strong><br>' + "Use: " + e.features[0].properties.Use + '<br>' + "This is a start based on the 2018 Town of Chatham GIS Data acquired from MassGIS.")
+            .addTo(map);
+    });
+    map.on('mouseenter', 'town parcels', function () {
+        map.getCanvas().style.cursor = 'pointer';
+    });
+    map.on('mouseleave', 'town parcels', function () {
+        map.getCanvas().style.cursor = '';
+    });
+
+// *************************************************************** sewer
+map.on('load', function() {
+map.addSource('sewer', {
+type: 'vector',
+url: 'mapbox://ese-toh.0ylassrw'
+});
+map.addLayer({
+'id': 'sewer',
+'type': 'fill',
+'source': 'sewer',
+'source-layer': 'Chatham_Sewer_2020c-bx3fy3',
+'layout': {
+'visibility': 'none'
+},
+'paint': {
+'fill-opacity': 0.4,
+'fill-color': [
+	'match',
+	['get', 'CONTRACT'],
+	'2010',
+	'#473b02',
+	'2011',
+	'#756410',
+	'2012',
+	'#5e4f1e',
+	'2013',
+	'#86873d',
+	'2014',
+	'#8c872a',
+	'2015',
+	'#ced12e',
+	'2016',
+	'#87713d',
+	'2017',
+	'#634d19',
+	'2018',
+	'#4a3503',
+	'2019',
+	'#8a8506',
+	'2020',
+	'#e7fa16',
+	'2021',
+	'#3d3610',
+	'2022',
+	'#78672c',
+	/* other */ '#ffffff'
+	],
+        },
+});
+});
+        map.on('click', 'sewer', function (e) {
+          new mapboxgl.Popup()
+            .setLngLat(e.lngLat)
+            .setHTML("Approximate year constructed: "+e.features[0].properties.CONTRACT+'<br>' +"Address: "+'<strong>'+e.features[0].properties.ADDRESS + '</strong><br>' +
+"Webpage: "+'<a href=\"'+ e.features[0].properties.URL +'" target="_blank"><b><u>Link to Page</u></b></a>')
+            .addTo(map);
+    });
+    map.on('mouseenter', 'sewer', function () {
+        map.getCanvas().style.cursor = 'pointer';
+    });
+    map.on('mouseleave', 'sewer', function () {
+        map.getCanvas().style.cursor = '';
+    });
+
+// *************************************************************** stories
+map.on('load', function() {
+map.addSource('stories', {
+type: 'vector',
+url: 'mapbox://ese-toh.1ma2t07c'
+});
+map.addLayer({
+'id': 'stories',
+'type': 'fill',
+'source': 'stories',
+'source-layer': '55-2018-1wy2zb',
+'layout': {
+// make layer invisible by default
+'visibility': 'none'
+},
+'paint': {
+'fill-opacity': 0.4,
+'fill-color': [
+	'match',
+	['get', 'STORIESS'],
+	'0',
+	'#e2ffcc',
+	'1',
+	'#fffbb3',
+	'1.1',
+	'#b3ffec',
+	'1.2',
+	'#a5f0dd',
+	'1.3',
+	'#94e0cd',
+	'1.4',
+	'#94ebd5',
+	'1.5',
+	'#8cf2ff',
+	'1.6',
+	'#7fe8f5',
+	'1.7',
+	'#72e0ed',
+	'1.8',
+	'#63cfdb',
+	'1.9',
+	'#5ac5d1',
+	'2',
+	'#5e90f2',
+	'2.3',
+	'#4c7bd9',
+	'2.5',
+	'#3b64b8',
+	'2.8',
+	'#2b53a6',
+	'3',
+	'#3841e8',
+	/* other */ '#ffffff'
+	],
+'fill-outline-color': '#257618'
+}
+});
+});
+        map.on('click', 'stories', function (e) {
+             new mapboxgl.Popup()
+            .setLngLat(e.lngLat)
+            .setHTML("Number of Stories: "+'<strong>'+e.features[0].properties.STORIES + '</strong><br>' + "Building Description: "+'<strong>'+e.features[0].properties.BLD_DESC + '</strong><br>' + "Zoning: "+'<strong>'+e.features[0].properties.ZONING + '</strong><br>')
+            .addTo(map);
+    });
+    map.on('mouseenter', 'stories', function () {
+        map.getCanvas().style.cursor = 'pointer';
+    });
+    map.on('mouseleave', 'stories', function () {
+        map.getCanvas().style.cursor = '';
+    });
+
+// *************************************************************** owner location
+map.on('load', function() {
+map.addSource('owner location', {
+type: 'vector',
+url: 'mapbox://ese-toh.1ma2t07c'
+});
+map.addLayer({
+'id': 'owner location',
+'type': 'fill',
+'source': 'owner location',
+'source-layer': '55-2018-1wy2zb',
+'layout': {
+// make layer invisible by default
+'visibility': 'none'
+},
+'paint': {
+'fill-opacity': 0.5,
+'fill-color': [
+	'match',
+	['get', 'OUTEY'],
+	'CH',
+	'#14B9F7',
+	'MA',
+	'#ff7373',
+	'CT',
+	'#73fffa',
+	'NY',
+	'#ffd900',
+	'NJ',
+	'#ffff00',
+	'VT',
+	'#3DCB00',
+	'RI',
+	'#99D8FF',
+	'NH',
+	'#73CB51',
+	'ME',
+	'#416379',
+	'FL',
+	'#FFE000',
+	/* other */ '#F014F7'
+	],
+'fill-outline-color': '#257618'
+}
+});
+});
+        map.on('click', 'owner location', function (e) {
+             new mapboxgl.Popup()
+            .setLngLat(e.lngLat)
+            .setHTML("Owner Mailing Location: " + '<strong>' + e.features[0].properties.OWN_TOWN + ", " + e.features[0].properties.OWN_STATE + '</strong>')
+            .addTo(map);
+    });
+    map.on('mouseenter', 'owner location', function () {
+        map.getCanvas().style.cursor = 'pointer';
+    });
+    map.on('mouseleave', 'owner location', function () {
+        map.getCanvas().style.cursor = '';
+    });
+
+// *************************************************************** intersection
+map.on('load', function() {
+map.addSource('intersection', {
+type: 'vector',
+url: 'mapbox://ese-toh.9c4wu0zd'
+});
+map.addLayer({
+'id': 'intersection',
+'type': 'fill',
+'source': 'intersection',
+'source-layer': 'Intersections-2d91o8',
+'layout': {
+// make layer invisible by default
+'visibility': 'none'
+},
+'paint': {
+'fill-opacity': 0.5,
+'fill-color': '#14B9F7',
+'fill-outline-color': '#257618'
+}
+});
+});
+        map.on('click', 'intersection', function (e) {
+             new mapboxgl.Popup()
+            .setLngLat(e.lngLat)
+	    .setHTML("Insection: "+'<strong>' + e.features[0].properties.Int_Name + '</strong><br>' + "Webpage: "+'<a href=\"'+ e.features[0].properties.Link +'" target="_blank"><b><u>Link to Page</u></b></a>')
+            .addTo(map);
+    });
+    map.on('mouseenter', 'intersection', function () {
+        map.getCanvas().style.cursor = 'pointer';
+    });
+    map.on('mouseleave', 'intersection', function () {
+        map.getCanvas().style.cursor = '';
+    });
+
+// *************************************************************** parcel highlight
+map.on('load', function() {
+map.addSource('parcel highlight', {
+type: 'vector',
+url: 'mapbox://ese-toh.1ya31624'
+});
+map.addLayer({
+'id': 'parcel highlight',
+'type': 'line',
+'source': 'parcel highlight',
+'source-layer': 'CapeTowns-2icvsh',
+'layout': {
+// make layer invisible by default
+'visibility': 'none',
+'line-join': 'round',
+'line-cap': 'round'
+},
+'paint': {
+'line-color': '#a0fa39',
+'line-width': 1.5
+}
+});
+});
+
+// *************************************************************** private parcels
+map.on('load', function() {
+    map.addSource('private parcels', {
+        type: 'vector',
+        url: 'mapbox://ese-toh.6oxjhupl'
+    });
+
+    map.addLayer({
+        'id': 'private parcels',
+        'type': 'fill',
+        'source': 'private parcels',
+        'source-layer': 'WELLFLEET_private_parcels_202-cikw1s',
+        'layout': {
+            // Make layer invisible by default
+            'visibility': 'none'
+        },
+        'paint': {
+            'fill-opacity': 0.5,
+            'fill-color': [
+                'interpolate',
+                ['linear'],
+                ['get', '_LOT_SIZE'],
+                0, '#ffffff',        // grey
+				79999, '#ffffff', 
+                80000, '#81d4fa',
+                100000, '#4fc3f7',
+                150000, '#29b6f6',
+                200000, '#03a9f4',
+                250000, '#039be5',
+                300000, '#0288d1',
+                350000, '#0277bd',
+                400000, '#01579b',   
+                500000, '#003f7f',
+                3530102, '#002c5e'   // Darker blue (bigger lots)
+            ],
+            'fill-outline-color': '#257618'
+        }
+    });
+});
+
+map.on('click', 'private parcels', function (e) {
+    let lotSize = e.features[0].properties["_LOT_SIZE"];
+    
+    // Format the number: no decimals and commas for thousands
+    let formattedLotSize = parseInt(lotSize).toLocaleString();
+
+    new mapboxgl.Popup() 
+        .setLngLat(e.lngLat)
+        .setHTML(
+            "Lot Size: <strong>" + formattedLotSize + " S.F. </strong><br>" +
+            "Owner (2024): <strong>" + e.features[0].properties["_OWNER1"] + "</strong>"
+        )
+        .addTo(map);
+});
+
+
+map.on('mouseenter', 'private parcels', function () {
+    map.getCanvas().style.cursor = 'pointer';
+});
+map.on('mouseleave', 'private parcels', function () {
+    map.getCanvas().style.cursor = '';
+});
+
+
+// *************************************************************** private upland
+map.on('load', function() {
+    map.addSource('private upland', {
+        type: 'vector',
+        url: 'mapbox://ese-toh.7ouj2770'
+    });
+
+    map.addLayer({
+        'id': 'private upland',
+        'type': 'fill',
+        'source': 'private upland',
+        'source-layer': 'WELLFLEET_private_upland_2024-8zr5ug',
+        'layout': {
+            // Make layer invisible by default
+            'visibility': 'none'
+        },
+        'paint': {
+            'fill-opacity': 0.5,
+            'fill-color': [
+                'interpolate',
+                ['linear'],
+                ['get', '_LOT_SIZE'],
+                0, '#ffffff',        // grey
+				79999, '#ffffff', 
+                80000, '#81d4fa',
+                100000, '#4fc3f7',
+                150000, '#29b6f6',
+                200000, '#03a9f4',
+                250000, '#039be5',
+                300000, '#0288d1',
+                350000, '#0277bd',
+                400000, '#01579b',   
+                500000, '#003f7f',
+                3530102, '#002c5e'   // Darker blue (bigger lots)
+            ],
+            'fill-outline-color': '#257618'
+        }
+    });
+});
+
+map.on('click', 'private upland', function (e) {
+    let lotSize = e.features[0].properties["_LOT_SIZE"];
+    
+    // Format the number: no decimals and commas for thousands
+    let formattedLotSize = parseInt(lotSize).toLocaleString();
+
+    new mapboxgl.Popup() 
+        .setLngLat(e.lngLat)
+        .setHTML(
+            "Lot Size: <strong>" + formattedLotSize + " S.F. </strong><br>" +
+            "Owner (2024): <strong>" + e.features[0].properties["_OWNER1"] + "</strong>"
+        )
+        .addTo(map);
+});
+
+map.on('mouseenter', 'private upland', function () {
+    map.getCanvas().style.cursor = 'pointer';
+});
+
+map.on('mouseleave', 'private upland', function () {
+    map.getCanvas().style.cursor = '';
+});
+
+// *************************************************************** buildable upland
+map.on('load', function() {
+    map.addSource('buildable upland', {
+        type: 'vector',
+        url: 'mapbox://ese-toh.5632nn10'
+    });
+
+    map.addLayer({
+        'id': 'buildable upland',
+        'type': 'fill',
+        'source': 'buildable upland',
+        'source-layer': 'WELLFLEET_private_bupland_202-443c8z',
+        'layout': {
+            // Make layer invisible by default
+            'visibility': 'none'
+        },
+        'paint': {
+            'fill-opacity': 0.5,
+            'fill-color': [
+                'interpolate',
+                ['linear'],
+                ['get', '_LOT_SIZE'],
+                0, '#ffffff',        // grey
+				79999, '#ffffff', 
+                80000, '#81d4fa',
+                100000, '#4fc3f7',
+                150000, '#29b6f6',
+                200000, '#03a9f4',
+                250000, '#039be5',
+                300000, '#0288d1',
+                350000, '#0277bd',
+                400000, '#01579b',   
+                500000, '#003f7f',
+                3530102, '#002c5e'   // Darker blue (bigger lots)
+            ],
+            'fill-outline-color': '#257618'
+        }
+    });
+});
+
+map.on('click', 'buildable upland', function (e) {
+    let lotSize = e.features[0].properties["_LOT_SIZE"];
+    
+    // Format the number: no decimals and commas for thousands
+    let formattedLotSize = parseInt(lotSize).toLocaleString();
+
+    new mapboxgl.Popup() 
+        .setLngLat(e.lngLat)
+        .setHTML(
+            "Lot Size: <strong>" + formattedLotSize + " S.F. </strong><br>" +
+            "Owner (2024): <strong>" + e.features[0].properties["_OWNER1"] + "</strong>"
+        )
+        .addTo(map);
+});
+
+
+map.on('mouseenter', 'buildable upland', function () {
+    map.getCanvas().style.cursor = 'pointer';
+});
+
+map.on('mouseleave', 'buildable upland', function () {
+    map.getCanvas().style.cursor = '';
+});
+
+
+
+function adjustLabelsForPrint(map, frameElement) {
+    // Step 1: Get the visible layers
+    const visibleLayers = listVisibleLayers(map);
+    const toggleableLayerIds = [
+        'satellite', 'parcels', 'parcel highlight', 'contours', 'agis', 'historic', 'floodplain', 
+        'acec', 'DEP wetland', 'priority habitat', 'estimated habitat', 'vernal pools', 
+        'zone II', 'soils', 'conservancy districts', 'zoning', 'conservation', 
+        'sewer', 'stories', 'intersection', 'towns'
+    ];
+
+    // Step 2: Loop through the main layers
+    toggleableLayerIds.forEach(layerId => {
+        // Check if the layer is visible
+        if (visibleLayers.includes(layerId)) {
+            const labelLayerId = `${layerId}-labels`; // Derive the label layer
+
+            // Check if the label layer exists
+            if (map.getLayer(labelLayerId)) {
+                // Get the coordinates of the printing frame
+                const frameCoordinates = getPrintingFrameCoordinates(map, frameElement);
+
+                // Get centroids for features in the layer within the frame
+                const centroids = getCentroidsInFrame(map, layerId, frameElement);
+
+                // Step 3: Move the labels to the centroid positions
+                centroids.forEach((centroid, index) => {
+                    map.setFeatureState({
+                        source: map.getLayer(layerId).source,
+                        id: centroid.id // Assumes feature IDs are unique
+                    }, { centroid: [centroid.x, centroid.y] });
+
+                    // Optional: Add debugging or logging for moved labels
+                    console.log(`Moved label for feature ${centroid.id} in ${labelLayerId} to (${centroid.x}, ${centroid.y})`);
+                });
+
+                // Update the label layer to use the new positions
+                map.setLayoutProperty(labelLayerId, 'text-anchor', 'center'); // Optional adjustment
+            } else {
+                console.warn(`Label layer "${labelLayerId}" does not exist for layer "${layerId}".`);
+            }
+        }
+    });
+}
+
+function toggleLayerVisibility(baseLayer, dependentLayer) {
+  var baseVisibility = map.getLayoutProperty(baseLayer, 'visibility');
+  if (baseVisibility === 'visible') {
+    map.setLayoutProperty(dependentLayer, 'visibility', 'visible');
+  } else {
+    map.setLayoutProperty(dependentLayer, 'visibility', 'none');
+  }
+}
+
+
+// buttons
+var toggleableLayerIds = ['satellite','parcels','parcel highlight','contours','floodplain','acec','DEP wetland','endangered species','zone II','soils','zoning','towns','placeholder1','placeholder2','placeholder3','placeholder4','PLANNING QUESTION','private parcels','private upland','buildable upland'];
+for (var i = 0; i < toggleableLayerIds.length; i++) {
+var id = toggleableLayerIds[i];
+ 
+var link = document.createElement('a');
+link.href = '#';
+link.className = '';
+link.textContent = id;
+
+link.onclick = function(e) {
+var clickedLayer = this.textContent;
+e.preventDefault();
+e.stopPropagation();
+var visibility = map.getLayoutProperty(clickedLayer, 'visibility');
+// toggle layer visibility by changing the layout object's visibility property
+if (visibility === 'visible') {
+map.setLayoutProperty(clickedLayer, 'visibility', 'none');
+this.className = '';
+} else {
+this.className = 'active';
+map.setLayoutProperty(clickedLayer, 'visibility', 'visible');
+}
+
+var satelliteVisibility = map.getLayoutProperty('satellite', 'visibility');
+map.moveLayer ('satellite','floodplain');
+map.moveLayer ('satellite', 'LiMWA');
+map.moveLayer ('satellite', 'contours');
+map.moveLayer ('parcels', 'satellite');
+toggleLayerVisibility('floodplain', 'LiMWA');
+toggleLayerVisibility('DEP wetland', 'DEP wetland line');
+toggleLayerVisibility('contours', 'contour-labels');
+toggleLayerVisibility('floodplain', 'floodplain-labels');
+toggleLayerVisibility('floodplain', 'floodplain-boundary');
+toggleLayerVisibility('DEP wetland', 'DEP wetland-labels');
+toggleLayerVisibility('endangered species', 'vernal pools');
+toggleLayerVisibility('endangered species', 'endangered species-labels');
+toggleLayerVisibility('vernal pools', 'vernal pools-labels');
+toggleLayerVisibility('zone II', 'zone II-outline');
+toggleLayerVisibility('zone II', 'zone II-labels');
+toggleLayerVisibility('soils', 'soils-outline');
+toggleLayerVisibility('soils', 'soils-labels');
+toggleLayerVisibility('conservancy districts', 'conservancy-districts-labels');
+
+};
+var layers = document.getElementById('menu');
+layers.appendChild(link);
+}
+map.addControl(new mapboxgl.ScaleControl({
+	maxWidth: 200,
+	unit: 'imperial'
+}), 'bottom-right'
+);
+
+// Run this function when the map loads - Apply URL Params
+map.on('load', function () {
+    applyUrlParams(map);
+});
+
+function applyUrlParams(map) {
+    const urlParams = new URLSearchParams(window.location.search);
+
+    // Get and set zoom level
+    const zoom = parseFloat(urlParams.get('zoom'));
+    if (!isNaN(zoom)) {
+        map.setZoom(zoom);
+    }
+
+    // Get and set marker position
+    const lat = parseFloat(urlParams.get('lat'));
+    const lng = parseFloat(urlParams.get('lng'));
+    if (!isNaN(lat) && !isNaN(lng)) {
+        marker = new mapboxgl.Marker().setLngLat([lng, lat]).addTo(map); // Store the marker in the global variable
+        map.setCenter([lng, lat]); // Center the map on the marker
+    }
+
+    // Ensure the layers are loaded and then simulate the button click for each layer
+    let layers = urlParams.get('layers')?.split(',') || [];
+    map.on('styledata', function () {
+        layers.forEach(layerId => {
+            // Check if the layer exists in the map style
+            if (map.getLayer(layerId)) {
+                // Toggle layer visibility by changing the layout object's visibility property
+                let visibility = map.getLayoutProperty(layerId, 'visibility');
+                if (visibility === 'none') {
+                    map.setLayoutProperty(layerId, 'visibility', 'visible');
+                }
+
+                // Simulate button click for toggling button colors
+                let buttonList = document.querySelectorAll('a'); // Get all buttons
+                buttonList.forEach(button => {
+                    if (button.textContent.trim() === layerId.trim()) {
+                        // Ensure the button gets the active class for the "on" state
+                        button.classList.add('active');
+                    }
+                });
+            }
+        });
+
+        // Nullify the layers array to ensure it's not processed again
+        layers = []; // Clear the array or set it to an empty array
+
+        // Clean the URL (remove parameters but keep the base page)
+        const cleanUrl = window.location.origin + window.location.pathname;
+        window.history.replaceState({}, document.title, cleanUrl);
+    });
+}
+
+
+
+//map.addControl(
+//new MapboxGeocoder({
+//accessToken: mapboxgl.accessToken,
+
+//mapboxgl: mapboxgl
+//})
+//);
+</script>
+</body>
+</html>
+
+
