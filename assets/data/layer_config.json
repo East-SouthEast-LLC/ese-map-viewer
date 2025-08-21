@@ -565,7 +565,7 @@
         ],
         "items": [
             { "label": "Not on original plan", "color": "#e57373", "opacity": 0.4, "isLine": false, "match": { "property": "ADDED", "value": "Y" } },
-            { "label": "Plan Year: 2014-2019", "color": "#d32f2f", "opacity": 0.4, "isLine": false, "match": { "property": "DATE", "min": 2014, "max": 2019 } },
+            { "label": "Plan Year: 2014-2022", "color": "#d32f2f", "opacity": 0.4, "isLine": false, "match": { "property": "DATE", "min": 2014, "max": 2022 } },
             { "label": "Plan Year: 2008-2013", "color": "#b71c1c", "opacity": 0.4, "isLine": false, "match": { "property": "DATE", "min": 2008, "max": 2013 } },
             { "label": "Plan Year: 2000-2007", "color": "#a31515", "opacity": 0.4, "isLine": false, "match": { "property": "DATE", "min": 2000, "max": 2007 } },
             { "label": "Plan Year: 1983-1999", "color": "#7f1010", "opacity": 0.4, "isLine": false, "match": { "property": "DATE", "min": 1983, "max": 1999 } },
