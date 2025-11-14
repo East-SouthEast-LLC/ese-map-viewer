@@ -7,7 +7,7 @@
       "center": [-69.991, 41.687],
       "zoom": 12
     },
-    "layers": [ 
+    "layers": [
       "satellite",
       "parcels",
       "parcel highlight",
@@ -36,7 +36,7 @@
     "townName": "Barnstable",
     "baseShareUrl": "https://ese-llc.com/barnstable",
     "map": {
-      "center": [-70.360, 41.660],
+      "center": [-70.36, 41.66],
       "zoom": 12
     },
     "layers": [
@@ -271,7 +271,7 @@
     "townName": "Mashpee",
     "baseShareUrl": "https://ese-llc.com/mashpee",
     "map": {
-      "center": [-70.500, 41.620],
+      "center": [-70.5, 41.62],
       "zoom": 12
     },
     "layers": [
@@ -295,7 +295,7 @@
     "townName": "Falmouth",
     "baseShareUrl": "https://ese-llc.com/falmouth",
     "map": {
-      "center": [-70.590, 41.590],
+      "center": [-70.59, 41.59],
       "zoom": 12
     },
     "layers": [
@@ -319,7 +319,7 @@
     "townName": "Sandwich",
     "baseShareUrl": "https://ese-llc.com/sandwich",
     "map": {
-      "center": [-70.500, 41.720],
+      "center": [-70.5, 41.72],
       "zoom": 12
     },
     "layers": [
@@ -343,7 +343,7 @@
     "townName": "Bourne",
     "baseShareUrl": "https://ese-llc.com/bourne",
     "map": {
-      "center": [-70.500, 41.720],
+      "center": [-70.5, 41.72],
       "zoom": 12
     },
     "layers": [
@@ -358,6 +358,38 @@
       "zone II",
       "soils",
       "zoning",
+      "usgs quad",
+      "panoramas"
+    ]
+  },
+  {
+    "townID": "development",
+    "townName": "Development",
+    "baseShareUrl": "https://ese-llc.com/map-viewer-dev",
+    "map": {
+      "center": [-69.991, 41.687],
+      "zoom": 12
+    },
+    "layers": [
+      "satellite",
+      "parcels",
+      "parcel highlight",
+      "lidar contours",
+      "agis",
+      "historic",
+      "floodplain",
+      "acec",
+      "DEP wetland",
+      "endangered species",
+      "zone II",
+      "soils",
+      "conservancy districts",
+      "zoning",
+      "conservation",
+      "sewer",
+      "sewer plans",
+      "stories",
+      "intersection",
       "usgs quad",
       "panoramas"
     ]
