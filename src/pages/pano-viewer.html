@@ -1,68 +1,145 @@
 <style>
-    /* hide the standard squarespace header and footer */
-    #header, #footer-sections, .sqs-announcement-bar {
-        display: none !important;
-    }
+  /* hide the standard squarespace header and footer */
+  #header,
+  #footer-sections,
+  .sqs-announcement-bar,
+  #mobileNav {
+    display: none !important;
+  }
 
-    /* force the page body and the squarespace block containers to take up the full screen height */
-    html, body, .sqs-block, .sqs-block-content {
-        height: 100vh !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        overflow: hidden !important;
-        /* new rule to remove the white border */
-        background-color: transparent !important;
-    }
-    
-    /* ensure the panorama div fills its container */
-    #panorama {
-        width: 100%;
-        height: 100%;
-    }
+  /* fix: target all parent wrappers that squarespace adds, forcing them
+      to be transparent and full-height so our panorama div can be seen.
+    */
+  html,
+  body,
+  #canvasWrapper,
+  #canvas,
+  #pageWrapper,
+  #page,
+  #mainContent,
+  .sqs-layout,
+  .row.sqs-row,
+  .col.sqs-col-12,
+  .sqs-block,
+  .sqs-block-content,
+  /* --- this is the fix --- */
+    .sqs-code-container {
+    /* --- end of fix --- */
+    height: 100vh !important;
+    max-height: 100vh !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    background: transparent !important;
+  }
+
+  /* ensure the panorama div fills its container */
+  #panorama {
+    width: 100%;
+    height: 100%;
+    position: relative !important;
+    z-index: 9999 !important;
+  }
+
+  /* Error message styling */
+  #error-message {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: #ff6b6b;
+    padding: 20px;
+    border-radius: 8px;
+    z-index: 10000;
+    text-align: center;
+    font-family: sans-serif;
+    max-width: 80%;
+  }
 </style>
 
-<link rel="stylesheet" href="https://www.ese-llc.com/s/pannellum.css"/>
-<script src="https://www.ese-llc.com/s/pannellum.js"></script>
+<!-- Reverting to CDN for reliability -->
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css"
+/>
+<script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
 
 <div id="panorama"></div>
+<div id="error-message"></div>
 
 <script>
-    document.addEventListener("DOMContentLoaded", async function() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const panoFile = urlParams.get('pano');
+  function showError(msg) {
+    const el = document.getElementById("error-message");
+    el.style.display = "block";
+    el.innerHTML += `<div>${msg}</div>`;
+    console.error(msg);
+  }
 
-        if (!panoFile) return;
+  // use 'load' to ensure all squarespace css is applied
+  window.addEventListener("load", async function () {
+    const urlParams = new URLSearchParams(window.location.search);
+    const panoFile = urlParams.get("pano");
 
-        const correctionDataUrl = "https://east-southeast-llc.github.io/ese-map-viewer/assets/data/pano_correction_data.json";
-        
-        try {
-            const response = await fetch(correctionDataUrl);
-            if (!response.ok) throw new Error(`http error! status: ${response.status}`);
-            const panoData = await response.json();
-            const pose = panoData[panoFile];
+    if (!panoFile) {
+        // intended state: no pano selected yet, so just do nothing or show blank
+        return;
+    }
 
-            const viewerConfig = {
-                "type": "equirectangular",
-                "panorama": `https://www.ese-llc.com/s/${panoFile}`,
-                "autoLoad": true,
-                "showControls": false
-            };
+    const correctionDataUrl =
+      "https://east-southeast-llc.github.io/ese-map-viewer/assets/data/pano_correction_data.json";
 
-            if (pose && pose.orientation) {
-                const q = pose.orientation;
-                const sinr_cosp = 2 * (q.w * q.x + q.y * q.z);
-                const cosr_cosp = 1 - 2 * (q.x * q.x + q.y * q.y);
-                viewerConfig.horizonRoll = Math.atan2(sinr_cosp, cosr_cosp) * (180 / Math.PI);
-                
-                const sinp = 2 * (q.w * q.y - q.z * q.x);
-                let pitch = Math.abs(sinp) >= 1 ? (Math.sign(sinp) * Math.PI / 2) * (180 / Math.PI) : Math.asin(sinp) * (180 / Math.PI);
-                viewerConfig.horizonPitch = -pitch;
-            }
-            
-            pannellum.viewer('panorama', viewerConfig);
+    try {
+      const response = await fetch(correctionDataUrl);
+      if (!response.ok)
+        throw new Error(`Correction Data HTTP error! status: ${response.status}`);
+      const panoData = await response.json();
+      const pose = panoData[panoFile];
 
-        } catch (error) {
-            console.error("error loading panorama:", error);
+      const viewerConfig = {
+        type: "equirectangular",
+        panorama: `https://www.ese-llc.com/s/${panoFile}`,
+        autoLoad: true,
+        showControls: false,
+        // Ensure we catch internal Pannellum errors
+        strings: {
+            loadingLabel: "Loading Panorama...",
+            loadButtonLabel: "Click to Load",
+            loadingError: "Error loading panorama image. Check console for CORS details."
         }
-    });
+      };
+
+      if (pose && pose.orientation) {
+        const q = pose.orientation;
+        const sinr_cosp = 2 * (q.w * q.x + q.y * q.z);
+        const cosr_cosp = 1 - 2 * (q.x * q.x + q.y * q.y);
+        viewerConfig.horizonRoll =
+          Math.atan2(sinr_cosp, cosr_cosp) * (180 / Math.PI);
+
+        const sinp = 2 * (q.w * q.y - q.z * q.x);
+        let pitch =
+          Math.abs(sinp) >= 1
+            ? ((Math.sign(sinp) * Math.PI) / 2) * (180 / Math.PI)
+            : Math.asin(sinp) * (180 / Math.PI);
+        viewerConfig.horizonPitch = -pitch;
+      }
+
+      const viewer = pannellum.viewer("panorama", viewerConfig);
+      
+      // Listener for generic errors if Pannellum exposes them efficiently, 
+      // otherwise the 'loadingError' string covers the UI.
+      viewer.on('error', function(e) {
+          showError("Pannellum Error: " + e);
+      });
+      
+      viewer.on('load', function() {
+          // Success
+          console.log("Panorama loaded successfully.");
+      });
+
+    } catch (error) {
+      showError("Initialization Error: " + error.message);
+    }
+  });
 </script>
