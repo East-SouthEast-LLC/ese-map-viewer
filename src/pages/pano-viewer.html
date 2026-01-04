@@ -1,68 +1,89 @@
 <style>
-    /* hide the standard squarespace header and footer */
-    #header, #footer-sections, .sqs-announcement-bar {
-        display: none !important;
-    }
+  /* hide the standard squarespace header and footer */
+  #header,
+  #footer-sections,
+  .sqs-announcement-bar,
+  #mobileNav {
+    display: none !important;
+  }
 
-    /* force the page body and the squarespace block containers to take up the full screen height */
-    html, body, .sqs-block, .sqs-block-content {
-        height: 100vh !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        overflow: hidden !important;
-        /* new rule to remove the white border */
-        background-color: transparent !important;
-    }
-    
-    /* ensure the panorama div fills its container */
-    #panorama {
-        width: 100%;
-        height: 100%;
-    }
+  /* fix: target all parent wrappers that squarespace adds, forcing them
+      to be transparent and full-height so our panorama div can be seen.
+    */
+  html, body, #canvasWrapper, #canvas, #pageWrapper, #page, #mainContent,
+    .sqs-layout, .row.sqs-row, .col.sqs-col-12, .sqs-block, .sqs-block-content,
+    /* --- this is the fix --- */
+    .sqs-code-container {
+    /* --- end of fix --- */
+    height: 100vh !important;
+    max-height: 100vh !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    background: transparent !important;
+  }
+
+  /* ensure the panorama div fills its container */
+  #panorama {
+    width: 100%;
+    height: 100%;
+    position: relative !important;
+    z-index: 9999 !important;
+  }
 </style>
 
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css"/>
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css"
+/>
 <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
 
 <div id="panorama"></div>
 
 <script>
-    document.addEventListener("DOMContentLoaded", async function() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const panoFile = urlParams.get('pano');
+  // use 'load' to ensure all squarespace css is applied
+  window.addEventListener("load", async function () {
+    const urlParams = new URLSearchParams(window.location.search);
+    const panoFile = urlParams.get("pano");
 
-        if (!panoFile) return;
+    if (!panoFile) return;
 
-        const correctionDataUrl = "https://east-southeast-llc.github.io/ese-map-viewer-dev/assets/data/pano_correction_data.json";
-        
-        try {
-            const response = await fetch(correctionDataUrl);
-            if (!response.ok) throw new Error(`http error! status: ${response.status}`);
-            const panoData = await response.json();
-            const pose = panoData[panoFile];
+    const correctionDataUrl =
+      "https://east-southeast-llc.github.io/ese-map-viewer-dev/assets/data/pano_correction_data.json";
 
-            const viewerConfig = {
-                "type": "equirectangular",
-                "panorama": `https://www.ese-llc.com/s/${panoFile}`,
-                "autoLoad": true,
-                "showControls": false
-            };
+    try {
+      const response = await fetch(correctionDataUrl);
+      if (!response.ok)
+        throw new Error(`http error! status: ${response.status}`);
+      const panoData = await response.json();
+      const pose = panoData[panoFile];
 
-            if (pose && pose.orientation) {
-                const q = pose.orientation;
-                const sinr_cosp = 2 * (q.w * q.x + q.y * q.z);
-                const cosr_cosp = 1 - 2 * (q.x * q.x + q.y * q.y);
-                viewerConfig.horizonRoll = Math.atan2(sinr_cosp, cosr_cosp) * (180 / Math.PI);
-                
-                const sinp = 2 * (q.w * q.y - q.z * q.x);
-                let pitch = Math.abs(sinp) >= 1 ? (Math.sign(sinp) * Math.PI / 2) * (180 / Math.PI) : Math.asin(sinp) * (180 / Math.PI);
-                viewerConfig.horizonPitch = -pitch;
-            }
-            
-            pannellum.viewer('panorama', viewerConfig);
+      const viewerConfig = {
+        type: "equirectangular",
+        panorama: `https://www.ese-llc.com/s/${panoFile}`,
+        autoLoad: true,
+        showControls: false,
+      };
 
-        } catch (error) {
-            console.error("error loading panorama:", error);
-        }
-    });
+      if (pose && pose.orientation) {
+        const q = pose.orientation;
+        const sinr_cosp = 2 * (q.w * q.x + q.y * q.z);
+        const cosr_cosp = 1 - 2 * (q.x * q.x + q.y * q.y);
+        viewerConfig.horizonRoll =
+          Math.atan2(sinr_cosp, cosr_cosp) * (180 / Math.PI);
+
+        const sinp = 2 * (q.w * q.y - q.z * q.x);
+        let pitch =
+          Math.abs(sinp) >= 1
+            ? ((Math.sign(sinp) * Math.PI) / 2) * (180 / Math.PI)
+            : Math.asin(sinp) * (180 / Math.PI);
+        viewerConfig.horizonPitch = -pitch;
+      }
+
+      // no timeout needed, 'load' is the final event
+      pannellum.viewer("panorama", viewerConfig);
+    } catch (error) {
+      console.error("error loading panorama:", error);
+    }
+  });
 </script>
