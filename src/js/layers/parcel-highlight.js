@@ -1,13 +1,13 @@
 function addParcelHighlightLayer() {
     map.addSource('parcel highlight', {
         type: 'vector',
-        url: 'mapbox://ese-toh.1ya31624'
+        url: 'mapbox://ese-toh.c0yoak91'
     });
     map.addLayer({
         'id': 'parcel highlight',
         'type': 'line',
         'source': 'parcel highlight',
-        'source-layer': 'CapeTowns-2icvsh',
+        'source-layer': 'PARCEL_LINES_SE-96csbl',
         'layout': {
             'visibility': 'none',
             'line-join': 'round',
