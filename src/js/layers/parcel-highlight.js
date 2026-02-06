@@ -5,9 +5,9 @@ function addParcelHighlightLayer() {
         url: 'mapbox://ese-toh.c0yoak91'
     });
     map.addLayer({
-        'id': 'parcel highlight',
+        'id': 'parcel highlight se',
         'type': 'line',
-        'source': 'parcel highlight',
+        'source': 'parcel highlight se',
         'source-layer': 'PARCEL_LINES_SE-96csbl',
         'layout': {
             'visibility': 'none',
@@ -25,9 +25,9 @@ function addParcelHighlightLayer() {
         url: 'mapbox://ese-toh.6fb8one0'
     });
     map.addLayer({
-        'id': 'parcel highlight',
+        'id': 'parcel highlight ne',
         'type': 'line',
-        'source': 'parcel highlight',
+        'source': 'parcel highlight ne',
         'source-layer': 'PARCEL_LINES_NE-30r7f4',
         'layout': {
             'visibility': 'none',
@@ -45,9 +45,9 @@ function addParcelHighlightLayer() {
         url: 'mapbox://ese-toh.4dcv8ivs'
     });
     map.addLayer({
-        'id': 'parcel highlight',
+        'id': 'parcel highlight cen',
         'type': 'line',
-        'source': 'parcel highlight',
+        'source': 'parcel highlight cen',
         'source-layer': 'PARCEL_LINES_CEN-9g69uw',
         'layout': {
             'visibility': 'none',
@@ -65,9 +65,9 @@ function addParcelHighlightLayer() {
         url: 'mapbox://ese-toh.bi1n6f4d'
     });
     map.addLayer({
-        'id': 'parcel highlight',
+        'id': 'parcel highlight west',
         'type': 'line',
-        'source': 'parcel highlight',
+        'source': 'parcel highlight west',
         'source-layer': 'PARCEL_LINES_WEST-0f2awl',
         'layout': {
             'visibility': 'none',
