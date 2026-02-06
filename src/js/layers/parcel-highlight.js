@@ -1,6 +1,6 @@
 function addParcelHighlightLayer() {
 	//SE Mass
-    map.addSource('parcel highlight', {
+    map.addSource('parcel highlight se', {
         type: 'vector',
         url: 'mapbox://ese-toh.c0yoak91'
     });
@@ -20,7 +20,7 @@ function addParcelHighlightLayer() {
         }
     });
 	//NE Mass
-    map.addSource('parcel highlight', {
+    map.addSource('parcel highlight ne', {
         type: 'vector',
         url: 'mapbox://ese-toh.6fb8one0'
     });
@@ -40,7 +40,7 @@ function addParcelHighlightLayer() {
         }
     });	
 	//CEN Mass
-    map.addSource('parcel highlight', {
+    map.addSource('parcel highlight cen', {
         type: 'vector',
         url: 'mapbox://ese-toh.4dcv8ivs'
     });
@@ -60,7 +60,7 @@ function addParcelHighlightLayer() {
         }
     });
 	//WEST Mass
-    map.addSource('parcel highlight', {
+    map.addSource('parcel highlight west', {
         type: 'vector',
         url: 'mapbox://ese-toh.bi1n6f4d'
     });
