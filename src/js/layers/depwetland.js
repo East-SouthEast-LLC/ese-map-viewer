@@ -79,9 +79,14 @@ function addDepWetlandLayer() {
             'line-color': [
                 'match',
                 ['get', 'ARC_CODE'],
-                '0', '#08ADEF', '1', '#EBF90A', '2', '#EBECDD', '3', '#F2A5EF',
-                '7', '#0B11F0', '8', '#5E87ED', '88', '#5EE1ED',
-                /* other */ '#ff0000'
+				0,  '#08ADEF',
+				1,  '#EBF90A',
+				2,  '#EBECDD',
+				3,  '#F2A5EF',
+				7,  '#0B11F0',
+				8,  '#5E87ED',
+				88, '#5EE1ED',
+				'#ff0000'
             ],
             'line-width': { 'base': 2.0, 'stops': [[12, 2], [22, 5]] }
         }
