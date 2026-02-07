@@ -35,7 +35,7 @@
     "legendConfig": null
   },
   {
-    "id": "parcel highlight se",
+    "id": "parcel highlight",
     "displayName": "Parcel Highlight",
     "scriptName": "parcel-highlight.js",
     "drawOrder": 95,
