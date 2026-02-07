@@ -49,7 +49,7 @@
     "legendConfig": {
         "displayName": "Parcel Highlight",
         "sources": [
-            { "id": "parcel highlight se" },
+            { "id": "parcel highlight" },
             { "id": "parcel highlight ne" },
             { "id": "parcel highlight cen" },
             { "id": "parcel highlight west" }		
