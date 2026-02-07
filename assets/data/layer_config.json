@@ -39,6 +39,12 @@
     "displayName": "Parcel Highlight",
     "scriptName": "parcel-highlight.js",
     "drawOrder": 95,
+	"dependencies": [
+    "parcel highlight se",
+    "parcel highlight ne",
+    "parcel highlight cen",
+    "parcel highlight west"
+  ],
     "popupConfig": null,
     "identifyConfig": null,
     "legendConfig": {
