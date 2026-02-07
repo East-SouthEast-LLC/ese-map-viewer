@@ -1,14 +1,14 @@
 function addDepWetlandLayer() {
     map.addSource('DEP wetland', {
         type: 'vector',
-        url: 'mapbox://ese-toh.75g1xaec'
+        url: 'mapbox://ese-toh.9hoztiqr'
     });
 
     map.addLayer({
         'id': 'DEP wetland',
         'type': 'fill',
         'source': 'DEP wetland',
-        'source-layer': 'BARNSTABLEwetlandsDEP_POLY-arr54b',
+        'source-layer': 'wetlandsdep_poly-0v67ee',
         'layout': {
             'visibility': 'none'
         },
@@ -41,7 +41,7 @@ function addDepWetlandLayer() {
         'id': 'dep-wetland-labels',
         'type': 'symbol',
         'source': 'DEP wetland',
-        'source-layer': 'BARNSTABLEwetlandsDEP_POLY-arr54b',
+        'source-layer': 'wetlandsdep_poly-0v67ee',
         'layout': {
             'text-field': ['get', 'IT_VALC'],
             'visibility': 'none',
@@ -62,14 +62,14 @@ function addDepWetlandLayer() {
 
     map.addSource('dep-wetland-line', {
         type: 'vector',
-        url: 'mapbox://ese-toh.2zhgmmx7'
+        url: 'mapbox://ese-toh.4l1powhy'
     });
 
     map.addLayer({
         'id': 'dep-wetland-line',
         'type': 'line',
         'source': 'dep-wetland-line',
-        'source-layer': 'BARNSTABLEwetlandsDEP_ARC-1hjeg7',
+        'source-layer': 'wetlandsdep_arc-4u52md',
         'layout': {
             'visibility': 'none',
             'line-join': 'round',
