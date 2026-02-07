@@ -1,14 +1,14 @@
 function addDepWetlandLayer() {
     map.addSource('DEP wetland', {
         type: 'vector',
-        url: 'mapbox://ese-toh.1yyzi7zz'
+        url: 'mapbox://ese-toh.aflbsqhu'
     });
 
     map.addLayer({
         'id': 'DEP wetland',
         'type': 'fill',
         'source': 'DEP wetland',
-        'source-layer': 'wetlandsdep_POLYf-9twhjj',
+        'source-layer': 'wetlandsdep_POLYi-7ujgk0',
         'layout': {
             'visibility': 'none'
         },
@@ -41,7 +41,7 @@ function addDepWetlandLayer() {
         'id': 'dep-wetland-labels',
         'type': 'symbol',
         'source': 'DEP wetland',
-        'source-layer': 'wetlandsdep_POLYf-9twhjj',
+        'source-layer': 'wetlandsdep_POLYi-7ujgk0',
         'layout': {
             'text-field': ['get', 'IT_VALC'],
             'visibility': 'none',
