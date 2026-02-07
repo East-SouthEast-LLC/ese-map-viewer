@@ -35,12 +35,11 @@
     "legendConfig": null
   },
   {
-    "id": "parcel highlight",
+    "id": "parcel highlight se",
     "displayName": "Parcel Highlight",
     "scriptName": "parcel-highlight.js",
     "drawOrder": 95,
 	"dependencies": [
-    "parcel highlight se",
     "parcel highlight ne",
     "parcel highlight cen",
     "parcel highlight west"
