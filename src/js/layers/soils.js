@@ -91,8 +91,8 @@ function addSoilsLayer() {
 		new mapboxgl.Popup()
 			.setLngLat(e.lngLat)
 			.setHTML("Numeric State Legend: " + '<strong>' + e.features[0].properties.MUSYM + '</strong><br>' + 
-					"Published Map Unit: " + '<strong>' + e.features[0].properties.MUS_TXT + '</strong><br>' + 
-					'<strong>' + e.features[0].properties.MUS_DESC + '</strong><br>')
+					"Published Map Unit: " + '<strong>' + e.features[0].properties.MUNAME + '</strong><br>' + 
+					'<strong>' + e.features[0].properties.HYDROLGRP + '</strong><br>')
 			.addTo(map);
 	});
 
@@ -196,8 +196,8 @@ function addSoilsLayer() {
 		new mapboxgl.Popup()
 			.setLngLat(e.lngLat)
 			.setHTML("Numeric State Legend: " + '<strong>' + e.features[0].properties.MUSYM + '</strong><br>' + 
-					"Published Map Unit: " + '<strong>' + e.features[0].properties.MUS_TXT + '</strong><br>' + 
-					'<strong>' + e.features[0].properties.MUS_DESC + '</strong><br>')
+					"Published Map Unit: " + '<strong>' + e.features[0].properties.MUNAME + '</strong><br>' + 
+					'<strong>' + e.features[0].properties.HYDROLGRP + '</strong><br>')
 			.addTo(map);
 	});
 
@@ -301,8 +301,8 @@ function addSoilsLayer() {
 		new mapboxgl.Popup()
 			.setLngLat(e.lngLat)
 			.setHTML("Numeric State Legend: " + '<strong>' + e.features[0].properties.MUSYM + '</strong><br>' + 
-					"Published Map Unit: " + '<strong>' + e.features[0].properties.MUS_TXT + '</strong><br>' + 
-					'<strong>' + e.features[0].properties.MUS_DESC + '</strong><br>')
+					"Published Map Unit: " + '<strong>' + e.features[0].properties.MUNAME + '</strong><br>' + 
+					'<strong>' + e.features[0].properties.HYDROLGRP + '</strong><br>')
 			.addTo(map);
 	});
 
@@ -407,8 +407,8 @@ function addSoilsLayer() {
 		new mapboxgl.Popup()
 			.setLngLat(e.lngLat)
 			.setHTML("Numeric State Legend: " + '<strong>' + e.features[0].properties.MUSYM + '</strong><br>' + 
-					"Published Map Unit: " + '<strong>' + e.features[0].properties.MUS_TXT + '</strong><br>' + 
-					'<strong>' + e.features[0].properties.MUS_DESC + '</strong><br>')
+					"Published Map Unit: " + '<strong>' + e.features[0].properties.MUNAME + '</strong><br>' + 
+					'<strong>' + e.features[0].properties.HYDROLGRP + '</strong><br>')
 			.addTo(map);
 	});
 
