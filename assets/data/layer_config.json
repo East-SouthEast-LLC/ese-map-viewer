@@ -309,9 +309,7 @@
 	"soils-outline WEST"
 	],
 
-    "popupConfig": {
-        "template": "Numeric State Legend: <strong>{MUSYM}</strong><br>Published Map Unit: <strong>{MUS_TXT}</strong><br><strong>{MUS_DESC}</strong>"
-    },
+
     "identifyConfig": {
         "template": "<strong>Soil Unit:</strong> {MUSYM}"
     },
