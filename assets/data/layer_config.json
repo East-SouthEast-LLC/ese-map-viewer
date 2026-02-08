@@ -295,7 +295,20 @@
     "displayName": "Soils",
     "scriptName": "soils.js",
     "drawOrder": 45,
-    "dependencies": ["soils-labels", "soils-outline"],
+    "dependencies": [
+	"soils-labels",
+	"soils-outline",
+	"soils NE",
+	"soils-labels NE",
+	"soils-outline NE",
+	"soils CEN",
+	"soils-labels CEN",
+	"soils-outline CEN",
+	"soils WEST",
+	"soils-labels WEST",
+	"soils-outline WEST"
+	],
+
     "popupConfig": {
         "template": "Numeric State Legend: <strong>{MUSYM}</strong><br>Published Map Unit: <strong>{MUS_TXT}</strong><br><strong>{MUS_DESC}</strong>"
     },
@@ -305,7 +318,11 @@
     "legendConfig": {
         "displayName": "NRCS Soils",
         "sources": [
-            { "id": "soils", "propertyKey": "MUSYM" }
+            { "id": "soils", "propertyKey": "MUSYM",
+			  "id": "soils NE", "propertyKey": "MUSYM",
+			  "id": "soils CEN", "propertyKey": "MUSYM",
+			  "id": "soils WEST", "propertyKey": "MUSYM"
+			}
         ],
         "items": [
             { "code": "258A", "label": "258A", "color": "#C88F0D", "opacity": 0.5, "isLine": false },
