@@ -114,7 +114,7 @@ function addSoilsLayer() {
 	map.addLayer({
 		'id': 'soils NE',
 		'type': 'fill',
-		'source': 'soils',
+		'source': 'soils NE',
 		'source-layer': '2026_soils_NE-4uf0vq',
 		'layout': {
 			'visibility': 'none'
