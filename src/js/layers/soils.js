@@ -2,7 +2,7 @@ function addSoilsLayer() {
 	// add source for soils
 	map.addSource('soils', {
 		type: 'vector',
-		url: 'mapbox://ese-toh.5udsb6bq'
+		url: 'mapbox://ese-toh.2bmwa01h'
 	});
 
 	// add layer for soils
@@ -10,7 +10,7 @@ function addSoilsLayer() {
 		'id': 'soils',
 		'type': 'fill',
 		'source': 'soils',
-		'source-layer': 'SOI_BARN-ae2ugp',
+		'source-layer': '2026_soils_SE-3a559s',
 		'layout': {
 			'visibility': 'none'
 		},
@@ -57,7 +57,7 @@ function addSoilsLayer() {
 		'id': 'soils-labels',
 		'type': 'symbol',
 		'source': 'soils',
-		'source-layer': 'SOI_BARN-ae2ugp',
+		'source-layer': '2026_soils_SE-3a559s',
 		'layout': {
 			'text-field': ['get', 'MUSYM'],
 			'text-size': 9,
@@ -77,7 +77,7 @@ function addSoilsLayer() {
 		'id': 'soils-outline',
 		'type': 'line',
 		'source': 'soils',
-		'source-layer': 'SOI_BARN-ae2ugp',
+		'source-layer': '2026_soils_SE-3a559s',
 		'layout': {
 			'visibility': 'none'
 		},
