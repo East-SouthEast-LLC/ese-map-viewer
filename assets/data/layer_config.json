@@ -144,9 +144,7 @@
 	  "floodplain-line-west",
       "floodplain-labels-west"
     ],
-    "popupConfig": {
-      "template": "Flood Zone: <strong>{FLD_ZONE}</strong><br>Elevation: <strong>{STATIC_BFE}</strong>"
-    },
+
     "identifyConfig": {
         "template": "<strong>Flood Zone:</strong> {FLD_ZONE}"
     },
