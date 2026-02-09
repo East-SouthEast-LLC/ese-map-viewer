@@ -142,7 +142,10 @@
       "floodplain-labels",
 	  "floodplain-west",
 	  "floodplain-line-west",
-      "floodplain-labels-west"
+      "floodplain-labels-west",
+	  "floodplain Q3",
+	  "floodplain-line-Q3",
+      "floodplain-labels-Q3"
     ],
 
     "identifyConfig": {
@@ -161,6 +164,7 @@
             { "code": "VE", "label": "Flood Zone VE", "color": "#eb3a34", "opacity": 0.4, "isLine": false },
             { "code": "AO", "label": "Flood Zone AO", "color": "#F7FE20", "opacity": 0.4, "isLine": false },
             { "code": "X", "label": "Flood Zone X", "color": "#2578F9", "opacity": 0.4, "isLine": false },
+			{ "code": "X500", "label": "Flood Zone B", "color": "#2578F9", "opacity": 0.4, "isLine": false },
             { "code": "A", "label": "Flood Zone A", "color": "#2e4bf0", "opacity": 0.4, "isLine": false }
         ]
     }
