@@ -202,6 +202,99 @@ function addFloodplainLayer() {
         map.getCanvas().style.cursor = '';
     });
 
+// Q3 
+
+    map.addSource('floodplain Q3', {
+        type: 'vector',
+        url: 'mapbox://ese-toh.7nnzd1x9'
+    });
+
+    map.addLayer({
+        'id': 'floodplain Q3',
+        'type': 'fill',
+        'source': 'floodplain Q3',
+        'source-layer': 'FEMA_Q3_Flood_2026-bn5geu',
+        'layout': { 'visibility': 'none' },
+        'paint': {
+            'fill-opacity': [
+                'match',
+                ['get', 'ZONE'],
+                'X500', 0.4,
+                'AREA OF MINIMAL FLOOD HAZARD', 0.001,
+                /* other */ 0.4
+            ],
+            'fill-color': [
+                'match',
+                ['get', 'FLD_ZONE'],
+                'AE', '#eb8c34',
+                'VE', '#eb3a34',
+                'AO', '#F7FE20',
+                'X500', '#2578F9',
+                'A', '#2e4bf0',
+                /* fallback */ '#ff0000'
+            ]
+        }
+    });
+
+    map.addLayer({
+        'id': 'floodplain-line-Q3',
+        'type': 'line',
+        'source': 'floodplain Q3',
+        'source-layer': 'FEMA_Q3_Flood_2026-bn5geu',
+        'layout': { 'visibility': 'none' },
+        'paint': {
+            'line-width': 0.5, 
+            'line-color': '#000000', 
+            'line-opacity': 0.5 
+        }
+    });
+
+    map.addLayer({
+        'id': 'floodplain-labels-Q3',
+        'type': 'symbol',
+        'source': 'floodplain Q3',
+        'source-layer': 'FEMA_Q3_Flood_2026-bn5geu',
+        'layout': {
+            'text-field': [
+                'case',
+                ['==', ['get', 'ZONE'], 'AE'], 'AE',
+                ['==', ['get', 'ZONE'], 'X500'], 'B',
+                ['==', ['get', 'ZONE'], 'A'], 'A',
+                ''
+            ],
+            'visibility': 'none',
+            'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
+            'text-size': ['interpolate', ['linear'], ['zoom'], 10, 12, 16, 16],
+            'symbol-placement': 'point',
+            'symbol-spacing': 80,
+            'text-rotation-alignment': 'map',
+        },
+        'paint': {
+            'text-color': '#202020',
+            'text-opacity': 0.6,
+            'text-halo-color': '#ffffff',
+            'text-halo-width': 1,
+            'text-halo-blur': 0.4
+        }
+    });
+    
+		map.on('click', 'floodplain Q3', function(e) {
+		new mapboxgl.Popup()
+			.setLngLat(e.lngLat)
+			.setHTML("Flood Zone: " + '<strong>' + e.features[0].properties.ZONE + '</strong><br>')
+			.addTo(map);
+	});
+	
+	
+    map.on('mouseenter', 'floodplain Q3', function () {
+        map.getCanvas().style.cursor = 'pointer';
+    });
+    
+    map.on('mouseleave', 'floodplain Q3', function () {
+        map.getCanvas().style.cursor = '';
+    });
+
+
 }
 
 addFloodplainLayer();
