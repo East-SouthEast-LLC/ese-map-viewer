@@ -137,7 +137,7 @@ function addFloodplainLayer() {
     map.addLayer({
         'id': 'floodplain-line-west',
         'type': 'line',
-        'source': 'floodplain',
+        'source': 'floodplain-west',
         'source-layer': 'NFHL-west-a1ra2l',
         'layout': { 'visibility': 'none' },
         'paint': {
@@ -150,7 +150,7 @@ function addFloodplainLayer() {
     map.addLayer({
         'id': 'floodplain-labels-west',
         'type': 'symbol',
-        'source': 'floodplain'west,
+        'source': 'floodplain-west',
         'source-layer': 'NFHL-west-a1ra2l',
         'layout': {
             'text-field': [
