@@ -139,10 +139,7 @@
     "dependencies": [
       "LiMWA",
       "floodplain-line",
-      "floodplain-labels",
-	  "floodplain-west",
-	  "floodplain-line-west",
-      "floodplain-labels-west"
+      "floodplain-labels"
     ],
     "popupConfig": {
       "template": "Flood Zone: <strong>{FLD_ZONE}</strong><br>Elevation: <strong>{STATIC_BFE}</strong>"
@@ -153,8 +150,7 @@
     "legendConfig": {
         "displayName": "FEMA Flood Zones",
         "sources": [
-            { "id": "floodplain", "propertyKey": "FLD_ZONE" },
-            { "id": "floodplain-west", "propertyKey": "FLD_ZONE" },			
+            { "id": "floodplain", "propertyKey": "FLD_ZONE" },		
             { "id": "LiMWA" }
         ],
         "items": [
