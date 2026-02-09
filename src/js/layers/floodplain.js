@@ -95,9 +95,11 @@ function addFloodplainLayer() {
 		map.on('click', 'floodplain', function(e) {
 		new mapboxgl.Popup()
 			.setLngLat(e.lngLat)
-			.setHTML("Flood Zone: <strong>{FLD_ZONE}</strong><br>Elevation: <strong>{STATIC_BFE}</strong>")
+			.setHTML("Flood Zone: " + '<strong>' + e.features[0].properties.FLD_ZONE + '</strong><br>' + 
+					"Elevation: " + '<strong>' + e.features[0].properties.STATIC_BFE + '</strong>')
 			.addTo(map);
 	});
+	
 	
     map.on('mouseenter', 'floodplain', function () {
         map.getCanvas().style.cursor = 'pointer';
@@ -186,7 +188,7 @@ function addFloodplainLayer() {
 			map.on('click', 'floodplain-west', function(e) {
 		new mapboxgl.Popup()
 			.setLngLat(e.lngLat)
-			setHTML("Flood Zone: " + '<strong>' + e.features[0].properties.FLD_ZONE + '</strong><br>' + 
+			.setHTML("Flood Zone: " + '<strong>' + e.features[0].properties.FLD_ZONE + '</strong><br>' + 
 					"Elevation: " + '<strong>' + e.features[0].properties.STATIC_BFE + '</strong>')
 			.addTo(map);
 	});
