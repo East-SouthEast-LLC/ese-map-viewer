@@ -102,7 +102,7 @@ function addFloodplainLayer() {
 
 
 // NFHL west	
-	    map.addSource('floodplain', {
+	    map.addSource('floodplain-west', {
         type: 'vector',
         url: 'mapbox://ese-toh.1uxp8bsd'
     });
@@ -110,7 +110,7 @@ function addFloodplainLayer() {
     map.addLayer({
         'id': 'floodplain-west',
         'type': 'fill',
-        'source': 'floodplain',
+        'source': 'floodplain-west',
         'source-layer': 'NFHL-west-a1ra2l',
         'layout': { 'visibility': 'none' },
         'paint': {
@@ -135,7 +135,7 @@ function addFloodplainLayer() {
     });
 
     map.addLayer({
-        'id': 'floodplain-line',
+        'id': 'floodplain-line-west',
         'type': 'line',
         'source': 'floodplain',
         'source-layer': 'NFHL-west-a1ra2l',
@@ -148,9 +148,9 @@ function addFloodplainLayer() {
     });
 
     map.addLayer({
-        'id': 'floodplain-labels',
+        'id': 'floodplain-labels-west',
         'type': 'symbol',
-        'source': 'floodplain',
+        'source': 'floodplain'west,
         'source-layer': 'NFHL-west-a1ra2l',
         'layout': {
             'text-field': [
@@ -177,11 +177,11 @@ function addFloodplainLayer() {
         }
     });
     
-    map.on('mouseenter', 'floodplain', function () {
+    map.on('mouseenter', 'floodplain-west', function () {
         map.getCanvas().style.cursor = 'pointer';
     });
     
-    map.on('mouseleave', 'floodplain', function () {
+    map.on('mouseleave', 'floodplain-west', function () {
         map.getCanvas().style.cursor = '';
     });
 	
