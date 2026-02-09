@@ -150,7 +150,8 @@
     "legendConfig": {
         "displayName": "FEMA Flood Zones",
         "sources": [
-            { "id": "floodplain", "propertyKey": "FLD_ZONE" },		
+            { "id": "floodplain", "propertyKey": "FLD_ZONE" },
+            { "id": "floodplain-west", "propertyKey": "FLD_ZONE" },
             { "id": "LiMWA" }
         ],
         "items": [
