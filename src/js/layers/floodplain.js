@@ -225,7 +225,7 @@ function addFloodplainLayer() {
             ],
             'fill-color': [
                 'match',
-                ['get', 'FLD_ZONE'],
+                ['get', 'ZONE'],
                 'AE', '#eb8c34',
                 'VE', '#eb3a34',
                 'AO', '#F7FE20',
