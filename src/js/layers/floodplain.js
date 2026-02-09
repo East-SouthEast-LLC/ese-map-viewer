@@ -19,14 +19,14 @@ function addFloodplainLayer() {
 
     map.addSource('floodplain', {
         type: 'vector',
-        url: 'mapbox://ese-toh.a7lml4y4'
+        url: 'mapbox://ese-toh.9z57sf5k'
     });
 
     map.addLayer({
         'id': 'floodplain',
         'type': 'fill',
         'source': 'floodplain',
-        'source-layer': '25001c-2014-c2ck89',
+        'source-layer': 'NFHL_east-4hsius',
         'layout': { 'visibility': 'none' },
         'paint': {
             'fill-opacity': [
@@ -53,7 +53,7 @@ function addFloodplainLayer() {
         'id': 'floodplain-line',
         'type': 'line',
         'source': 'floodplain',
-        'source-layer': '25001c-2014-c2ck89',
+        'source-layer': 'NFHL_east-4hsius',
         'layout': { 'visibility': 'none' },
         'paint': {
             'line-width': 0.5, 
@@ -66,7 +66,7 @@ function addFloodplainLayer() {
         'id': 'floodplain-labels',
         'type': 'symbol',
         'source': 'floodplain',
-        'source-layer': '25001c-2014-c2ck89',
+        'source-layer': 'NFHL_east-4hsius',
         'layout': {
             'text-field': [
                 'case',
