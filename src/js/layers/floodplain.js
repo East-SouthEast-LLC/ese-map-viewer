@@ -183,6 +183,14 @@ function addFloodplainLayer() {
         }
     });
     
+			map.on('click', 'floodplain-west', function(e) {
+		new mapboxgl.Popup()
+			.setLngLat(e.lngLat)
+			.setHTML("Flood Zone: <strong>{FLD_ZONE}</strong><br>Elevation: <strong>{STATIC_BFE}</strong>")
+			.addTo(map);
+	});
+	
+	
     map.on('mouseenter', 'floodplain-west', function () {
         map.getCanvas().style.cursor = 'pointer';
     });
