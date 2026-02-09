@@ -139,7 +139,10 @@
     "dependencies": [
       "LiMWA",
       "floodplain-line",
-      "floodplain-labels"
+      "floodplain-labels",
+	  "floodplain-west",
+	  "floodplain-line-west",
+      "floodplain-labels-west"
     ],
     "popupConfig": {
       "template": "Flood Zone: <strong>{FLD_ZONE}</strong><br>Elevation: <strong>{STATIC_BFE}</strong>"
