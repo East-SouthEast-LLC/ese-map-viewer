@@ -45,7 +45,7 @@ if (!customPrintButton || !customPrintBox) {
             { page: 3, layers: ['parcel highlight', 'DEP wetland', 'lidar contours'] },
             { page: 4, layers: ['parcel highlight', 'zone II'] },
             { page: 5, layers: ['parcel highlight', 'soils'] },
-            { page: 6, layers: ['usgs quad'] }
+            { page: 5, layers: ['usgs quad'] }
         ]
     };
 
@@ -439,5 +439,10 @@ function getLegendForPrint(expectedLayerIds = []) {
         } else {
             customPrintBox.style.display = 'none';
         }
+<<<<<<< HEAD
     });
 }
+=======
+    });    
+}
+>>>>>>> parent of 8e6e73a (Update custom-print.js)
