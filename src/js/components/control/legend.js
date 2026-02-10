@@ -245,7 +245,7 @@ if (!legendButton || !legendBox) {
                 return; 
             }
 			// from chatgpt
-			if (layerInfo.displayName === "Parcel Highlight") {
+			if (layerInfo.displayName === "Parcel Highlight"  && map.getZoom() >= 12) {
 				const anyLayerVisible = (layerInfo.sources || []).some(s =>
 					map.getLayer(s.id) &&
 					map.getLayoutProperty(s.id, 'visibility') === 'visible'
