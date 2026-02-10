@@ -313,8 +313,14 @@ if (!customPrintButton || !customPrintBox) {
             const mapCanvas = map.getCanvas();
             const mapImageSrc = mapCanvas.toDataURL();
 // another fix from ChatGPT
-const legendLayers = expandLayersWithDependencies(config.layers);
-fullHtml += getPageHTML(printData, mapImageSrc, config.page, legendLayers, currentDate);
+const legendLayers = expandLayersForLegend(config.layers);
+fullHtml += getPageHTML(
+    printData,
+    mapImageSrc,
+    config.page,
+    legendLayers,
+    currentDate
+);
 
     
             // clean up layers before the next page generation.
@@ -447,19 +453,12 @@ fullHtml += getPageHTML(printData, mapImageSrc, config.page, legendLayers, curre
     });    
 	
 	// additional function from ChatGPT to deal with Legend
-	function expandLayersWithDependencies(layerIds) {
-    const expanded = new Set();
-
-    layerIds.forEach(id => {
-        expanded.add(id);
-
+function expandLayersForLegend(layerIds) {
+    return layerIds.filter(id => {
         const cfg = window.layerConfig.find(l => l.id === id);
-        if (cfg?.dependencies) {
-            cfg.dependencies.forEach(dep => expanded.add(dep));
-        }
+        return cfg?.legendConfig;
     });
-
-    return [...expanded];
 }
+
 
 }
