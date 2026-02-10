@@ -440,8 +440,13 @@ function getLegendForPrint(expectedLayerIds = []) {
             customPrintBox.style.display = 'none';
         }
 <<<<<<< HEAD
+<<<<<<< HEAD
     });
 }
+=======
+    });    
+}
+>>>>>>> parent of 8e6e73a (Update custom-print.js)
 =======
     });    
 }
