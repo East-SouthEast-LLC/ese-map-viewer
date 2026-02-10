@@ -45,7 +45,7 @@ if (!customPrintButton || !customPrintBox) {
             { page: 3, layers: ['parcel highlight', 'DEP wetland', 'lidar contours'] },
             { page: 4, layers: ['parcel highlight', 'zone II',] },
             { page: 5, layers: ['parcel highlight', 'soils'] },
-            { page: 5, layers: ['usgs quad'] }
+            { page: 6, layers: ['usgs quad'] }
         ]
     };
     
@@ -442,4 +442,21 @@ if (!customPrintButton || !customPrintBox) {
             customPrintBox.style.display = 'none';
         }
     });    
+	
+	// additional function from ChatGPT to deal with Legend
+	function expandLayersWithDependencies(layerIds) {
+    const expanded = new Set();
+
+    layerIds.forEach(id => {
+        expanded.add(id);
+
+        const cfg = window.layerConfig.find(l => l.id === id);
+        if (cfg?.dependencies) {
+            cfg.dependencies.forEach(dep => expanded.add(dep));
+        }
+    });
+
+    return [...expanded];
+}
+
 }
