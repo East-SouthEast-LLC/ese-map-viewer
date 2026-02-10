@@ -12,10 +12,8 @@ function adjustFontSizeForPrint(element) {
     const minFontSize = 8;    // minimum readable font size
     const step = 0.5;         // how much to decrease font size by each step
 
-    // set the initial font size
     element.style.fontSize = `${currentFontSize}px`;
 
-    // loop to reduce font size until the content fits
     while (element.scrollHeight > element.clientHeight && currentFontSize > minFontSize) {
         currentFontSize -= step;
         element.style.fontSize = `${currentFontSize}px`;
@@ -30,7 +28,9 @@ customPrintBox.style.display = 'none';
 if (!customPrintButton || !customPrintBox) {
     console.error("Required custom print elements not found in the DOM.");
 } else {
-    // defines the layer combinations for each preset printout type.
+    // ----------------------------------------------------------------------
+    // PRINT PRESETS
+    // ----------------------------------------------------------------------
     const printPresets = {
         'Conservation': [
             { page: 1, layers: ['parcel highlight', 'lidar contours', 'floodplain'] },
@@ -43,23 +43,20 @@ if (!customPrintButton || !customPrintBox) {
             { page: 1, layers: ['parcel highlight', 'lidar contours'] },
             { page: 2, layers: ['parcel highlight', 'floodplain', 'lidar contours'] },
             { page: 3, layers: ['parcel highlight', 'DEP wetland', 'lidar contours'] },
-            { page: 4, layers: ['parcel highlight', 'zone II',] },
+            { page: 4, layers: ['parcel highlight', 'zone II'] },
             { page: 5, layers: ['parcel highlight', 'soils'] },
             { page: 6, layers: ['usgs quad'] }
         ]
     };
-    
-    /**
-     * sets the visibility property for a map layer and its defined dependencies.
-     * @param {string} layerId - the id of the layer to modify.
-     * @param {string} visibility - 'visible' or 'none'.
-     */
+
+    // ----------------------------------------------------------------------
+    // LAYER VISIBILITY
+    // ----------------------------------------------------------------------
     function setLayerVisibility(layerId, visibility) {
         if (map.getLayer(layerId)) {
             map.setLayoutProperty(layerId, 'visibility', visibility);
         }
-    
-        // dynamically get dependencies from the global layer config
+
         const layerConfig = window.layerConfig.find(l => l.id === layerId);
         if (layerConfig && layerConfig.dependencies) {
             layerConfig.dependencies.forEach(depId => {
@@ -70,9 +67,9 @@ if (!customPrintButton || !customPrintBox) {
         }
     }
 
-    /**
-     * loads saved company information from localstorage into the print form.
-     */
+    // ----------------------------------------------------------------------
+    // COMPANY INFO
+    // ----------------------------------------------------------------------
     function loadCompanyInfo() {
         const shouldSave = localStorage.getItem('ese-should-save-info') !== 'false';
         document.getElementById('save-info-checkbox').checked = shouldSave;
@@ -87,9 +84,6 @@ if (!customPrintButton || !customPrintBox) {
         }
     }
 
-    /**
-     * handles changes to the "save company info" checkbox.
-     */
     function handleCheckboxChange() {
         const isChecked = document.getElementById('save-info-checkbox').checked;
         localStorage.setItem('ese-should-save-info', isChecked);
@@ -99,20 +93,49 @@ if (!customPrintButton || !customPrintBox) {
         }
     }
 
+    // ----------------------------------------------------------------------
+    // LEGEND HANDLING
+    // ----------------------------------------------------------------------
     /**
-     * gets the html string for the custom print form.
-     * @returns {string} the html for the form.
+     * Filters layers to those with a legendConfig defined
+     * @param {string[]} layerIds
+     * @returns {string[]}
      */
+    function expandLayersForLegend(layerIds) {
+        return layerIds.filter(id => {
+            const cfg = window.layerConfig.find(l => l.id === id);
+            return cfg?.legendConfig;
+        });
+    }
+
+    /**
+     * Returns simple HTML for legend display
+     * @param {string[]} expectedLayerIds
+     * @returns {string}
+     */
+    function getLegendForPrint(expectedLayerIds = []) {
+        if (!expectedLayerIds.length) return '<div class="legend-item">No layers to display.</div>';
+
+        return expectedLayerIds.map(layerId => {
+            const cfg = window.layerConfig.find(l => l.id === layerId);
+            if (!cfg || !cfg.legendConfig) return '';
+
+            const displayName = cfg.legendConfig.displayName || layerId;
+            return `<div class="legend-item"><strong>${displayName}</strong></div>`;
+        }).join('');
+    }
+
+    // ----------------------------------------------------------------------
+    // FORM HTML
+    // ----------------------------------------------------------------------
     function getCustomPrintFormHTML() {
-        // Form HTML remains the same
         return `
             <strong style="display:block; text-align:center; margin-bottom:8px;">Custom Print Details</strong>
-            
             <input type="text" id="custom-company-name" placeholder="Company Name" style="width: 100%; margin-bottom: 5px; padding: 5px; box-sizing: border-box; border-radius: 3px; border: 1px solid #ccc;">
             <input type="text" id="custom-address" placeholder="Company Address" style="width: 100%; margin-bottom: 5px; padding: 5px; box-sizing: border-box; border-radius: 3px; border: 1px solid #ccc;">
             <input type="text" id="custom-website" placeholder="Website" style="width: 100%; margin-bottom: 5px; padding: 5px; box-sizing: border-box; border-radius: 3px; border: 1px solid #ccc;">
             <input type="text" id="custom-phone" placeholder="Phone Number" style="width: 100%; margin-bottom: 5px; padding: 5px; box-sizing: border-box; border-radius: 3px; border: 1px solid #ccc;">
-            
+
             <div style="text-align: center; margin: 8px 0;">
                 <input type="checkbox" id="save-info-checkbox" style="vertical-align: middle;">
                 <label for="save-info-checkbox" style="vertical-align: middle; font-size: 12px;">Save Company Info</label>
@@ -122,7 +145,7 @@ if (!customPrintButton || !customPrintBox) {
 
             <input type="text" id="custom-client-name" placeholder="Client Name" style="width: 100%; margin-bottom: 5px; padding: 5px; box-sizing: border-box; border-radius: 3px; border: 1px solid #ccc;">
             <input type="text" id="custom-property-address" placeholder="Property Address" style="width: 100%; margin-bottom: 10px; padding: 5px; box-sizing: border-box; border-radius: 3px; border: 1px solid #ccc;">
-            
+
             <label for="custom-print-preset" style="display:block; margin-bottom:5px;">Select Print Preset:</label>
             <select id="custom-print-preset" style="width: 100%; margin-bottom: 10px; padding: 5px; box-sizing: border-box;"></select>
 
@@ -144,9 +167,9 @@ if (!customPrintButton || !customPrintBox) {
         `;
     }
 
-    /**
-     * processes the custom print form data and initiates the multi-page printout generation.
-     */
+    // ----------------------------------------------------------------------
+    // PROCESS PRINT
+    // ----------------------------------------------------------------------
     function processCustomPrint() {
         if (document.getElementById('save-info-checkbox').checked) {
             const companyInfo = {
@@ -187,34 +210,23 @@ if (!customPrintButton || !customPrintBox) {
         });
 
         customPrintBox.style.display = 'none';
-        customPrintVisibility = false; 
+        customPrintVisibility = false;
 
         generateMultiPagePrintout(printData, pageConfigs);
     }
 
-    /**
-     * formats a string of numbers into a standard phone number format.
-     * @param {string} phoneNumberString - the raw phone number.
-     * @returns {string|null} the formatted phone number or null if invalid.
-     */
     function formatPhoneNumber(phoneNumberString) {
         var cleaned = ('' + phoneNumberString).replace(/\D/g, '');
         var match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
         if (match) {
             return '(' + match[1] + ') ' + match[2] + '-' + match[3];
         }
-        return null; 
+        return null;
     }
 
-    /**
-     * generates the html for a single page of the printout.
-     * @param {object} printData - the user-entered form data.
-     * @param {string} mapImageSrc - the base64 data url for the map canvas image.
-     * @param {number} pageNumber - the current page number.
-     * @param {string[]} expectedLayers - array of layer ids expected on this page.
-     * @param {string} currentDate - the formatted current date.
-     * @returns {string} the complete html for one page.
-     */
+    // ----------------------------------------------------------------------
+    // PAGE HTML
+    // ----------------------------------------------------------------------
     function getPageHTML(printData, mapImageSrc, pageNumber, expectedLayers, currentDate) {
         const formattedPhone = formatPhoneNumber(printData.phone);
 
@@ -259,18 +271,13 @@ if (!customPrintButton || !customPrintBox) {
         `;
     }
 
-    /**
-     * orchestrates the creation of a multi-page printout. it saves the map's current state,
-     * iterates through page configurations, sets layer visibility, captures the map canvas,
-     * and then restores the map to its original state.
-     * @param {object} printData - the user-entered form data.
-     * @param {object[]} pageConfigs - an array of page configuration objects.
-     */
+    // ----------------------------------------------------------------------
+    // MULTI-PAGE PRINT
+    // ----------------------------------------------------------------------
     async function generateMultiPagePrintout(printData, pageConfigs) {
         const currentDate = new Date().toLocaleDateString();
         const usgsLayerIsActive = document.querySelector('[data-layer-id="usgs quad"].active');
-        
-        // if usgs layer is on, temporarily disable it to prevent interference.
+
         if (usgsLayerIsActive && typeof deinitializeUsgsTileManager === 'function') {
             deinitializeUsgsTileManager();
         }
@@ -278,89 +285,71 @@ if (!customPrintButton || !customPrintBox) {
         let fullHtml = '';
         const allToggleableLayers = window.toggleableLayerIds.filter(id => id !== 'tools' && id !== 'usgs quad');
         const initiallyVisibleLayers = listVisibleLayers(map, allToggleableLayers);
-        
-        // set the map to the user-defined scale for printing.
+
         if (typeof setMapToScale === 'function') {
             setMapToScale(Number(printData.scale));
         } else {
             console.error("setMapToScale function not found.");
             return;
         }
-        if(marker) {
-            map.setCenter(marker.getLngLat());
-        }
-        
-        // turn off all layers to start with a clean slate for each page.
+        if(marker) map.setCenter(marker.getLngLat());
+
         allToggleableLayers.forEach(layerId => setLayerVisibility(layerId, 'none'));
 
-        // loop through each page configuration in the preset.
         for (const config of pageConfigs) {
             const isUsgsPage = config.layers.includes('usgs quad');
-    
-            // handle usgs quad pages by awaiting the tile manager.
+
             if (isUsgsPage) {
                 if (typeof initializeUsgsTileManager === 'function') {
-                    // this now returns a promise that resolves only when tiles are fully rendered.
                     await initializeUsgsTileManager();
                 }
             } else {
-                // for standard vector/raster layers, turn them on and wait for map to be idle.
                 config.layers.forEach(layerId => setLayerVisibility(layerId, 'visible'));
                 await new Promise(resolve => map.once('idle', resolve));
             }
-            
-            // capture the canvas and generate the html for the page.
+
             const mapCanvas = map.getCanvas();
             const mapImageSrc = mapCanvas.toDataURL();
+            const legendLayers = expandLayersForLegend(config.layers);
 
+            fullHtml += getPageHTML(printData, mapImageSrc, config.page, legendLayers, currentDate);
 
-    
-            // clean up layers before the next page generation.
-            if (isUsgsPage) {
-                if (typeof deinitializeUsgsTileManager === 'function') {
-                    deinitializeUsgsTileManager();
-                }
-            } else {
+            if (!isUsgsPage) {
                 config.layers.forEach(layerId => setLayerVisibility(layerId, 'none'));
+            } else if (typeof deinitializeUsgsTileManager === 'function') {
+                deinitializeUsgsTileManager();
             }
         }
 
-        // restore all initially visible layers to return the map to its original state.
         initiallyVisibleLayers.forEach(layerId => setLayerVisibility(layerId, 'visible'));
 
-        // re-initialize the usgs layer if it was active before printing.
         if (usgsLayerIsActive && typeof initializeUsgsTileManager === 'function') {
             initializeUsgsTileManager();
         }
 
-        // open a new window and write the generated html for printing.
         const win = window.open('', '_blank');
         if (win) {
             let documentTitle = "Custom Map Printout";
             if (printData.clientName && printData.propertyAddress) {
                 documentTitle = `${printData.clientName} | ${printData.propertyAddress} | ${currentDate}`;
             }
-            
+
             win.document.write(`
                 <!DOCTYPE html>
                 <html>
                 <head>
                     <title>${documentTitle}</title>
                     <link rel="stylesheet" href="https://east-southeast-llc.github.io/ese-map-viewer/src/css/globals.css?v=3" type="text/css" />
-                    
                     <link rel="preconnect" href="https://fonts.googleapis.com">
                     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
                     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
-
                     <style>
-                        /* Apply the new font to all relevant elements */
-                        .custom-info-frame, .gis-map, .legend-print-title {
-                            font-family: 'Montserrat', sans-serif !important;
-                        }
+                        .custom-info-frame, .gis-map, .legend-print-title { font-family: 'Montserrat', sans-serif !important; }
                     </style>
                 </head>
                 <body class="print-body">${fullHtml}</body>
                 </html>`);
+
             win.document.close();
             win.onload = () => {
                 win.document.querySelectorAll('.custom-info-frame').forEach(adjustFontSizeForPrint);
@@ -372,34 +361,24 @@ if (!customPrintButton || !customPrintBox) {
         }
     }
 
-    // ============================================================================
-    // MAIN EVENT LISTENERS
-    // ============================================================================
-    
-    /**
-     * attaches all necessary event listeners to the custom print form elements.
-     */
+    // ----------------------------------------------------------------------
+    // EVENT LISTENERS
+    // ----------------------------------------------------------------------
     function attachCustomPrintFormListeners() {
         const submitButton = document.getElementById('custom-print-submit');
-        if (submitButton) {
-            submitButton.addEventListener('click', processCustomPrint);
-        }
+        if (submitButton) submitButton.addEventListener('click', processCustomPrint);
 
         const saveCheckbox = document.getElementById('save-info-checkbox');
-        if (saveCheckbox) {
-            saveCheckbox.addEventListener('change', handleCheckboxChange);
-        }
+        if (saveCheckbox) saveCheckbox.addEventListener('change', handleCheckboxChange);
 
         const scaleDropdown = document.getElementById('custom-scale-dropdown');
         const scaleInput = document.getElementById('custom-scale-input');
         if (scaleDropdown && scaleInput) {
             scaleDropdown.addEventListener('change', () => {
-                if (scaleDropdown.value) {
-                    scaleInput.value = scaleDropdown.value;
-                }
+                if (scaleDropdown.value) scaleInput.value = scaleDropdown.value;
             });
         }
-        
+
         customPrintBox.addEventListener('keydown', (event) => {
             if (event.key === 'Enter') {
                 event.preventDefault();
@@ -408,9 +387,6 @@ if (!customPrintButton || !customPrintBox) {
         });
     }
 
-    /**
-     * populates the custom print box with the form html and attaches listeners.
-     */
     function updateCustomPrintBox() {
         customPrintBox.innerHTML = getCustomPrintFormHTML();
 
@@ -423,13 +399,12 @@ if (!customPrintButton || !customPrintBox) {
                 presetDropdown.appendChild(option);
             }
         }
-        
+
         customPrintBox.style.display = 'block';
         attachCustomPrintFormListeners();
-        loadCompanyInfo(); 
+        loadCompanyInfo();
     }
-    
-    // main button to toggle the visibility of the custom print form.
+
     customPrintButton.addEventListener('click', () => {
         if (!marker) {
             alert('Please drop a pin on the map to set the center for your printout.');
@@ -442,6 +417,5 @@ if (!customPrintButton || !customPrintBox) {
         } else {
             customPrintBox.style.display = 'none';
         }
-    });    
-	
+    });
 }
