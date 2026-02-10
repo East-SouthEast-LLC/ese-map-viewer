@@ -322,12 +322,12 @@
     },
     "legendConfig": {
         "displayName": "NRCS Soils",
-        "sources": [
-            { "id": "soils", "propertyKey": "MUSYM",
-			  "id": "soils NE", "propertyKey": "MUSYM",
-			  "id": "soils CEN", "propertyKey": "MUSYM",
-			  "id": "soils WEST", "propertyKey": "MUSYM"
-			}
+"sources": [
+  { "id": "soils",       "propertyKey": "MUSYM" },
+  { "id": "soils NE",    "propertyKey": "MUSYM" },
+  { "id": "soils CEN",   "propertyKey": "MUSYM" },
+  { "id": "soils WEST",  "propertyKey": "MUSYM" }
+]
         ],
         "items": [
             { "code": "258A", "label": "258A", "color": "#C88F0D", "opacity": 0.5, "isLine": false },
