@@ -1,4 +1,4 @@
-@ -1,445 +1,462 @@
+@ -1,462 +1,465 @@
 // src/js/components/control/custom-print.js
 
 /**
@@ -46,7 +46,6 @@ if (!customPrintButton || !customPrintBox) {
             { page: 3, layers: ['parcel highlight', 'DEP wetland', 'lidar contours'] },
             { page: 4, layers: ['parcel highlight', 'zone II',] },
             { page: 5, layers: ['parcel highlight', 'soils'] },
-            { page: 5, layers: ['usgs quad'] }
             { page: 6, layers: ['usgs quad'] }
         ]
     };
