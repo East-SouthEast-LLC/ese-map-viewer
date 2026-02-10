@@ -312,7 +312,10 @@ if (!customPrintButton || !customPrintBox) {
             // capture the canvas and generate the html for the page.
             const mapCanvas = map.getCanvas();
             const mapImageSrc = mapCanvas.toDataURL();
-            fullHtml += getPageHTML(printData, mapImageSrc, config.page, config.layers, currentDate);
+// another fix from ChatGPT
+const legendLayers = expandLayersWithDependencies(config.layers);
+fullHtml += getPageHTML(printData, mapImageSrc, config.page, legendLayers, currentDate);
+
     
             // clean up layers before the next page generation.
             if (isUsgsPage) {
