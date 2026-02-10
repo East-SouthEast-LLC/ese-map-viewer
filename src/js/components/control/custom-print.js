@@ -108,22 +108,44 @@ if (!customPrintButton || !customPrintBox) {
         });
     }
 
-    /**
-     * Returns simple HTML for legend display
-     * @param {string[]} expectedLayerIds
-     * @returns {string}
-     */
-    function getLegendForPrint(expectedLayerIds = []) {
-        if (!expectedLayerIds.length) return '<div class="legend-item">No layers to display.</div>';
+/**
+ * Returns HTML for the legend, including color/style swatches.
+ * @param {string[]} expectedLayerIds
+ * @returns {string}
+ */
+function getLegendForPrint(expectedLayerIds = []) {
+    if (!expectedLayerIds.length) return '<div class="legend-item">No layers to display.</div>';
 
-        return expectedLayerIds.map(layerId => {
-            const cfg = window.layerConfig.find(l => l.id === layerId);
-            if (!cfg || !cfg.legendConfig) return '';
+    return expectedLayerIds.map(layerId => {
+        const cfg = window.layerConfig.find(l => l.id === layerId);
+        if (!cfg || !cfg.legendConfig) return '';
 
-            const displayName = cfg.legendConfig.displayName || layerId;
-            return `<div class="legend-item"><strong>${displayName}</strong></div>`;
-        }).join('');
-    }
+        const displayName = cfg.legendConfig.displayName || layerId;
+        let swatchHTML = '';
+
+        // Attempt to get style info from Mapbox layer for the swatch
+        if (map.getLayer(layerId)) {
+            const type = map.getLayer(layerId).type;
+            let color = '#000';
+
+            if (type === 'fill') {
+                color = map.getPaintProperty(layerId, 'fill-color') || '#888';
+                swatchHTML = `<span class="legend-swatch" style="background:${color}; width:15px; height:15px; display:inline-block; margin-right:5px; border:1px solid #000;"></span>`;
+            } else if (type === 'line') {
+                color = map.getPaintProperty(layerId, 'line-color') || '#000';
+                const width = map.getPaintProperty(layerId, 'line-width') || 2;
+                swatchHTML = `<span class="legend-swatch" style="display:inline-block; margin-right:5px; width:20px; height:0; border-top:${width}px solid ${color};"></span>`;
+            } else if (type === 'circle') {
+                color = map.getPaintProperty(layerId, 'circle-color') || '#000';
+                const radius = map.getPaintProperty(layerId, 'circle-radius') || 5;
+                swatchHTML = `<span class="legend-swatch" style="display:inline-block; margin-right:5px; width:${radius*2}px; height:${radius*2}px; border-radius:50%; background:${color}; border:1px solid #000;"></span>`;
+            }
+        }
+
+        return `<div class="legend-item">${swatchHTML}<strong>${displayName}</strong></div>`;
+    }).join('');
+}
+
 
     // ----------------------------------------------------------------------
     // FORM HTML
