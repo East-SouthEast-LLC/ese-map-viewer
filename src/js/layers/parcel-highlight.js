@@ -9,13 +9,11 @@ function addParcelHighlightLayer() {
     });
     map.addLayer({
         'id': 'parcel highlight',
-        'type': 'fill',
+        'type': 'line',
         'source': 'parcel highlight',
         'source-layer': '2026_Statewide_Parcels_brain-58henn',
         'layout': {
-            'visibility': 'none',
-            'line-join': 'round',
-            'line-cap': 'round'
+            'visibility': 'none'
         },
         'paint': {
             'line-color': '#a0fa39',
@@ -30,13 +28,11 @@ function addParcelHighlightLayer() {
     });
     map.addLayer({
         'id': 'parcel highlight cc',
-        'type': 'fill',
+        'type': 'line',
         'source': 'parcel highlight cc',
         'source-layer': '2026_Statewide_Parcels_cc-5jy337',
         'layout': {
-            'visibility': 'none',
-            'line-join': 'round',
-            'line-cap': 'round'
+            'visibility': 'none'
         },
         'paint': {
             'line-color': '#a0fa39',
@@ -50,13 +46,11 @@ function addParcelHighlightLayer() {
     });
     map.addLayer({
         'id': 'parcel highlight marsh',
-        'type': 'fill',
+        'type': 'line',
         'source': 'parcel highlight marsh',
         'source-layer': '2026_Statewide_Parcels_marsh-d5rfkr',
         'layout': {
-            'visibility': 'none',
-            'line-join': 'round',
-            'line-cap': 'round'
+            'visibility': 'none'
         },
         'paint': {
             'line-color': '#a0fa39',
@@ -70,13 +64,11 @@ function addParcelHighlightLayer() {
     });
     map.addLayer({
         'id': 'parcel highlight cen',
-        'type': 'fill',
+        'type': 'line',
         'source': 'parcel highlight cen',
         'source-layer': '2026_Statewide_Parcels_cen-45u8b6',
         'layout': {
-            'visibility': 'none',
-            'line-join': 'round',
-            'line-cap': 'round'
+            'visibility': 'none'
         },
         'paint': {
             'line-color': '#a0fa39',
@@ -90,13 +82,11 @@ function addParcelHighlightLayer() {
     });
     map.addLayer({
         'id': 'parcel highlight salem',
-        'type': 'fill',
+        'type': 'line',
         'source': 'parcel highlight salem',
         'source-layer': '2026_Statewide_Parcels_salem-dybfc1',
         'layout': {
-            'visibility': 'none',
-            'line-join': 'round',
-            'line-cap': 'round'
+            'visibility': 'none'
         },
         'paint': {
             'line-color': '#a0fa39',
@@ -110,13 +100,11 @@ function addParcelHighlightLayer() {
     });
     map.addLayer({
         'id': 'parcel highlight west',
-        'type': 'fill',
+        'type': 'line',
         'source': 'parcel highlight west',
         'source-layer': '2026_Statewide_Parcels_west-bc729e',
         'layout': {
-            'visibility': 'none',
-            'line-join': 'round',
-            'line-cap': 'round'
+            'visibility': 'none'
         },
         'paint': {
             'line-color': '#a0fa39',
@@ -130,13 +118,11 @@ function addParcelHighlightLayer() {
     });
     map.addLayer({
         'id': 'parcel highlight wilb',
-        'type': 'fill',
+        'type': 'line',
         'source': 'parcel highlight wilb',
         'source-layer': '2026_Statewide_Parcels_wilb-dyq6sl',
         'layout': {
-            'visibility': 'none',
-            'line-join': 'round',
-            'line-cap': 'round'
+            'visibility': 'none'
         },
         'paint': {
             'line-color': '#a0fa39',
@@ -150,13 +136,11 @@ function addParcelHighlightLayer() {
     });
     map.addLayer({
         'id': 'parcel highlight ss',
-        'type': 'fill',
+        'type': 'line',
         'source': 'parcel highlight ss',
         'source-layer': '2026_Statewide_Parcels_ss-4s6wu9',
         'layout': {
-            'visibility': 'none',
-            'line-join': 'round',
-            'line-cap': 'round'
+            'visibility': 'none'
         },
         'paint': {
             'line-color': '#a0fa39',
