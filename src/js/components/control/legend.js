@@ -93,7 +93,7 @@ if (layerInfo.displayName === "Parcel Highlight") {
     if (map.getLayer('parcel highlight') && map.getZoom() >= 12) {
                 allItemsToRender.push(`<div class="legend-section">${layerInfo.displayName}</div>`);
                 const item = layerInfo.items[0];
-                const style = `background-color: ${item.color}; opacity: ${item.opacity};`;
+				const style = 'background-color: transparent; border: 2px solid ${item.color};`;
                 const swatchClass = 'color-box';
                 allItemsToRender.push(
                     `<div class="legend-item">
