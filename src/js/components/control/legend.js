@@ -88,8 +88,36 @@ function getLegendForPrint(expectedLayerIds = []) {
             }
             return; // done with this item, move to the next
         }
+// 3. handle parcel highlight
+if (layerInfo.id === 'parcel highlight') {
+
+    const anyLayerVisible = (layerInfo.sources || []).some(source =>
+        map.getLayer(source.id) &&
+        map.getLayoutProperty(source.id, 'visibility') === 'visible'
+    );
+
+    if (anyLayerVisible) {
+        allItemsToRender.push(`<div class="legend-section">${layerInfo.displayName}</div>`);
+
+        const item = layerInfo.items[0];
+        const style = `background-color: ${item.color}; opacity: ${item.opacity};`;
+        const swatchClass = item.isLine ? 'color-line' : 'color-box';
+
+        allItemsToRender.push(
+            `<div class="legend-item">
+                <span class="${swatchClass}" style="${style}"></span>
+                <span>${item.label}</span>
+            </div>`
+        );
+
+        renderedLegendSections.add(layerInfo.displayName);
+    }
+
+    return; // done with this item
+}
+
 	
-        // 3. handle all other vector layers
+        // 4. handle all other vector layers
         if (!layerInfo.sources) {
             return;
         }
