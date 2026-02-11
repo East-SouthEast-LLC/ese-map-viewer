@@ -1,85 +1,70 @@
 function addParcelHighlightLayer() {
-	//SE Mass
-    map.addSource('parcel highlight', {
-        type: 'vector',
-        url: 'mapbox://ese-toh.c0yoak91'
-    });
-    map.addLayer({
-        'id': 'parcel highlight',
-        'type': 'line',
-        'source': 'parcel highlight',
-        'source-layer': 'PARCEL_LINES_SE-96csbl',
-        'layout': {
-            'visibility': 'none',
-            'line-join': 'round',
-            'line-cap': 'round'
+
+    const parcels = [
+        {
+            id: 'parcel highlight',
+            sourceLayer: '2026_Statewide_Parcels_brain-58henn',
+            url: 'mapbox://ese-toh.71nvl5kq'
         },
-        'paint': {
-            'line-color': '#a0fa39',
-            'line-width': 1.5
-        }
-    });
-	//NE Mass
-    map.addSource('parcel highlight ne', {
-        type: 'vector',
-        url: 'mapbox://ese-toh.6fb8one0'
-    });
-    map.addLayer({
-        'id': 'parcel highlight ne',
-        'type': 'line',
-        'source': 'parcel highlight ne',
-        'source-layer': 'PARCEL_LINES_NE-30r7f4',
-        'layout': {
-            'visibility': 'none',
-            'line-join': 'round',
-            'line-cap': 'round'
+        {
+            id: 'parcel highlight cc',
+            sourceLayer: '2026_Statewide_Parcels_cc-5jy337',
+            url: 'mapbox://ese-toh.cxvs0pej'
         },
-        'paint': {
-            'line-color': '#a0fa39',
-            'line-width': 1.5
-        }
-    });	
-	//CEN Mass
-    map.addSource('parcel highlight cen', {
-        type: 'vector',
-        url: 'mapbox://ese-toh.4dcv8ivs'
-    });
-    map.addLayer({
-        'id': 'parcel highlight cen',
-        'type': 'line',
-        'source': 'parcel highlight cen',
-        'source-layer': 'PARCEL_LINES_CEN-9g69uw',
-        'layout': {
-            'visibility': 'none',
-            'line-join': 'round',
-            'line-cap': 'round'
+        {
+            id: 'parcel highlight marsh',
+            sourceLayer: '2026_Statewide_Parcels_marsh-d5rfkr',
+            url: 'mapbox://ese-toh.3b7hwfjm'
         },
-        'paint': {
-            'line-color': '#a0fa39',
-            'line-width': 1.5
-        }
-    });
-	//WEST Mass
-    map.addSource('parcel highlight west', {
-        type: 'vector',
-        url: 'mapbox://ese-toh.bi1n6f4d'
-    });
-    map.addLayer({
-        'id': 'parcel highlight west',
-        'type': 'line',
-        'source': 'parcel highlight west',
-        'source-layer': 'PARCEL_LINES_WEST-0f2awl',
-        'layout': {
-            'visibility': 'none',
-            'line-join': 'round',
-            'line-cap': 'round'
+        {
+            id: 'parcel highlight cen',
+            sourceLayer: '2026_Statewide_Parcels_cen-45u8b6',
+            url: 'mapbox://ese-toh.cs2vjhk0'
         },
-        'paint': {
-            'line-color': '#a0fa39',
-            'line-width': 1.5
+		{
+            id: 'parcel highlight salem',
+            sourceLayer: '2026_Statewide_Parcels_salem-dybfc1',
+            url: 'mapbox://ese-toh.bfeflzh4'
+        },
+        {
+            id: 'parcel highlight west',
+            sourceLayer: '2026_Statewide_Parcels_west-bc729e',
+            url: 'mapbox://ese-toh.5145412c'
+        },
+        {
+            id: 'parcel highlight wilb',
+            sourceLayer: '2026_Statewide_Parcels_wilb-dyq6sl',
+            url: 'mapbox://ese-toh.b2yjtsvz'
+        },
+        {
+            id: 'parcel highlight ss',
+            sourceLayer: '2026_Statewide_Parcels_ss-4s6wu9',
+            url: 'mapbox://ese-toh.9geeudeh'
         }
+    ];
+
+    parcels.forEach(p => {
+        map.addSource(p.id, {
+            type: 'vector',
+            url: p.url
+        });
+
+        map.addLayer({
+            id: p.id,
+            type: 'line',
+            source: p.id,
+            'source-layer': p.sourceLayer,
+            layout: {
+                visibility: 'none',
+                'line-join': 'round',
+                'line-cap': 'round'
+            },
+            paint: {
+                'line-color': '#a0fa39',
+                'line-width': 1.5
+            }
+        });
     });
-	
 }
 
 addParcelHighlightLayer();
