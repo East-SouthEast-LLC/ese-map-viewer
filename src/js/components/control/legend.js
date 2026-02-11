@@ -92,32 +92,20 @@ function getLegendForPrint(expectedLayerIds = []) {
 if (layerInfo.displayName === "Parcel Highlight") {
 
     if (map.getLayer('parcel highlight') && map.getZoom() >= 12) {
-
-        allItemsToRender.push(`<div class="legend-section">${layerInfo.displayName}</div>`);
-
-        const item = layerInfo.items[0];
-
-        const style = `
-            background-color: transparent;
-            border: 2px solid ${item.color};
-        `;
-
-        const swatchClass = 'color-box';
-
-        allItemsToRender.push(
-            `<div class="legend-item">
-                <span class="${swatchClass}" style="${style}"></span>
-                <span>${item.label}</span>
-            </div>`
-        );
-
-        renderedLegendSections.add(layerInfo.displayName);
-    }
-
-    return;
-}
-
-	
+                allItemsToRender.push(`<div class="legend-section">${layerInfo.displayName}</div>`);
+                const item = layerInfo.items[0];
+                const style = `background-color: ${item.color}; opacity: ${item.opacity};`;
+                const swatchClass = 'color-box';
+                allItemsToRender.push(
+                    `<div class="legend-item">
+                        <span class="${swatchClass}" style="${style}"></span>
+                        <span>${item.label}</span>
+                    </div>`
+                );
+                renderedLegendSections.add(layerInfo.displayName);
+            }
+            return; // done with this item, move to the next
+        }	
         // 4. handle all other vector layers
         if (!layerInfo.sources) {
             return;
