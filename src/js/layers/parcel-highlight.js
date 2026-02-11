@@ -51,7 +51,7 @@ function addParcelHighlightLayer() {
 
         map.addLayer({
             id: p.id,
-            type: 'line',
+            type: 'fill',
             source: p.id,
             'source-layer': p.sourceLayer,
             layout: {
