@@ -40,9 +40,13 @@
     "scriptName": "parcel-highlight.js",
     "drawOrder": 95,
 	"dependencies": [
-    "parcel highlight ne",
+    "parcel highlight cc",
+    "parcel highlight marsh",
     "parcel highlight cen",
-    "parcel highlight west"
+    "parcel highlight salem",
+    "parcel highlight west",
+    "parcel highlight wilb",
+    "parcel highlight ss"
   ],
     "popupConfig": null,
     "identifyConfig": null,
@@ -50,9 +54,13 @@
         "displayName": "Parcel Highlight",
         "sources": [
             { "id": "parcel highlight" },
-            { "id": "parcel highlight ne" },
+            { "id": "parcel highlight cc" },
+            { "id": "parcel highlight marsh" },
             { "id": "parcel highlight cen" },
-            { "id": "parcel highlight west" }		
+            { "id": "parcel highlight salem" },
+            { "id": "parcel highlight west" },
+            { "id": "parcel highlight wilb" },
+            { "id": "parcel highlight ss" }				
         ],
         "items": [
             {
