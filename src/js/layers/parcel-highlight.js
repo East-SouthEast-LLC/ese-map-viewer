@@ -55,8 +55,7 @@ map.addLayer({
         visibility: 'none'
     },
     paint: {
-        'fill-color': '#a0fa39',
-        'fill-opacity': 0.4,
+        'fill-color': 'rgba(0,0,0,0)',   // truly transparent
         'fill-outline-color': '#a0fa39'
     }
 });
@@ -71,8 +70,7 @@ map.addLayer({
         visibility: 'none'
     },
     paint: {
-        'fill-color': '#a0fa39',
-        'fill-opacity': 0.4,
+        'fill-color': 'rgba(0,0,0,0)',   // truly transparent
         'fill-outline-color': '#a0fa39'
     }
 });
@@ -87,8 +85,7 @@ map.addLayer({
         visibility: 'none'
     },
     paint: {
-        'fill-color': '#a0fa39',
-        'fill-opacity': 0.4,
+        'fill-color': 'rgba(0,0,0,0)',   // truly transparent
         'fill-outline-color': '#a0fa39'
     }
 });
@@ -103,8 +100,7 @@ map.addLayer({
         visibility: 'none'
     },
     paint: {
-        'fill-color': '#a0fa39',
-        'fill-opacity': 0.4,
+        'fill-color': 'rgba(0,0,0,0)',   // truly transparent
         'fill-outline-color': '#a0fa39'
     }
 });
@@ -119,8 +115,7 @@ map.addLayer({
         visibility: 'none'
     },
     paint: {
-        'fill-color': '#a0fa39',
-        'fill-opacity': 0.4,
+        'fill-color': 'rgba(0,0,0,0)',   // truly transparent
         'fill-outline-color': '#a0fa39'
     }
 });
@@ -135,8 +130,7 @@ map.addLayer({
         visibility: 'none'
     },
     paint: {
-        'fill-color': '#a0fa39',
-        'fill-opacity': 0.4,
+        'fill-color': 'rgba(0,0,0,0)',   // truly transparent
         'fill-outline-color': '#a0fa39'
     }
 });
@@ -151,8 +145,7 @@ map.addLayer({
         visibility: 'none'
     },
     paint: {
-        'fill-color': '#a0fa39',
-        'fill-opacity': 0.4,
+        'fill-color': 'rgba(0,0,0,0)',   // truly transparent
         'fill-outline-color': '#a0fa39'
     }
 });
@@ -167,8 +160,7 @@ map.addLayer({
         visibility: 'none'
     },
     paint: {
-        'fill-color': '#a0fa39',
-        'fill-opacity': 0.4,
+        'fill-color': 'rgba(0,0,0,0)',   // truly transparent
         'fill-outline-color': '#a0fa39'
     }
 });
