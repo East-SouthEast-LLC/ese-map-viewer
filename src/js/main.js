@@ -127,7 +127,10 @@
         buildToolkit();
         setupLayoutAdjustments();
 
-        mapboxgl.accessToken = 'pk.eyJ1IjoiZXNlLXRvaCIsImEiOiJjbWVrM2hjMnUwMXVnMnFvYTBnazc2dmtjIn0.UUSb9J5lGL8H7pzEqapwnQ';
+// here goes nothing
+import { MAPBOX_ACCESS_TOKEN } from './config.js';
+mapboxgl.accessToken = MAPBOX_ACCESS_TOKEN;
+
         const map = new mapboxgl.Map({
             container: 'map',
             style: 'mapbox://styles/ese-toh/ckh2ss32s06i119paer9mt67h',
