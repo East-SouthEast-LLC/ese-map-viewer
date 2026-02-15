@@ -684,7 +684,7 @@
   "id": "counties",
   "displayName": "Counties",
   "scriptName": "counties.js",
-  "drawOrder": 50,
+  "drawOrder": 99,
   "popupConfig": {
       "fields": ["NAME", "STATE"],
       "template": "<strong>{NAME}</strong>, {STATE}"
