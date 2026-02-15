@@ -663,8 +663,8 @@
     "townName": "Worcester County",
     "baseShareUrl": "https://ese-llc.com/map-viewer-dev",
     "map": {
-      "center": [-71.801, 42.362],
-      "zoom": 9.2
+      "center": [-71.901, 42.362],
+      "zoom": 9.0
     },
     "layers": [
       "satellite",
