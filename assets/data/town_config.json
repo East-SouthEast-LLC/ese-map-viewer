@@ -393,5 +393,278 @@
       "usgs quad",
       "panoramas"
     ]
+  },
+  {
+    "townID": "barnstable-county",
+    "townName": "Barnstable County",
+    "baseShareUrl": "https://ese-llc.com/map-viewer-dev",
+    "map": {
+      "center": [-70.260, 41.733],
+      "zoom": 9.5
+    },
+    "layers": [
+      "satellite",
+      "parcel highlight",
+      "lidar contours",
+      "floodplain",
+      "acec",
+      "DEP wetland",
+      "endangered species",
+      "zone II",
+      "soils",
+      "usgs quad"
+    ]
+  },
+  {
+    "townID": "bristol-county",
+    "townName": "Bristol County",
+    "baseShareUrl": "https://ese-llc.com/map-viewer-dev",
+    "map": {
+      "center": [-73.530, 41.742],
+      "zoom": 9.5
+    },
+    "layers": [
+      "satellite",
+      "parcel highlight",
+      "lidar contours",
+      "floodplain",
+      "acec",
+      "DEP wetland",
+      "endangered species",
+      "zone II",
+      "soils",
+      "usgs quad"
+    ]
+  },
+  {
+    "townID": "dukes-county",
+    "townName": "Dukes County",
+    "baseShareUrl": "https://ese-llc.com/map-viewer-dev",
+    "map": {
+      "center": [-70.626, 41.386],
+      "zoom": 10.5
+    },
+    "layers": [
+      "satellite",
+      "parcel highlight",
+      "lidar contours",
+      "floodplain",
+      "acec",
+      "DEP wetland",
+      "endangered species",
+      "zone II",
+      "soils",
+      "usgs quad"
+    ]
+  },
+  {
+    "townID": "essex-county",
+    "townName": "Essex County",
+    "baseShareUrl": "https://ese-llc.com/map-viewer-dev",
+    "map": {
+      "center": [-70.932, 42.662],
+      "zoom": 9.8
+    },
+    "layers": [
+      "satellite",
+      "parcel highlight",
+      "lidar contours",
+      "floodplain",
+      "acec",
+      "DEP wetland",
+      "endangered species",
+      "zone II",
+      "soils",
+      "usgs quad"
+    ]
+  },
+  {
+      "townID": "franklin-county",
+    "townName": "Franklin County",
+    "baseShareUrl": "https://ese-llc.com/map-viewer-dev",
+    "map": {
+      "center": [-72.584, 42.524],
+      "zoom": 9.8
+    },
+    "layers": [
+      "satellite",
+      "parcel highlight",
+      "lidar contours",
+      "floodplain",
+      "acec",
+      "DEP wetland",
+      "endangered species",
+      "zone II",
+      "soils",
+      "usgs quad"
+    ]
+  },
+  {
+      "townID": "hampden-county",
+    "townName": "Hampden County",
+    "baseShareUrl": "https://ese-llc.com/map-viewer-dev",
+    "map": {
+      "center": [-72.530, 42.128],
+      "zoom": 9.8
+    },
+    "layers": [
+      "satellite",
+      "parcel highlight",
+      "lidar contours",
+      "floodplain",
+      "acec",
+      "DEP wetland",
+      "endangered species",
+      "zone II",
+      "soils",
+      "usgs quad"
+    ]
+  },
+  {
+      "townID": "hampshire-county",
+    "townName": "Hampshire County",
+    "baseShareUrl": "https://ese-llc.com/map-viewer-dev",
+    "map": {
+      "center": [-72.650, 42.346],
+      "zoom": 9.8
+    },
+    "layers": [
+      "satellite",
+      "parcel highlight",
+      "lidar contours",
+      "floodplain",
+      "acec",
+      "DEP wetland",
+      "endangered species",
+      "zone II",
+      "soils",
+      "usgs quad"
+    ]
+  },
+  {
+      "townID": "middlesex-county",
+    "townName": "Middlesex County",
+    "baseShareUrl": "https://ese-llc.com/map-viewer-dev",
+    "map": {
+      "center": [-71.398, 42.436],
+      "zoom": 9.6
+    },
+    "layers": [
+      "satellite",
+      "parcel highlight",
+      "lidar contours",
+      "floodplain",
+      "acec",
+      "DEP wetland",
+      "endangered species",
+      "zone II",
+      "soils",
+      "usgs quad"
+    ]
+  },
+  {
+      "townID": "nantucket-county",
+    "townName": "Nantucket County",
+    "baseShareUrl": "https://ese-llc.com/map-viewer-dev",
+    "map": {
+      "center": [-70.097, 41.309],
+      "zoom": 11.3
+    },
+    "layers": [
+      "satellite",
+      "parcel highlight",
+      "lidar contours",
+      "floodplain",
+      "acec",
+      "DEP wetland",
+      "endangered species",
+      "zone II",
+      "soils",
+      "usgs quad"
+    ]
+  },
+  {
+      "townID": "norfolk-county",
+    "townName": "Norfolk County",
+    "baseShareUrl": "https://ese-llc.com/map-viewer-dev",
+    "map": {
+      "center": [-71.187, 42.166],
+      "zoom": 10.3
+    },
+    "layers": [
+      "satellite",
+      "parcel highlight",
+      "lidar contours",
+      "floodplain",
+      "acec",
+      "DEP wetland",
+      "endangered species",
+      "zone II",
+      "soils",
+      "usgs quad"
+    ]
+  },
+ {
+      "townID": "plymouth-county",
+    "townName": "Plymouth County",
+    "baseShareUrl": "https://ese-llc.com/map-viewer-dev",
+    "map": {
+      "center": [-70.885, 41.958],
+      "zoom": 9.4
+    },
+    "layers": [
+      "satellite",
+      "parcel highlight",
+      "lidar contours",
+      "floodplain",
+      "acec",
+      "DEP wetland",
+      "endangered species",
+      "zone II",
+      "soils",
+      "usgs quad"
+    ]
+  },
+  {
+      "townID": "suffolk-county",
+    "townName": "Suffolk County",
+    "baseShareUrl": "https://ese-llc.com/map-viewer-dev",
+    "map": {
+      "center": [-71.006, 42.337],
+      "zoom": 10.7
+    },
+    "layers": [
+      "satellite",
+      "parcel highlight",
+      "lidar contours",
+      "floodplain",
+      "acec",
+      "DEP wetland",
+      "endangered species",
+      "zone II",
+      "soils",
+      "usgs quad"
+    ]
+  },
+  {
+      "townID": "worcester-county",
+    "townName": "Worcester County",
+    "baseShareUrl": "https://ese-llc.com/map-viewer-dev",
+    "map": {
+      "center": [-71.801, 42.362],
+      "zoom": 9.2
+    },
+    "layers": [
+      "satellite",
+      "parcel highlight",
+      "lidar contours",
+      "floodplain",
+      "acec",
+      "DEP wetland",
+      "endangered species",
+      "zone II",
+      "soils",
+      "usgs quad"
+    ]
   }
 ]
