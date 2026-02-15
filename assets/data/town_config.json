@@ -399,8 +399,30 @@
     "townName": "Barnstable County",
     "baseShareUrl": "https://ese-llc.com/map-viewer-dev",
     "map": {
-      "center": [-70.260, 41.733],
-      "zoom": 9.5
+      "center": [-70.006, 41.761],
+      "zoom": 9.2
+    },
+    "layers": [
+      "satellite",
+      "parcel highlight",
+      "lidar contours",
+      "floodplain",
+      "acec",
+      "DEP wetland",
+      "endangered species",
+      "zone II",
+      "soils",
+      "usgs quad",
+	  "counties"
+    ]
+  },
+    {
+    "townID": "berkshire-county",
+    "townName": "Berkshire County",
+    "baseShareUrl": "https://ese-llc.com/map-viewer-dev",
+    "map": {
+      "center": [-72.820, 42.391],
+      "zoom": 9.2
     },
     "layers": [
       "satellite",
@@ -421,7 +443,7 @@
     "townName": "Bristol County",
     "baseShareUrl": "https://ese-llc.com/map-viewer-dev",
     "map": {
-      "center": [-73.530, 41.742],
+      "center": [-70.772, 41.742],
       "zoom": 9.5
     },
     "layers": [
@@ -443,8 +465,8 @@
     "townName": "Dukes County",
     "baseShareUrl": "https://ese-llc.com/map-viewer-dev",
     "map": {
-      "center": [-70.626, 41.386],
-      "zoom": 10.5
+      "center": [-70.569, 41.361],
+      "zoom": 10.7
     },
     "layers": [
       "satellite",
@@ -465,8 +487,8 @@
     "townName": "Essex County",
     "baseShareUrl": "https://ese-llc.com/map-viewer-dev",
     "map": {
-      "center": [-70.932, 42.662],
-      "zoom": 9.8
+      "center": [-70.746, 42.662],
+      "zoom": 9.6
     },
     "layers": [
       "satellite",
@@ -487,7 +509,7 @@
     "townName": "Franklin County",
     "baseShareUrl": "https://ese-llc.com/map-viewer-dev",
     "map": {
-      "center": [-72.584, 42.524],
+      "center": [-72.486, 42.524],
       "zoom": 9.8
     },
     "layers": [
@@ -509,7 +531,7 @@
     "townName": "Hampden County",
     "baseShareUrl": "https://ese-llc.com/map-viewer-dev",
     "map": {
-      "center": [-72.530, 42.128],
+      "center": [-72.519, 42.180],
       "zoom": 9.8
     },
     "layers": [
@@ -531,7 +553,7 @@
     "townName": "Hampshire County",
     "baseShareUrl": "https://ese-llc.com/map-viewer-dev",
     "map": {
-      "center": [-72.650, 42.346],
+      "center": [-72.616, 42.346],
       "zoom": 9.8
     },
     "layers": [
@@ -553,8 +575,8 @@
     "townName": "Middlesex County",
     "baseShareUrl": "https://ese-llc.com/map-viewer-dev",
     "map": {
-      "center": [-71.398, 42.436],
-      "zoom": 9.6
+      "center": [-71.182, 42.436],
+      "zoom": 9.4
     },
     "layers": [
       "satellite",
@@ -576,7 +598,7 @@
     "baseShareUrl": "https://ese-llc.com/map-viewer-dev",
     "map": {
       "center": [-70.097, 41.309],
-      "zoom": 11.3
+      "zoom": 11.2
     },
     "layers": [
       "satellite",
@@ -597,8 +619,8 @@
     "townName": "Norfolk County",
     "baseShareUrl": "https://ese-llc.com/map-viewer-dev",
     "map": {
-      "center": [-71.187, 42.166],
-      "zoom": 10.3
+      "center": [-71.053, 42.166],
+      "zoom": 10.0
     },
     "layers": [
       "satellite",
@@ -619,8 +641,8 @@
     "townName": "Plymouth County",
     "baseShareUrl": "https://ese-llc.com/map-viewer-dev",
     "map": {
-      "center": [-70.885, 41.958],
-      "zoom": 9.4
+      "center": [-70.341, 41.958],
+      "zoom": 9.2
     },
     "layers": [
       "satellite",
@@ -641,7 +663,7 @@
     "townName": "Suffolk County",
     "baseShareUrl": "https://ese-llc.com/map-viewer-dev",
     "map": {
-      "center": [-71.006, 42.337],
+      "center": [-70.870, 42.337],
       "zoom": 10.7
     },
     "layers": [
@@ -663,7 +685,7 @@
     "townName": "Worcester County",
     "baseShareUrl": "https://ese-llc.com/map-viewer-dev",
     "map": {
-      "center": [-71.901, 42.362],
+      "center": [-71.627, 42.362],
       "zoom": 9.0
     },
     "layers": [
