@@ -12,8 +12,8 @@ function addCountiesLayer() {
             'visibility': 'visible'
         },
         'paint': {
-            'line-color': '#08f8fc',
-            'line-width': 1
+            'line-color': '#1152f5',
+            'line-width': 1.5
         },
     });
 }
