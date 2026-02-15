@@ -443,8 +443,8 @@
     "townName": "Bristol County",
     "baseShareUrl": "https://ese-llc.com/map-viewer-dev",
     "map": {
-      "center": [-70.772, 41.742],
-      "zoom": 9.5
+      "center": [-70.772, 41.782],
+      "zoom": 9.2
     },
     "layers": [
       "satellite",
