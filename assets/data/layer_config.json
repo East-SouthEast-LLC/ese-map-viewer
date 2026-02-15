@@ -681,6 +681,16 @@
     }
   },
   {
+  "id": "counties",
+  "displayName": "Counties",
+  "scriptName": "counties.js",
+  "drawOrder": 50,
+  "popupConfig": {
+      "fields": ["NAME", "STATE"],
+      "template": "<strong>{NAME}</strong>, {STATE}"
+  }
+},
+  {
     "id": "private properties upland",
     "displayName": "Private Properties Upland",
     "scriptName": "private-properties-upland.js",
