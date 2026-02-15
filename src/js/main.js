@@ -123,7 +123,8 @@
     }
 
     // --- main execution logic ---
-    document.addEventListener('DOMContentLoaded', () => {
+ //   document.addEventListener('DOMContentLoaded', () => {
+	 {
         buildToolkit();
         setupLayoutAdjustments();
 
