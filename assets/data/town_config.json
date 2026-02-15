@@ -422,7 +422,7 @@
     "baseShareUrl": "https://ese-llc.com/map-viewer-dev",
     "map": {
       "center": [-72.820, 42.391],
-      "zoom": 9.2
+      "zoom": 9.0
     },
     "layers": [
       "satellite",
