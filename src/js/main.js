@@ -146,7 +146,8 @@ mapboxgl.accessToken = MAPBOX_ACCESS_TOKEN;
         map.on('load', async function () {            
             // first, always load the base towns layer
             await loadScript(`https://east-southeast-llc.github.io/ese-map-viewer/src/js/layers/towns.js`);
-
+            await loadScript(`https://east-southeast-llc.github.io/ese-map-viewer/src/js/layers/counties.js`);
+			
             try {
                 // then, fetch town and layer configurations
                 const [townConfigResponse, layerConfigResponse] = await Promise.all([
