@@ -92,7 +92,11 @@ function setupToggleableMenu() {
 if (clickedLayer === 'maphelp') {
     window.open('https://www.ese-llc.com/maphelp/map-help', '_blank', 'noopener,noreferrer');
     return;
-}				
+}		
+if (clickedLayer === 'donategis') {
+    window.open('https://www.ese-llc.com/donate-gis', '_blank', 'noopener,noreferrer');
+    return;
+}			
 				
 
                 if (!map.getLayer(clickedLayer)) {
