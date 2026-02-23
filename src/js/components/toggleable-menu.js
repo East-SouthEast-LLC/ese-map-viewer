@@ -89,7 +89,7 @@ function setupToggleableMenu() {
                     return;
                 }
 // chatgpt add 
-if (clickedLayer === 'map-help') {
+if (clickedLayer === 'maphelp') {
     window.open('https://www.ese-llc.com/maphelp/map-help', '_blank', 'noopener,noreferrer');
     return;
 }				
