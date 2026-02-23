@@ -1,5 +1,5 @@
-function initializeMapHelp() {
-    window.open('https://www.ese-llc.com/maphelp/map-help', '_blank', 'noopener,noreferrer');
+function initializeDonateGIS() {
+    window.open('https://www.impactchatham.org/donate-for-gis', '_blank', 'noopener,noreferrer');
 }
 
 function deinitializeMapHelp() {
