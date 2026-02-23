@@ -10,14 +10,10 @@ if (!identifyButton || !identifyBox) {
 
     function handleIdentifyClick(e) {
         // this function no longer creates a marker. it only identifies features.
-// chat gpt
+     
+// chatgpt	 
 const queryableLayers = window.layerConfig
-    .filter(l => {
-        if (!l.identifyConfig) return false;
-
-        const visibility = map.getLayoutProperty(l.id, 'visibility');
-        return visibility === 'visible';
-    })
+    .filter(l => l.identifyConfig)
     .map(l => l.id);
 
         const originalVisibilities = {};
