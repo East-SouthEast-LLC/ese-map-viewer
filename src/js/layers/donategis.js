@@ -2,7 +2,7 @@ function initializeDonateGIS() {
     window.open('https://www.ese-llc.com/donate-gis', '_blank', 'noopener,noreferrer');
 }
 
-function deinitializeMapHelp() {
+function deinitializeDonateGIS() {
     // nothing needed
 }
 
