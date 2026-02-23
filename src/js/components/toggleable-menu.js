@@ -96,7 +96,11 @@ if (clickedLayer === 'maphelp') {
 if (clickedLayer === 'donategis') {
     window.open('https://www.ese-llc.com/donate-gis', '_blank', 'noopener,noreferrer');
     return;
-}			
+}		
+if (clickedLayer === 'updates') {
+    window.open('https://www.ese-llc.com/updates', '_blank', 'noopener,noreferrer');
+    return;
+}		
 				
 
                 if (!map.getLayer(clickedLayer)) {
