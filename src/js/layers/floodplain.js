@@ -11,6 +11,7 @@ function addFloodplainLayer() {
         'source': 'LiMWA',
         'source-layer': 'LiMWA-dtmi75',
         'layout': { 'visibility': 'none' },
+		'minzoom': 12,
         'paint': {
             'line-color': '#E70B0B',
             'line-width': 3.0
@@ -28,6 +29,7 @@ function addFloodplainLayer() {
         'source': 'floodplain',
         'source-layer': 'NFHL_east-4hsius',
         'layout': { 'visibility': 'none' },
+		'minzoom': 12,
         'paint': {
             'fill-opacity': [
                 'match',
@@ -55,6 +57,7 @@ function addFloodplainLayer() {
         'source': 'floodplain',
         'source-layer': 'NFHL_east-4hsius',
         'layout': { 'visibility': 'none' },
+		'minzoom': 12,
         'paint': {
             'line-width': 0.5, 
             'line-color': '#000000', 
@@ -83,6 +86,7 @@ function addFloodplainLayer() {
             'symbol-spacing': 80,
             'text-rotation-alignment': 'map',
         },
+		'minzoom': 12,
         'paint': {
             'text-color': '#202020',
             'text-opacity': 0.6,
@@ -121,6 +125,7 @@ function addFloodplainLayer() {
         'source': 'floodplain-west',
         'source-layer': 'NFHL-west-a1ra2l',
         'layout': { 'visibility': 'none' },
+		'minzoom': 12,
         'paint': {
             'fill-opacity': [
                 'match',
@@ -148,6 +153,7 @@ function addFloodplainLayer() {
         'source': 'floodplain-west',
         'source-layer': 'NFHL-west-a1ra2l',
         'layout': { 'visibility': 'none' },
+		'minzoom': 12,
         'paint': {
             'line-width': 0.5, 
             'line-color': '#000000', 
@@ -176,6 +182,7 @@ function addFloodplainLayer() {
             'symbol-spacing': 80,
             'text-rotation-alignment': 'map',
         },
+		'minzoom': 12,
         'paint': {
             'text-color': '#202020',
             'text-opacity': 0.6,
@@ -215,6 +222,7 @@ function addFloodplainLayer() {
         'source': 'floodplain Q3',
         'source-layer': 'FEMA_Q3_Flood_2026-bn5geu',
         'layout': { 'visibility': 'none' },
+		'minzoom': 12,
         'paint': {
             'fill-opacity': [
                 'match',
@@ -242,6 +250,7 @@ function addFloodplainLayer() {
         'source': 'floodplain Q3',
         'source-layer': 'FEMA_Q3_Flood_2026-bn5geu',
         'layout': { 'visibility': 'none' },
+		'minzoom': 12,
         'paint': {
             'line-width': 0.5, 
             'line-color': '#000000', 
@@ -269,6 +278,7 @@ function addFloodplainLayer() {
             'symbol-spacing': 80,
             'text-rotation-alignment': 'map',
         },
+		'minzoom': 12,
         'paint': {
             'text-color': '#202020',
             'text-opacity': 0.6,
