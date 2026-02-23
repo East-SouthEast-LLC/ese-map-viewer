@@ -1,3 +1,13 @@
+// src/js/components/control/identify.js
+
+const identifyButton = document.getElementById('identifyButton');
+const identifyBox = document.getElementById('identify-box');
+
+if (!identifyButton || !identifyBox) {
+    console.error("Required elements not found for the Identify tool.");
+} else {
+    let identifyMode = false;
+
 function handleIdentifyClick(e) {
 
     const queryableConfigs = window.layerConfig
@@ -79,4 +89,29 @@ function handleIdentifyClick(e) {
     identifyBox.style.display = 'block';
 
     exitIdentifyMode();
+}
+
+    function enterIdentifyMode() {
+        trackEvent('identify_tool', {});
+        identifyMode = true;
+        map.getCanvasContainer().classList.add('identify-mode-active');
+        identifyButton.classList.add('active');
+        map.once('click', handleIdentifyClick);
+    }
+
+    function exitIdentifyMode() {
+        identifyMode = false;
+        map.getCanvasContainer().classList.remove('identify-mode-active');
+        identifyButton.classList.remove('active');
+        map.off('click', handleIdentifyClick);
+    }
+
+    identifyButton.addEventListener('click', () => {
+        if (identifyMode) {
+            exitIdentifyMode();
+            identifyBox.style.display = 'none';
+        } else {
+            enterIdentifyMode();
+        }
+    });
 }
