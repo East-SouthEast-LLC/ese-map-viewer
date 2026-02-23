@@ -773,8 +773,9 @@
         ]
     }
   },
-// trythis
-    {
-    "id": "maphelp"
-	}
+{
+    id: 'maphelp',
+    displayName: 'Map Help',
+    type: 'static' // or leave type out
+}
 ]
