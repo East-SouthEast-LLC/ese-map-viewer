@@ -1,89 +1,75 @@
-// src/js/components/control/identify.js
+function handleIdentifyClick(e) {
 
-const identifyButton = document.getElementById('identifyButton');
-const identifyBox = document.getElementById('identify-box');
+    const queryableConfigs = window.layerConfig
+        .filter(l => l.identifyConfig)
+        .filter(l => map.getLayer(l.id));
 
-if (!identifyButton || !identifyBox) {
-    console.error("Required elements not found for the Identify tool.");
-} else {
-    let identifyMode = false;
+    let html = '<strong style="font-size: 14px;">Features at this Point</strong><hr style="margin: 2px 0 5px;">';
+    const foundInfo = new Set();
 
-    function handleIdentifyClick(e) {
-        // this function no longer creates a marker. it only identifies features.
-     
-// chatgpt	 
-const queryableLayers = window.layerConfig
-    .filter(l => l.identifyConfig)
-    .map(l => l.id);
+    const clickedPoint = turf.point([e.lngLat.lng, e.lngLat.lat]);
 
-        const originalVisibilities = {};
-        queryableLayers.forEach(layerId => {
-            originalVisibilities[layerId] = map.getLayoutProperty(layerId, 'visibility') || 'none';
-            map.setLayoutProperty(layerId, 'visibility', 'visible');
-        });
+    queryableConfigs.forEach(config => {
 
-        map.once('idle', () => {
-            const features = map.queryRenderedFeatures(e.point, { layers: queryableLayers });
-            let html = '<strong style="font-size: 14px;">Features at this Point</strong><hr style="margin: 2px 0 5px;">';
-            const foundInfo = new Set();
+        const layer = map.getLayer(config.id);
+        if (!layer) return;
 
-            if (features.length > 0) {
-                features.forEach(feature => {
-                    const config = window.layerConfig.find(l => l.id === feature.layer.id);
-                    if (config && config.identifyConfig) {
-                        let info = config.identifyConfig.template;
-                        
-                        for (const key in feature.properties) {
-                            const regex = new RegExp(`{${key}}`, 'g');
-                            info = info.replace(regex, feature.properties[key]);
-                        }
+        const sourceId = layer.source;
+        const sourceLayer = layer['source-layer'];
 
-                        if (info && !foundInfo.has(info)) {
-                            html += info + '<br>';
-                            foundInfo.add(info);
-                        }
-                    }
-                });
-            }
+        let features = [];
 
-            if (foundInfo.size === 0) {
-                html += 'No data features found at this location.';
-            }
-            
-            identifyBox.innerHTML = html;
-            identifyBox.style.display = 'block';
-
-            queryableLayers.forEach(layerId => {
-                map.setLayoutProperty(layerId, 'visibility', originalVisibilities[layerId]);
+        try {
+            features = map.querySourceFeatures(sourceId, {
+                sourceLayer: sourceLayer
             });
-
-            exitIdentifyMode();
-        });
-    }
-    
-    function enterIdentifyMode() {
-        trackEvent('identify_tool', {});
-        identifyMode = true;
-        // add a class to the map container to force the cursor style
-        map.getCanvasContainer().classList.add('identify-mode-active');
-        identifyButton.classList.add('active');
-        map.once('click', handleIdentifyClick);
-    }
-
-    function exitIdentifyMode() {
-        identifyMode = false;
-        // remove the class to return to the default cursor behavior
-        map.getCanvasContainer().classList.remove('identify-mode-active');
-        identifyButton.classList.remove('active');
-        map.off('click', handleIdentifyClick);
-    }
-
-    identifyButton.addEventListener('click', () => {
-        if (identifyMode) {
-            exitIdentifyMode();
-            identifyBox.style.display = 'none';
-        } else {
-            enterIdentifyMode();
+        } catch (err) {
+            console.warn(`Identify skipped ${config.id}`, err);
+            return;
         }
+
+        features.forEach(feature => {
+
+            if (!feature.geometry) return;
+
+            let match = false;
+
+            const geomType = feature.geometry.type;
+
+            if (geomType === 'Polygon' || geomType === 'MultiPolygon') {
+                match = turf.booleanPointInPolygon(clickedPoint, feature);
+            }
+
+            else if (geomType === 'LineString' || geomType === 'MultiLineString') {
+                match = turf.booleanPointOnLine(clickedPoint, feature, { tolerance: 0.00001 });
+            }
+
+            else if (geomType === 'Point' || geomType === 'MultiPoint') {
+                const dist = turf.distance(clickedPoint, feature);
+                match = dist < 0.01; // ~10m tolerance
+            }
+
+            if (!match) return;
+
+            let info = config.identifyConfig.template;
+
+            for (const key in feature.properties) {
+                info = info.replace(new RegExp(`{${key}}`, 'g'), feature.properties[key]);
+            }
+
+            if (info && !foundInfo.has(info)) {
+                html += info + '<br>';
+                foundInfo.add(info);
+            }
+        });
     });
-}
+
+    if (foundInfo.size === 0) {
+        html += 'No data features found at this location.';
+    }
+
+    identifyBox.innerHTML = html;
+    identifyBox.style.display = 'block';
+
+    exitIdentifyMode();
+}s
