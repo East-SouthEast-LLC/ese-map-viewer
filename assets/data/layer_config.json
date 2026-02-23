@@ -777,6 +777,6 @@
     {
   "id": "maphelp",
   "displayName": "Map Help",
-  "scriptName": "maphelp.js",
+  "scriptName": "maphelp.js"
 	}
 ]
