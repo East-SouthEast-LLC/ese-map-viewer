@@ -78,16 +78,21 @@ function setupToggleableMenu() {
                 
                 const layerConfig = window.layerConfig.find(l => l.id === clickedLayer);
                 if (!layerConfig) return;
+// chatchange for maphelp
+if (layerConfig.type === 'managed') {
+    const isActive = this.classList.toggle('active');
 
-                if (layerConfig.type === 'managed') {
-                    const isActive = this.classList.toggle('active');
-                    if (isActive) {
-                        if (window.initializeUsgsTileManager) initializeUsgsTileManager();
-                    } else {
-                        if (window.deinitializeUsgsTileManager) deinitializeUsgsTileManager();
-                    }
-                    return;
-                }
+    const initFn = window['initialize' + clickedLayer.replace(/-([a-z])/g, g => g[1].toUpperCase()).replace(/^./, c => c.toUpperCase())];
+    const deinitFn = window['deinitialize' + clickedLayer.replace(/-([a-z])/g, g => g[1].toUpperCase()).replace(/^./, c => c.toUpperCase())];
+
+    if (isActive && typeof initFn === 'function') {
+        initFn();
+    } else if (!isActive && typeof deinitFn === 'function') {
+        deinitFn();
+    }
+
+    return;
+}
 
                 if (!map.getLayer(clickedLayer)) {
                     return console.warn("Layer not found:", clickedLayer);
