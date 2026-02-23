@@ -438,7 +438,8 @@
       "soils",
       "usgs quad",
 	  "counties",
-	  "maphelp"
+	  "maphelp",
+	  "donategis"
     ]
   },
   {
@@ -461,7 +462,8 @@
       "soils",
       "usgs quad",
 	  "counties",
-	  "maphelp"
+	  "maphelp",
+	  "donategis"
     ]
   },
   {
@@ -484,7 +486,8 @@
       "soils",
       "usgs quad",
 	  "counties",
-	  "maphelp"
+	  "maphelp",
+	  "donategis"
     ]
   },
   {
@@ -507,7 +510,8 @@
       "soils",
       "usgs quad",
 	  "counties",
-	  "maphelp"
+	  "maphelp",
+	  "donategis"
     ]
   },
   {
@@ -530,7 +534,8 @@
       "soils",
       "usgs quad",
 	  "counties",
-	  "maphelp"
+	  "maphelp",
+	  "donategis"
     ]
   },
   {
@@ -553,7 +558,8 @@
       "soils",
       "usgs quad",
 	  "counties",
-	  "maphelp"
+	  "maphelp",
+	  "donategis"
     ]
   },
   {
@@ -576,7 +582,8 @@
       "soils",
       "usgs quad",
 	  "counties",
-	  "maphelp"
+	  "maphelp",
+	  "donategis"
     ]
   },
   {
@@ -599,7 +606,8 @@
       "soils",
       "usgs quad",
 	  "counties",
-	  "maphelp"
+	  "maphelp",
+	  "donategis"
     ]
   },
   {
@@ -622,7 +630,8 @@
       "soils",
       "usgs quad",
 	  "counties",
-	  "maphelp"
+	  "maphelp",
+	  "donategis"
     ]
   },
   {
@@ -645,7 +654,8 @@
       "soils",
       "usgs quad",
 	  "counties",
-	  "maphelp"
+	  "maphelp",
+	  "donategis"
     ]
   },
  {
@@ -668,7 +678,8 @@
       "soils",
       "usgs quad",
 	  "counties",
-	  "maphelp"
+	  "maphelp",
+	  "donategis"
     ]
   },
   {
@@ -691,7 +702,8 @@
       "soils",
       "usgs quad",
 	  "counties",
-	  "maphelp"
+	  "maphelp",
+	  "donategis"
     ]
   },
   {
@@ -714,7 +726,8 @@
       "soils",
       "usgs quad",
 	  "counties",
-	  "maphelp"
+	  "maphelp",
+	  "donategis"
     ]
   }
 ]
