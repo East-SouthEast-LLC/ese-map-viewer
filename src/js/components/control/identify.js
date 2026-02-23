@@ -8,75 +8,42 @@ if (!identifyButton || !identifyBox) {
 } else {
     let identifyMode = false;
 
-    function handleIdentifyClick(e) {
+function handleIdentifyClick(e) {
 
-        const queryableConfigs = window.layerConfig
-            .filter(l => l.identifyConfig)
-            .filter(l => map.getLayer(l.id));
+    // 1. capture original visibility for all layers in layerConfig
+    const originalVisibilities = {};
+    const queryableLayers = window.layerConfig
+        .filter(l => l.identifyConfig)
+        .map(l => l.id)
+        .filter(id => map.getLayer(id));
+
+    queryableLayers.forEach(layerId => {
+        originalVisibilities[layerId] =
+            map.getLayoutProperty(layerId, 'visibility') || 'none';
+
+        // 2. temporarily show the layer
+        map.setLayoutProperty(layerId, 'visibility', 'visible');
+    });
+
+    // 3. wait for render so features are available
+    map.once('idle', () => {
+
+        const features = map.queryRenderedFeatures(e.point, {
+            layers: queryableLayers
+        });
 
         let html = '<strong style="font-size: 14px;">Features at this Point</strong><hr style="margin: 2px 0 5px;">';
         const foundInfo = new Set();
+        const layersWithData = new Set();
 
-        // point of click for geometry tests
-        const clickedPoint = turf.point([e.lngLat.lng, e.lngLat.lat]);
-
-        queryableConfigs.forEach(config => {
-
-            const layer = map.getLayer(config.id);
-            if (!layer) return;
-
-            const sourceId = layer.source;
-            const sourceLayer = layer['source-layer'];
-
-            let features = [];
-
-            try {
-                features = map.querySourceFeatures(sourceId, {
-                    sourceLayer: sourceLayer
-                });
-            } catch (err) {
-                console.warn(`Identify skipped ${config.id}`, err);
-                return;
-            }
-
+        if (features.length > 0) {
             features.forEach(feature => {
 
-                if (!feature.geometry) return;
+                const layerId = feature.layer.id;
+                layersWithData.add(layerId);
 
-                let match = false;
-                const geomType = feature.geometry.type;
-
-                // polygon or multipolygon
-                if (geomType === 'Polygon' || geomType === 'MultiPolygon') {
-                    try {
-                        match = turf.booleanPointInPolygon(clickedPoint, feature);
-                    } catch (err) {
-                        console.warn('booleanPointInPolygon failed', err);
-                    }
-                }
-
-                // lines
-                else if (geomType === 'LineString' || geomType === 'MultiLineString') {
-                    try {
-                        match = turf.booleanPointOnLine(clickedPoint, feature, {
-                            tolerance: 0.00001
-                        });
-                    } catch (err) {
-                        console.warn('booleanPointOnLine failed', err);
-                    }
-                }
-
-                // points
-                else if (geomType === 'Point' || geomType === 'MultiPoint') {
-                    try {
-                        const dist = turf.distance(clickedPoint, feature);
-                        match = dist < 0.01; // roughly 10m tolerance
-                    } catch (err) {
-                        console.warn('distance failed', err);
-                    }
-                }
-
-                if (!match) return;
+                const config = window.layerConfig.find(l => l.id === layerId);
+                if (!config || !config.identifyConfig) return;
 
                 let info = config.identifyConfig.template;
 
@@ -89,17 +56,31 @@ if (!identifyButton || !identifyBox) {
                     foundInfo.add(info);
                 }
             });
-        });
+        }
 
         if (foundInfo.size === 0) {
             html += 'No data features found at this location.';
         }
 
+        // 4. publish layers that actually returned data
+        if (layersWithData.size > 0) {
+            html += '<hr><strong>Layers with Data</strong><br>';
+            layersWithData.forEach(id => {
+                html += `• ${id}<br>`;
+            });
+        }
+
         identifyBox.innerHTML = html;
         identifyBox.style.display = 'block';
 
+        // 5. restore original visibility
+        queryableLayers.forEach(layerId => {
+            map.setLayoutProperty(layerId, 'visibility', originalVisibilities[layerId]);
+        });
+
         exitIdentifyMode();
-    }
+    });
+}
 
     function enterIdentifyMode() {
         trackEvent('identify_tool', {});
