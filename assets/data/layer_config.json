@@ -144,6 +144,7 @@
     "displayName": "Floodplain",
     "scriptName": "floodplain.js",
     "drawOrder": 50,
+	"minzoom": 12.5,
     "dependencies": [
       "LiMWA",
       "floodplain-line",
