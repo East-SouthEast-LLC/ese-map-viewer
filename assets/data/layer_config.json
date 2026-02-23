@@ -778,5 +778,10 @@
   "id": "maphelp",
   "displayName": "Map Help",
   "scriptName": "maphelp.js"
+	},
+	    {
+  "id": "donategis",
+  "displayName": "Donate",
+  "scriptName": "donategis.js"
 	}
 ]
