@@ -783,5 +783,10 @@
   "id": "donategis",
   "displayName": "Donate",
   "scriptName": "donategis.js"
+	},
+		    {
+  "id": "updates",
+  "displayName": "Updates",
+  "scriptName": "updates.js"
 	}
 ]

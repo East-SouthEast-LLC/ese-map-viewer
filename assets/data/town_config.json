@@ -727,7 +727,8 @@
       "usgs quad",
 	  "counties",
 	  "maphelp",
-	  "donategis"
+	  "donategis",
+	  "updates"
     ]
   }
 ]
