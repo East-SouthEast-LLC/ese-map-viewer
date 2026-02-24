@@ -1,26 +1,12 @@
-// src/js/components/control/identify.js
+document.addEventListener('DOMContentLoaded', () => {
+    const identifyButton = document.getElementById('identifyButton');
 
-const identifyButton = document.getElementById('identifyButton');
-const identifyBox = document.getElementById('identify-box');
-
-if (!identifyButton || !identifyBox) {
-    console.error("Required elements not found for Identify tool.");
-} else {
-
-    function handleIdentifyClick(e) {
-        console.log("Identify click fired at:", e.lngLat);
-
-        identifyBox.innerHTML =
-            `<strong>Identify Click Fired</strong><br>
-             Lat: ${e.lngLat.lat}<br>
-             Lng: ${e.lngLat.lng}`;
-
-        identifyBox.style.display = 'block';
+    if (!identifyButton) {
+        console.error("identifyButton not found in DOM");
+        return;
     }
 
     identifyButton.addEventListener('click', () => {
-        console.log("Identify button clicked");
-
-        map.once('click', handleIdentifyClick);
+        console.log("button event fired");
     });
-}
+});
