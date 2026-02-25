@@ -309,48 +309,26 @@ INFO DISPLAY PANELS (for distance and scale)
 
 /* main container for the coordinates */
 #coordinates-box {
-  background: white;
-  color: #333;
-  padding: 10px 15px;
-  border-radius: 5px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-  margin-top: 5px;
-  max-width: 240px;
-  overflow-y: auto; 
-  width: 100%;
-  box-sizing: border-box;
-  display: none; 
+    font-size: 0.85rem;  /* slightly smaller */
 }
 
-.coordinates-title {
-  font-weight: bold;
-  font-size: 14px;
-  margin-top: auto;
-  text-align: center;
+.coord-title {
+    font-weight: 600;
+    margin-bottom: 4px;
 }
 
-.coordinates-item-row {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 6px;
-  font-size: 12px;
-  margin-bottom: 3px;
+.coord-row {
+    display: flex;
+    justify-content: space-between;
 }
 
-.color-box {
-  width: 15px;
-  height: 15px;
-  border: 1px solid #555;
-  margin-right: 8px;
-  flex-shrink: 0;
+.coord-label {
+    margin-right: 8px;
 }
 
-.color-line {
-  width: 15px;
-  height: 3px;
-  border: 1px solid #555;
-  margin-right: 8px;
-  flex-shrink: 0;
+.coord-value {
+    text-align: right;
+    font-family: monospace; /* makes DMS line up beautifully */
 }
 
 /* ============================================================
