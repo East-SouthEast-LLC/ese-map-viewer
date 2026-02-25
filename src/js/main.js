@@ -249,10 +249,13 @@
                     return;
                 }
 
-                const panoFeatures = map.queryRenderedFeatures(e.point, { layers: ['panoramas'] });
-                if (panoFeatures.length > 0) {
-                    return; 
-                }
+// only query if the layer actually exists
+if (map.getLayer && map.getLayer('panoramas')) {
+    const panoFeatures = map.queryRenderedFeatures(e.point, { layers: ['panoramas'] });
+    if (panoFeatures.length > 0) {
+        return;
+    }
+}
 
                 const townLayerIds = window.toggleableLayerIds;
                 const queryableLayers = window.layerConfig
