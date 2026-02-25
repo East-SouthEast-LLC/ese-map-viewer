@@ -77,7 +77,7 @@
             <div id="custom-print-box"></div>
             <div id="bookmark-box"></div>
             <div id="identify-box"></div>
-			<div id="c-box"></div>
+			<div id="coordinates-box"></div>
         `;
         document.body.appendChild(geocoderContainer);
     }
