@@ -39,44 +39,7 @@
         });
     }// src/js/main.js
 
-(function() {
-    // get the townid from the script tag's data attribute
-    const thisScript = document.querySelector('script[src*="main.js"]');
-    const townId = thisScript.getAttribute('data-town-id');
-    
-    if (!townId) {
-        console.error("town id is not defined in the script tag's data-town-id attribute.");
-        return;
-    }
-    window.townId = townId;
 
-    // central state variables
-    let marker = null;
-    const markerCoordinates = { lat: null, lng: null };
-    let placingPoint = false;
-    let lastViewedPanoId = null; 
-
-    // expose variables globally so all control scripts can use them
-    window.marker = marker;
-    window.markerCoordinates = markerCoordinates;
-    window.placingPoint = placingPoint;
-    window.lastViewedPanoId = lastViewedPanoId;
-    
-    /**
-     * dynamically creates and appends a script tag to the body.
-     * returns a promise that resolves when the script is loaded.
-     * @param {string} src - the source url of the script to load.
-     * @returns {promise}
-     */
-    function loadScript(src) {
-        return new Promise((resolve, reject) => {
-            const script = document.createElement('script');
-            script.src = src;
-            script.onload = resolve;
-            script.onerror = () => reject(new Error(`script load error for ${src}`));
-            document.body.appendChild(script);
-        });
-    }
 
     /**
      * dynamically builds the html for the toolkit and appends it to the body.
