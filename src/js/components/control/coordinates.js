@@ -1,36 +1,33 @@
 // coordinates.js
-// simple coordinates tool placeholder
-// ============================================================================
-
 const coordinatesButton = document.getElementById('coordinatesButton');
 const coordinatesBox = document.getElementById('coordinates-box');
-
-let coordinatesMode = false;
 
 if (coordinatesButton && coordinatesBox) {
 
     coordinatesButton.addEventListener('click', () => {
-        coordinatesMode = !coordinatesMode;
-        coordinatesButton.classList.toggle('active');
 
-        if (coordinatesMode) {
-            coordinatesBox.style.display = 'block';
-            map.getCanvas().style.cursor = 'crosshair';
-        } else {
+        // toggle active state (optional UI feedback)
+        const isActive = coordinatesButton.classList.contains('active');
+
+        if (isActive) {
+            coordinatesButton.classList.remove('active');
             coordinatesBox.style.display = 'none';
-            map.getCanvas().style.cursor = '';
+            return;
         }
-    });
 
-    map.on('click', (e) => {
-        if (!coordinatesMode) return;
+        coordinatesButton.classList.add('active');
 
-        const { lat, lng } = e.lngLat;
+        if (window.map) {
+            const center = window.map.getCenter();
+            const lat = center.lat.toFixed(6);
+            const lng = center.lng.toFixed(6);
 
-        coordinatesBox.innerHTML = `
-            <div class="coordinates-title">Coordinates</div>
-            <div class="coordinates-item-row">WGS84 Lat: <span>${lat.toFixed(8)}</span></div>
-            <div class="coordinates-item-row">WGS84 Lng: <span>${lng.toFixed(8)}</span></div>
-        `;
+            coordinatesBox.innerHTML = `
+                <strong>Coordinates (WGS84)</strong><br>
+                Lat: ${lat}<br>
+                Lon: ${lng}
+            `;
+            coordinatesBox.style.display = 'block';
+        }
     });
 }
