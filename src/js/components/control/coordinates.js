@@ -19,14 +19,27 @@
 
     let active = false;
 
+function toDMS(decimal) {
+    const abs = Math.abs(decimal);
+    const degrees = Math.floor(abs);
+    const minutesFloat = (abs - degrees) * 60;
+    const minutes = Math.floor(minutesFloat);
+    const seconds = (minutesFloat - minutes) * 60;
+
+    const sign = decimal < 0 ? "-" : "";
+
+    return `${sign}${degrees}°${minutes}'${seconds.toFixed(4)}"`;
+}
+
+
     function handleMapClick(e) {
         const { lat, lng } = e.lngLat;
 
-        coordinatesBox.innerHTML = `
-            <strong>Coordinates (WGS84)</strong><br>
-            Lat: ${lat.toFixed(6)}<br>
-            Lon: ${lng.toFixed(6)}
-        `;
+coordinatesBox.innerHTML = `
+    <strong>Coordinates (WGS84 - DMS)</strong><br>
+    Lat: ${toDMS(lat)}<br>
+    Lon: ${toDMS(lng)}
+`;
         coordinatesBox.style.display = 'block';
     }
 
