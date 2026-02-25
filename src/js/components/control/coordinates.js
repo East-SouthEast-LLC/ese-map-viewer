@@ -5,6 +5,7 @@
 
     if (!coordinatesButton || !coordinatesBox || !window.map) {
         console.warn("coordinates tool: elements or map not found");
+		    coordinatesBox.style.display = 'none';
         return;
     }
 
