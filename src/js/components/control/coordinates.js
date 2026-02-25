@@ -41,9 +41,15 @@ function toDMS(dec) {
         const { lat, lng } = e.lngLat;
 
 coordinatesBox.innerHTML = `
-    <strong>Coordinates (WGS84 - DMS)</strong><br>
-    Lat: ${toDMS(lat)}<br>
-    Lon: ${toDMS(lng)}
+    <div class="coord-title">Coordinates (WGS84 - DMS)</div>
+    <div class="coord-row">
+        <span class="coord-label">Lat:</span>
+        <span class="coord-value">${toDMS(lat)}</span>
+    </div>
+    <div class="coord-row">
+        <span class="coord-label">Lon:</span>
+        <span class="coord-value">${toDMS(lng)}</span>
+    </div>
 `;
         coordinatesBox.style.display = 'block';
     }
