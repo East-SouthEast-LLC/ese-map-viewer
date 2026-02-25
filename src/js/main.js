@@ -1,5 +1,7 @@
 // src/js/main.js
 
+
+
 (function() {
     // get the townid from the script tag's data attribute
     const thisScript = document.querySelector('script[src*="main.js"]');
@@ -37,9 +39,7 @@
             script.onerror = () => reject(new Error(`script load error for ${src}`));
             document.body.appendChild(script);
         });
-    }// src/js/main.js
-
-
+    }
 
     /**
      * dynamically builds the html for the toolkit and appends it to the body.
