@@ -19,21 +19,26 @@
 
     let active = false;
 
-function toDMS(dec) {
+function toDMS(dec, type) {
     const absolute = Math.abs(dec);
+
     const degrees = Math.floor(absolute);
     const minutesFull = (absolute - degrees) * 60;
     const minutes = Math.floor(minutesFull);
-    const secondsFull = (minutesFull - minutes) * 60;
-    const seconds = secondsFull.toFixed(4);
+    const seconds = ((minutesFull - minutes) * 60).toFixed(4);
 
-    // pad minutes and seconds to 2 digits
     const m = String(minutes).padStart(2, '0');
-    const s = String(seconds).padStart(2, '0').padStart(7, '0'); 
-    // 7 total gives "00.0000" style after decimal
+    const s = String(seconds).padStart(7, '0'); // ensures 00.0000
 
-    const hemi = dec >= 0 ? '' : '';
-    return `${degrees}°${m}'${s}"${hemi}`;
+    let hemisphere = '';
+
+    if (type === 'lat') {
+        hemisphere = dec >= 0 ? 'N' : 'S';
+    } else if (type === 'lon') {
+        hemisphere = dec >= 0 ? 'E' : 'W';
+    }
+
+    return `${degrees}°${m}'${s}" ${hemisphere}`;
 }
 
 
@@ -44,11 +49,11 @@ coordinatesBox.innerHTML = `
     <div class="coord-title">Coordinates (WGS84 - DMS)</div>
     <div class="coord-row">
         <span class="coord-label">Lat:</span>
-        <span class="coord-value">${toDMS(lat)}</span>
+        <span class="coord-value">${toDMS(lat, 'lat')}</span>
     </div>
     <div class="coord-row">
         <span class="coord-label">Lon:</span>
-        <span class="coord-value">${toDMS(lng)}</span>
+        <span class="coord-value">${toDMS(lng, 'lon')}</span>
     </div>
 `;
         coordinatesBox.style.display = 'block';
