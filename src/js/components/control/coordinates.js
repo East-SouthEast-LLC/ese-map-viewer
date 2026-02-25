@@ -19,16 +19,21 @@
 
     let active = false;
 
-function toDMS(decimal) {
-    const abs = Math.abs(decimal);
-    const degrees = Math.floor(abs);
-    const minutesFloat = (abs - degrees) * 60;
-    const minutes = Math.floor(minutesFloat);
-    const seconds = (minutesFloat - minutes) * 60;
+function toDMS(dec) {
+    const absolute = Math.abs(dec);
+    const degrees = Math.floor(absolute);
+    const minutesFull = (absolute - degrees) * 60;
+    const minutes = Math.floor(minutesFull);
+    const secondsFull = (minutesFull - minutes) * 60;
+    const seconds = secondsFull.toFixed(4);
 
-    const sign = decimal < 0 ? "-" : "";
+    // pad minutes and seconds to 2 digits
+    const m = String(minutes).padStart(2, '0');
+    const s = String(seconds).padStart(2, '0').padStart(7, '0'); 
+    // 7 total gives "00.0000" style after decimal
 
-    return `${sign}${degrees}°${minutes}'${seconds.toFixed(4)}"`;
+    const hemi = dec >= 0 ? '' : '';
+    return `${degrees}°${m}'${s}"${hemi}`;
 }
 
 
