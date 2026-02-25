@@ -9,8 +9,9 @@
         return;
     }
 
-    let active = false;
-    let collectedPoints = [];
+	let active = false;
+	let collectedPoints = [];
+	let labelCounter = 65; // ASCII 'A'
 
     // hide on startup
     coordinatesBox.style.display = 'none';
@@ -37,6 +38,42 @@
         return `${degrees}°${m}'${s}" ${hemisphere}`;
     }
 
+function renderPointsList() {
+    if (!collectedPoints.length) {
+        coordinatesBox.innerHTML = "<em>No points yet.</em>";
+        return;
+    }
+
+    let html = `<div class="coord-title">Points</div>`;
+
+    collectedPoints.forEach((p, index) => {
+        html += `
+            <div class="coord-row">
+                <span class="coord-label">${p.label}:</span>
+                <span class="coord-value">${p.description}</span>
+                <button class="center-btn" data-index="${index}">Center</button>
+            </div>
+        `;
+    });
+
+    html += `
+        <button id="copyCoords">Copy CSV</button>
+        <button id="exportCSV">Export CSV</button>
+    `;
+
+    coordinatesBox.innerHTML = html;
+
+    document.querySelectorAll(".center-btn").forEach(btn => {
+        btn.onclick = () => {
+            const idx = parseInt(btn.getAttribute("data-index"));
+            const p = collectedPoints[idx];
+            window.map.flyTo({ center: [p.lonDecimal, p.latDecimal], essential: true });
+        };
+    });
+
+    document.getElementById('exportCSV').onclick = exportToCSV;
+}
+
 function handleMapClick(e) {
     const { lat, lng } = e.lngLat;
 
@@ -47,13 +84,24 @@ function handleMapClick(e) {
 
     if (!description) return;
 
+    const label = String.fromCharCode(labelCounter);
+    labelCounter++;
+
     const point = {
+        label,
         description,
         latDecimal: lat,
         lonDecimal: lng,
         latDMS,
         lonDMS: lngDMS
     };
+
+    collectedPoints.push(point);
+
+    renderPointsList();
+
+    coordinatesBox.style.display = 'block';
+}
 
     collectedPoints.push(point);
 
