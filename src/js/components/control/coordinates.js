@@ -45,54 +45,22 @@ function toDMS(dec, type) {
 }
 
 
-function handleMapClick(e) {
-    const { lat, lng } = e.lngLat;
+    function handleMapClick(e) {
+        const { lat, lng } = e.lngLat;
 
-    const latDMS = toDMS(lat, 'lat');
-    const lngDMS = toDMS(lng, 'lon');
-
-    const description = prompt("Enter point description:");
-
-    if (!description) return;
-
-    const point = {
-        description,
-        latDecimal: lat,
-        lonDecimal: lng,
-        latDMS,
-        lonDMS
-    };
-
-    collectedPoints.push(point);
-
-    coordinatesBox.innerHTML = `
-        <div class="coord-title">Last Point</div>
-        <div class="coord-row">
-            <span class="coord-label">Desc:</span>
-            <span class="coord-value">${description}</span>
-        </div>
-        <div class="coord-row">
-            <span class="coord-label">Lat:</span>
-            <span class="coord-value">${latDMS}</span>
-        </div>
-        <div class="coord-row">
-            <span class="coord-label">Lon:</span>
-            <span class="coord-value">${lngDMS}</span>
-        </div>
-        <button id="copyCoords">Copy</button>
-        <button id="exportCSV">Export CSV</button>
-    `;
-
-    coordinatesBox.style.display = 'block';
-
-    document.getElementById('copyCoords').onclick = () => {
-        navigator.clipboard.writeText(
-            `${description}, ${latDMS}, ${lngDMS}`
-        );
-    };
-
-    document.getElementById('exportCSV').onclick = exportToCSV;
-}
+coordinatesBox.innerHTML = `
+    <div class="coord-title">Coordinates (WGS84 - DMS)</div>
+    <div class="coord-row">
+        <span class="coord-label">Lat:</span>
+        <span class="coord-value">${toDMS(lat, 'lat')}</span>
+    </div>
+    <div class="coord-row">
+        <span class="coord-label">Lon:</span>
+        <span class="coord-value">${toDMS(lng, 'lon')}</span>
+    </div>
+`;
+        coordinatesBox.style.display = 'block';
+    }
 
     function enable() {
         active = true;
