@@ -1,15 +1,12 @@
-document.addEventListener('DOMContentLoaded', () => {
+// coordinates.js
+const coordinatesButton = document.getElementById('coordinatesButton');
+const coordinatesBox = document.getElementById('coordinates-box');
 
-    const coordinatesButton = document.getElementById('coordinatesButton');
-    const coordinatesBox = document.getElementById('coordinates-box');
-
-    if (!coordinatesButton || !coordinatesBox) {
-        console.warn("coordinates elements not found");
-        return;
-    }
+if (coordinatesButton && coordinatesBox) {
 
     coordinatesButton.addEventListener('click', () => {
 
+        // toggle active state (optional UI feedback)
         const isActive = coordinatesButton.classList.contains('active');
 
         if (isActive) {
@@ -22,12 +19,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (window.map) {
             const center = window.map.getCenter();
+            const lat = center.lat.toFixed(6);
+            const lng = center.lng.toFixed(6);
+
             coordinatesBox.innerHTML = `
                 <strong>Coordinates (WGS84)</strong><br>
-                Lat: ${center.lat.toFixed(6)}<br>
-                Lon: ${center.lng.toFixed(6)}
+                Lat: ${lat}<br>
+                Lon: ${lng}
             `;
             coordinatesBox.style.display = 'block';
         }
     });
-});
+}
