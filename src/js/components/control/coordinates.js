@@ -86,6 +86,30 @@ function handleMapClick(e) {
     document.getElementById('exportCSV').onclick = exportToCSV;
 }
 
+function exportToCSV() {
+    if (!collectedPoints.length) {
+        alert("No points to export.");
+        return;
+    }
+
+    let csv = "Description,Latitude (Decimal),Longitude (Decimal),Latitude (DMS),Longitude (DMS)\n";
+
+    collectedPoints.forEach(p => {
+        csv += `"${p.description}",${p.latDecimal},${p.lonDecimal},"${p.latDMS}","${p.lonDMS}"\n`;
+    });
+
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "coordinates_export.csv";
+    link.click();
+
+    URL.revokeObjectURL(url);
+}
+
+
     function enable() {
         active = true;
         coordinatesButton.classList.add('active');
