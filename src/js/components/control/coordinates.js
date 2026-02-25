@@ -1,10 +1,10 @@
-document.addEventListener('DOMContentLoaded', () => {
+(function () {
 
     const coordinatesButton = document.getElementById('coordinatesButton');
     const coordinatesBox = document.getElementById('coordinates-box');
 
     if (!coordinatesButton || !coordinatesBox || !window.map) {
-        console.warn("coordinates elements or map not found");
+        console.warn("coordinates tool: elements or map not found");
         return;
     }
 
@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
         coordinatesBox.style.display = 'block';
     }
 
-    function enableTool() {
+    function enable() {
         active = true;
         coordinatesButton.classList.add('active');
         window.map.getCanvas().style.cursor = 'crosshair';
@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
         window.map.on('click', handleMapClick);
     }
 
-    function disableTool() {
+    function disable() {
         active = false;
         coordinatesButton.classList.remove('active');
         window.map.getCanvas().style.cursor = '';
@@ -40,9 +40,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     coordinatesButton.addEventListener('click', () => {
         if (active) {
-            disableTool();
+            disable();
         } else {
-            enableTool();
+            enable();
         }
     });
-});
+
+})();
