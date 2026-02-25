@@ -3,9 +3,17 @@
     const coordinatesButton = document.getElementById('coordinatesButton');
     const coordinatesBox = document.getElementById('coordinates-box');
 
-    if (!coordinatesButton || !coordinatesBox || !window.map) {
-        console.warn("coordinates tool: elements or map not found");
-		    coordinatesBox.style.display = 'none';
+    if (!coordinatesButton || !coordinatesBox) {
+        console.warn("coordinates tool: elements not found");
+        return;
+    }
+
+    // always hide on startup
+    coordinatesBox.style.display = 'none';
+
+    // wait for map to exist
+    if (!window.map) {
+        console.warn("map not ready yet — coordinates tool will activate when map loads");
         return;
     }
 
@@ -26,7 +34,6 @@
         active = true;
         coordinatesButton.classList.add('active');
         window.map.getCanvas().style.cursor = 'crosshair';
-
         window.map.on('click', handleMapClick);
     }
 
@@ -34,17 +41,12 @@
         active = false;
         coordinatesButton.classList.remove('active');
         window.map.getCanvas().style.cursor = '';
-
         coordinatesBox.style.display = 'none';
         window.map.off('click', handleMapClick);
     }
 
     coordinatesButton.addEventListener('click', () => {
-        if (active) {
-            disable();
-        } else {
-            enable();
-        }
+        active ? disable() : enable();
     });
 
 })();
