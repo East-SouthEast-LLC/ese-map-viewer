@@ -37,27 +37,54 @@
         return `${degrees}°${m}'${s}" ${hemisphere}`;
     }
 
-    function handleMapClick(e) {
-        const { lat, lng } = e.lngLat;
+function handleMapClick(e) {
+    const { lat, lng } = e.lngLat;
 
-        const latDMS = toDMS(lat, 'lat');
-        const lngDMS = toDMS(lng, 'lon');
+    const latDMS = toDMS(lat, 'lat');
+    const lngDMS = toDMS(lng, 'lon');
 
-        coordinatesBox.innerHTML = `
-            <div class="coord-title">Coordinates (WGS84 - DMS)</div>
-            <div class="coord-row">
-                <span class="coord-label">Lat:</span>
-                <span class="coord-value">${latDMS}</span>
-            </div>
-            <div class="coord-row">
-                <span class="coord-label">Lon:</span>
-                <span class="coord-value">${lngDMS}</span>
-            </div>
-        `;
+    const description = prompt("Enter point description:");
 
-        coordinatesBox.style.display = 'block';
-        collectedPoints.push({ lat, lng, latDMS, lngDMS });
-    }
+    if (!description) return;
+
+    const point = {
+        description,
+        latDecimal: lat,
+        lonDecimal: lng,
+        latDMS,
+        lonDMS: lngDMS
+    };
+
+    collectedPoints.push(point);
+
+    coordinatesBox.innerHTML = `
+        <div class="coord-title">Last Point</div>
+        <div class="coord-row">
+            <span class="coord-label">Desc:</span>
+            <span class="coord-value">${description}</span>
+        </div>
+        <div class="coord-row">
+            <span class="coord-label">Lat:</span>
+            <span class="coord-value">${latDMS}</span>
+        </div>
+        <div class="coord-row">
+            <span class="coord-label">Lon:</span>
+            <span class="coord-value">${lngDMS}</span>
+        </div>
+        <button id="copyCoords">Copy</button>
+        <button id="exportCSV">Export CSV</button>
+    `;
+
+    coordinatesBox.style.display = 'block';
+
+    document.getElementById('copyCoords').onclick = () => {
+        navigator.clipboard.writeText(
+            `${description}, ${latDMS}, ${lngDMS}`
+        );
+    };
+
+    document.getElementById('exportCSV').onclick = exportToCSV;
+}
 
     function enable() {
         active = true;
