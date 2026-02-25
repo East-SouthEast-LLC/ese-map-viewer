@@ -337,6 +337,21 @@ INFO DISPLAY PANELS (for distance and scale)
   margin-bottom: 3px;
 }
 
+.color-box {
+  width: 15px;
+  height: 15px;
+  border: 1px solid #555;
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+.color-line {
+  width: 15px;
+  height: 3px;
+  border: 1px solid #555;
+  margin-right: 8px;
+  flex-shrink: 0;
+}
 
 /* ============================================================
 CUSTOM PRINT BOX STYLES
