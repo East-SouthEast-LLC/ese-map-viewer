@@ -9,11 +9,10 @@
         return;
     }
 
-	let active = false;
-	let collectedPoints = [];
-	let labelCounter = 65; // ASCII 'A'
+    let active = false;
+    let collectedPoints = [];
+    let labelCounter = 65; // ASCII 'A'
 
-    // hide on startup
     coordinatesBox.style.display = 'none';
 
     function toDMS(dec, type) {
@@ -38,125 +37,97 @@
         return `${degrees}°${m}'${s}" ${hemisphere}`;
     }
 
-function renderPointsList() {
-    if (!collectedPoints.length) {
-        coordinatesBox.innerHTML = "<em>No points yet.</em>";
-        return;
-    }
+    function renderPointsList() {
+        if (!collectedPoints.length) {
+            coordinatesBox.innerHTML = "<em>No points yet.</em>";
+            return;
+        }
 
-    let html = `<div class="coord-title">Points</div>`;
+        let html = `<div class="coord-title">Points</div>`;
 
-    collectedPoints.forEach((p, index) => {
+        collectedPoints.forEach((p, index) => {
+            html += `
+                <div class="coord-row">
+                    <span class="coord-label">${p.label}:</span>
+                    <span class="coord-value">${p.description}</span>
+                    <button class="center-btn" data-index="${index}">Center</button>
+                </div>
+            `;
+        });
+
         html += `
-            <div class="coord-row">
-                <span class="coord-label">${p.label}:</span>
-                <span class="coord-value">${p.description}</span>
-                <button class="center-btn" data-index="${index}">Center</button>
-            </div>
+            <button id="copyCoords">Copy CSV</button>
+            <button id="exportCSV">Export CSV</button>
         `;
-    });
 
-    html += `
-        <button id="copyCoords">Copy CSV</button>
-        <button id="exportCSV">Export CSV</button>
-    `;
+        coordinatesBox.innerHTML = html;
 
-    coordinatesBox.innerHTML = html;
+        document.querySelectorAll(".center-btn").forEach(btn => {
+            btn.onclick = () => {
+                const idx = parseInt(btn.getAttribute("data-index"));
+                const p = collectedPoints[idx];
+                window.map.flyTo({ center: [p.lonDecimal, p.latDecimal], essential: true });
+            };
+        });
 
-    document.querySelectorAll(".center-btn").forEach(btn => {
-        btn.onclick = () => {
-            const idx = parseInt(btn.getAttribute("data-index"));
-            const p = collectedPoints[idx];
-            window.map.flyTo({ center: [p.lonDecimal, p.latDecimal], essential: true });
+        document.getElementById('exportCSV').onclick = exportToCSV;
+        document.getElementById('copyCoords').onclick = () => {
+            const csv = collectedPoints.map(p =>
+                `"${p.label}","${p.description}",${p.latDecimal},${p.lonDecimal},"${p.latDMS}","${p.lonDMS}"`
+            ).join("\n");
+
+            navigator.clipboard.writeText(csv);
         };
-    });
-
-    document.getElementById('exportCSV').onclick = exportToCSV;
-}
-
-function handleMapClick(e) {
-    const { lat, lng } = e.lngLat;
-
-    const latDMS = toDMS(lat, 'lat');
-    const lngDMS = toDMS(lng, 'lon');
-
-    const description = prompt("Enter point description:");
-
-    if (!description) return;
-
-    const label = String.fromCharCode(labelCounter);
-    labelCounter++;
-
-    const point = {
-        label,
-        description,
-        latDecimal: lat,
-        lonDecimal: lng,
-        latDMS,
-        lonDMS: lngDMS
-    };
-
-    collectedPoints.push(point);
-
-    renderPointsList();
-
-    coordinatesBox.style.display = 'block';
-}
-
-    collectedPoints.push(point);
-
-    coordinatesBox.innerHTML = `
-        <div class="coord-title">Last Point</div>
-        <div class="coord-row">
-            <span class="coord-label">Desc:</span>
-            <span class="coord-value">${description}</span>
-        </div>
-        <div class="coord-row">
-            <span class="coord-label">Lat:</span>
-            <span class="coord-value">${latDMS}</span>
-        </div>
-        <div class="coord-row">
-            <span class="coord-label">Lon:</span>
-            <span class="coord-value">${lngDMS}</span>
-        </div>
-        <button id="copyCoords">Copy</button>
-        <button id="exportCSV">Export CSV</button>
-    `;
-
-    coordinatesBox.style.display = 'block';
-
-    document.getElementById('copyCoords').onclick = () => {
-        navigator.clipboard.writeText(
-            `${description}, ${latDMS}, ${lngDMS}`
-        );
-    };
-
-    document.getElementById('exportCSV').onclick = exportToCSV;
-}
-
-function exportToCSV() {
-    if (!collectedPoints.length) {
-        alert("No points to export.");
-        return;
     }
 
-    let csv = "Description,Latitude (Decimal),Longitude (Decimal),Latitude (DMS),Longitude (DMS)\n";
+    function handleMapClick(e) {
+        const { lat, lng } = e.lngLat;
 
-    collectedPoints.forEach(p => {
-        csv += `"${p.description}",${p.latDecimal},${p.lonDecimal},"${p.latDMS}","${p.lonDMS}"\n`;
-    });
+        const latDMS = toDMS(lat, 'lat');
+        const lngDMS = toDMS(lng, 'lon');
 
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
+        const description = prompt("Enter point description:");
+        if (!description) return;
 
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "coordinates_export.csv";
-    link.click();
+        const label = String.fromCharCode(labelCounter);
+        labelCounter++;
 
-    URL.revokeObjectURL(url);
-}
+        const point = {
+            label,
+            description,
+            latDecimal: lat,
+            lonDecimal: lng,
+            latDMS,
+            lonDMS: lngDMS
+        };
 
+        collectedPoints.push(point);
+        renderPointsList();
+        coordinatesBox.style.display = 'block';
+    }
+
+    function exportToCSV() {
+        if (!collectedPoints.length) {
+            alert("No points to export.");
+            return;
+        }
+
+        let csv = "Label,Description,Latitude (Decimal),Longitude (Decimal),Latitude (DMS),Longitude (DMS)\n";
+
+        collectedPoints.forEach(p => {
+            csv += `"${p.label}","${p.description}",${p.latDecimal},${p.lonDecimal},"${p.latDMS}","${p.lonDMS}"\n`;
+        });
+
+        const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "coordinates_export.csv";
+        link.click();
+
+        URL.revokeObjectURL(url);
+    }
 
     function enable() {
         active = true;
