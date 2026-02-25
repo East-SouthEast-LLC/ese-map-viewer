@@ -162,7 +162,7 @@ CONTROL BUTTON STYLES
 .mapboxgl-ctrl-legend        { background-image: url('https://east-southeast-llc.github.io/ese-map-viewer/assets/img/legend.png'); }
 .mapboxgl-ctrl-bookmark      { background-image: url('https://img.icons8.com/ios-glyphs/30/bookmark-ribbon.png'); }
 .mapboxgl-ctrl-identify      { background-image: url('https://img.icons8.com/ios-filled/50/info.png'); }
-
+.mapboxgl-ctrl-coordinates	 { background-image: url('https://www.ese-llc.com/s/icons8-coordinate-100.png');}
 .mapboxgl-ctrl-point-center  { background-image: url('https://www.ese-llc.com/s/marker-blue-center.svg'); }
 .mapboxgl-ctrl-parea         { background-image: url('https://www.ese-llc.com/s/square-50.png'); }
 .mapboxgl-ctrl-sZoom         { background-image: url('https://www.ese-llc.com/s/scale-zoom.png'); }
@@ -304,6 +304,39 @@ INFO DISPLAY PANELS (for distance and scale)
   margin-right: 8px;
   flex-shrink: 0;
 }
+
+/* ==== COORDINATES STYLES ==== */
+
+/* main container for the coordinates */
+#coordinates-box {
+  background: white;
+  color: #333;
+  padding: 10px 15px;
+  border-radius: 5px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  margin-top: 5px;
+  max-width: 240px;
+  overflow-y: auto; 
+  width: 100%;
+  box-sizing: border-box;
+  display: none; 
+}
+
+.coordinates-title {
+  font-weight: bold;
+  font-size: 14px;
+  margin-top: auto;
+  text-align: center;
+}
+
+.coordinates-item-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 6px;
+  font-size: 12px;
+  margin-bottom: 3px;
+}
+
 
 /* ============================================================
 CUSTOM PRINT BOX STYLES
