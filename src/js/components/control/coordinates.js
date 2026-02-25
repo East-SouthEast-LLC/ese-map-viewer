@@ -1,33 +1,47 @@
-// coordinates.js
-const coordinatesButton = document.getElementById('coordinatesButton');
-const coordinatesBox = document.getElementById('coordinates-box');
+// /src/js/components/control/button.js
 
-if (coordinatesButton && coordinatesBox) {
+function setPinPosition(lat, lng) {
+    // check if the global markercoordinates object exists before setting
+    if (window.markerCoordinates) {
+        window.markerCoordinates.lat = lat;
+        window.markerCoordinates.lng = lng;
+    }
+}
 
-    coordinatesButton.addEventListener('click', () => {
+function dropPinAtCenter() {
+    // uses the global 'marker' and 'map' variables from town-loader.js
+    if (window.marker) {
+        let { lng, lat } = window.marker.getLngLat();
+        window.markerCoordinates.lng = lng;
+        window.markerCoordinates.lat = lat;
+        window.map.flyTo({ center: window.markerCoordinates, essential: true });
+    } else {
+        window.marker = new mapboxgl.Marker().setLngLat(window.map.getCenter()).addTo(window.map);
+        window.markerCoordinates.lng = window.map.getCenter().lng;
+        window.markerCoordinates.lat = window.map.getCenter().lat;
+    }
+    return window.markerCoordinates;
+}
 
-        // toggle active state (optional UI feedback)
-        const isActive = coordinatesButton.classList.contains('active');
+document.getElementById('pointButton').addEventListener('click', function () {
+    window.placingPoint = true; // sets the global variable
+    this.classList.add('active');
+    window.map.getCanvas().style.cursor = 'crosshair';
+});
 
-        if (isActive) {
-            coordinatesButton.classList.remove('active');
-            coordinatesBox.style.display = 'none';
-            return;
-        }
+document.getElementById('pointCButton').addEventListener('click', () => dropPinAtCenter());
 
-        coordinatesButton.classList.add('active');
+document.getElementById('pointOffButton').addEventListener('click', () => {
+    if (window.marker) {
+        window.marker.remove();
+        window.marker = null;
+    }
+    document.getElementById('pointButton').classList.remove('active');
+    window.markerCoordinates.lat = null;
+    window.markerCoordinates.lng = null;
+});
 
-        if (window.map) {
-            const center = window.map.getCenter();
-            const lat = center.lat.toFixed(6);
-            const lng = center.lng.toFixed(6);
-
-            coordinatesBox.innerHTML = `
-                <strong>Coordinates (WGS84)</strong><br>
-                Lat: ${lat}<br>
-                Lon: ${lng}
-            `;
-            coordinatesBox.style.display = 'block';
-        }
-    });
+function listVisibleLayers(map, layerIds) {
+    if (!Array.isArray(layerIds)) return [];
+    return layerIds.filter(id => map.getLayer(id) && map.getLayoutProperty(id, 'visibility') === 'visible');
 }
