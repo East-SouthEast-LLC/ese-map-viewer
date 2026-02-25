@@ -8,6 +8,9 @@
         return;
     }
 
+    let active = false;
+    let collectedPoints = [];
+	
     // always hide on startup
     coordinatesBox.style.display = 'none';
 
