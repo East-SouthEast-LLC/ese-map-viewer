@@ -58,7 +58,7 @@
                 <button class="mapboxgl-ctrl-point-center" id="pointCButton" aria-label="Point Center" data-tooltip="Center the point or centerpoint"></button>
                 <button class="mapboxgl-ctrl-parea" id="pareaButton" aria-label="Print Area" data-tooltip="Print Area"></button>
                 <button class="mapboxgl-ctrl-identify" id="identifyButton" aria-label="Identify" data-tooltip="Identify all features at a point"></button>
-                <button class="mapboxgl-ctrl-four" id="fourButton" aria-label="four" data-tooltip="Placeholder"></button>
+                <button class="mapboxgl-ctrl-coordinates" id="coordinatesButton" aria-label="Coordinates" data-tooltip="List coordinates at a point"></button>
                 <button class="mapboxgl-ctrl-sZoom" id="scaleZoom" aria-label="Zoom to Scale" data-tooltip="Zoom to Scale"></button>
             </div>
             <div> 
@@ -193,6 +193,7 @@
                         "https://east-southeast-llc.github.io/ese-map-viewer/src/js/components/control/legend.js",
                         "https://east-southeast-llc.github.io/ese-map-viewer/src/js/components/control/bookmarks.js",
                         "https://east-southeast-llc.github.io/ese-map-viewer/src/js/components/control/identify.js",
+                        "https://east-southeast-llc.github.io/ese-map-viewer/src/js/components/control/coordinates.js",
                         "https://east-southeast-llc.github.io/ese-map-viewer/src/js/components/control/toggle-off.js",
                         "https://east-southeast-llc.github.io/ese-map-viewer/src/js/components/control/tooltip.js",
                         "https://east-southeast-llc.github.io/ese-map-viewer/src/js/components/disclaimer-popup.js",
