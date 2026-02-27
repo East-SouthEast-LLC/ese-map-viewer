@@ -21,6 +21,10 @@
         ]
     }
   },
+{
+  "id": "print-marker-layer",
+  "drawOrder": 99
+},
   {
     "id": "parcels",
     "displayName": "Parcels",
