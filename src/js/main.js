@@ -248,27 +248,11 @@ map.addLayer({
                     applyUrlParams(map);
                     
                     // wait for the map to finish its first complete render cycle.
-map.once('idle', () => {
-    if (typeof hideSkeleton === 'function') {
-        hideSkeleton();
-    }
-
-    // NEW: ensure marker layer draws above satellite (if both exist)
-    if (map.getLayer('print-marker-layer') && map.getLayer('satellite')) {
-        try {
-            map.moveLayer('print-marker-layer', 'satellite');
-        } catch (e) {
-            console.warn('could not move print-marker-layer above satellite', e);
-        }
-    }
-	    if (map.getLayer('print-marker-layer') && map.getLayer('usgs quad')) {
-        try {
-            map.moveLayer('print-marker-layer', 'usgs quad');
-        } catch (e) {
-            console.warn('could not move print-marker-layer above usgs quad', e);
-        }
-    }
-});
+                    map.once('idle', () => {
+                        if (typeof hideSkeleton === 'function') {
+                            hideSkeleton();
+                        }
+                    });
 
                 } else {
                     console.error("town data not found for id:", window.townId);
