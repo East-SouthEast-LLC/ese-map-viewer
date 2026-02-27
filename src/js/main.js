@@ -113,17 +113,29 @@
             }, 400);
         });
     }
-    
-    function handleMarkerPlacement(lngLat) {
-        const { lat, lng } = lngLat;
-        setPinPosition(lat, lng); 
-        if (window.marker) window.marker.remove();
-        window.marker = new mapboxgl.Marker().setLngLat([lng, lat]).addTo(map);
-        window.placingPoint = false; 
-        document.getElementById('pointButton').classList.remove('active');
-        map.getCanvas().style.cursor = '';
-        trackEvent('place_marker', {});
+    // new handle marker placement
+function handleMarkerPlacement(lngLat) {
+    const { lat, lng } = lngLat;
+
+    setPinPosition(lat, lng);
+
+    if (window.marker) {
+        window.marker.remove();
     }
+
+    window.marker = new mapboxgl.Marker()
+        .setLngLat([lng, lat])
+        .addTo(map);
+
+    // NEW: sync print layer
+    updatePrintMarker(lat, lng);
+
+    window.placingPoint = false;
+    document.getElementById('pointButton').classList.remove('active');
+    map.getCanvas().style.cursor = '';
+
+    trackEvent('place_marker', {});
+}
 
     // --- main execution logic ---
     document.addEventListener('DOMContentLoaded', () => {
