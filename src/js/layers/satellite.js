@@ -13,6 +13,10 @@ function addSatelliteLayer() {
         },
         'source-layer': 'satellite'
     });
+	    // NEW: ensure marker layer sits above satellite
+    if (map.getLayer('print-marker-layer') && map.getLayer('satellite')) {
+        map.moveLayer('print-marker-layer', 'satellite');
+    }
 }
 
 addSatelliteLayer();
