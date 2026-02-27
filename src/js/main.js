@@ -145,7 +145,27 @@
         });
         document.getElementById('geocoder').appendChild(geocoder.onAdd(map));
 
-        map.on('load', async function () {            
+        map.on('load', async function () {   
+// --- print marker layer ---
+map.addSource('print-marker', {
+    type: 'geojson',
+    data: {
+        type: 'FeatureCollection',
+        features: []
+    }
+});
+
+map.addLayer({
+    id: 'print-marker-layer',
+    type: 'circle',
+    source: 'print-marker',
+    paint: {
+        'circle-radius': 8,
+        'circle-color': '#ff0000',
+        'circle-stroke-width': 2,
+        'circle-stroke-color': '#ffffff'
+    }
+});		
             // first, always load the base towns layer
             await loadScript(`https://east-southeast-llc.github.io/ese-map-viewer/src/js/layers/towns.js`);
             await loadScript(`https://east-southeast-llc.github.io/ese-map-viewer/src/js/layers/counties.js`);
