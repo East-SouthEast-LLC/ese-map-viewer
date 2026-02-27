@@ -178,6 +178,8 @@ map.addLayer({
         'circle-stroke-color': '#ffffff'
     }
 });		
+// NEW: force marker layer to top of stack
+map.moveLayer('print-marker-layer');
             // first, always load the base towns layer
             await loadScript(`https://east-southeast-llc.github.io/ese-map-viewer/src/js/layers/towns.js`);
             await loadScript(`https://east-southeast-llc.github.io/ese-map-viewer/src/js/layers/counties.js`);
