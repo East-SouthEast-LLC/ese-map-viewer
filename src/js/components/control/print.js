@@ -46,24 +46,26 @@ function getStandardPrintPageHTML(mapImageSrc) {
 // ============================================================================
 
 document.getElementById('printButton').addEventListener('click', () => {
-    // Log the print event to Google Analytics.
-    trackEvent('print_map', {
-    });
 
-    // Wait for the map to be fully rendered before capturing.
-    map.once('render', () => {
+    trackEvent('print_map', {});
+
+    map.once('idle', () => {
+
+        if (map.getLayer('print-marker-layer')) {
+            map.moveLayer('print-marker-layer');
+        }
+
         const canvas = map.getCanvas();
         const mapImageSrc = canvas.toDataURL();
         const win = window.open('', '_blank');
 
         if (win) {
-            // Write the new, clean HTML structure to the print window.
             win.document.write(`
                 <!DOCTYPE html>
                 <html>
                 <head>
                     <title>Map Print</title>
-                    <link rel="stylesheet" href="https://east-southeast-llc.github.io/ese-map-viewer/src/css/globals.css?v=3" type="text/css" />
+                    <link rel="stylesheet" href="...globals.css?v=3" />
                 </head>
                 <body class="print-body">
                     ${getStandardPrintPageHTML(mapImageSrc)}
@@ -74,7 +76,6 @@ document.getElementById('printButton').addEventListener('click', () => {
             win.document.title = 'Map Print';
             win.document.close();
 
-            // Wait for the content to load, then trigger the print dialog.
             win.onload = () => {
                 win.print();
                 win.close();
@@ -83,6 +84,10 @@ document.getElementById('printButton').addEventListener('click', () => {
             alert("Popup blocked! Please allow popups for this site.");
         }
     });
+
+    map.resize();
+    map.triggerRepaint();
+});S
 
     // Ensure the map fully renders before capturing it.
     map.resize();
