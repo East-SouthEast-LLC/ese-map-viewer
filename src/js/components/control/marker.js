@@ -52,10 +52,23 @@ document.getElementById('pointButton').addEventListener('click', function () {
 document.getElementById('pointCButton').addEventListener('click', () => dropPinAtCenter());
 
 document.getElementById('pointOffButton').addEventListener('click', () => {
+
+    // remove DOM marker
     if (window.marker) {
         window.marker.remove();
         window.marker = null;
     }
+
+    // clear print layer (GeoJSON source)
+    const source = window.map?.getSource('print-marker');
+    if (source) {
+        source.setData({
+            type: 'FeatureCollection',
+            features: []
+        });
+    }
+
+    // reset UI state
     document.getElementById('pointButton').classList.remove('active');
     window.markerCoordinates.lat = null;
     window.markerCoordinates.lng = null;
