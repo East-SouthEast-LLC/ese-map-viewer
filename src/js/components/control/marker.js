@@ -1,5 +1,25 @@
 // /src/js/components/control/button.js
 
+function updatePrintMarker(lat, lng) {
+    const source = window.map?.getSource('print-marker');
+
+    if (!source) {
+        console.warn("print-marker source not found (map may not be loaded yet)");
+        return;
+    }
+
+    source.setData({
+        type: 'FeatureCollection',
+        features: [{
+            type: 'Feature',
+            geometry: {
+                type: 'Point',
+                coordinates: [lng, lat]
+            }
+        }]
+    });
+}
+
 function setPinPosition(lat, lng) {
     // check if the global markercoordinates object exists before setting
     if (window.markerCoordinates) {
