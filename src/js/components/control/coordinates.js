@@ -36,7 +36,6 @@
 
         return `${degrees}°${m}'${s}" ${hemisphere}`;
     }
-// create the geojson to view the points on the map
 
 
     // small confirmation popup under cursor
