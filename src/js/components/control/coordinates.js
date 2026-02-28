@@ -50,6 +50,7 @@ function renderPointsList() {
             <div class="coord-row">
                 <button class="label-btn" data-index="${index}">${p.label}</button>
                 <button class="desc-btn" data-index="${index}">Description</button>
+                <button class="del-btn" data-index="${index}">Delete</button>
             </div>
         `;
     });
@@ -62,7 +63,7 @@ function renderPointsList() {
 
     coordinatesBox.innerHTML = html;
 
-    // center on point when label clicked
+    // center map on point when label clicked
     document.querySelectorAll(".label-btn").forEach(btn => {
         btn.onclick = () => {
             const idx = parseInt(btn.getAttribute("data-index"));
@@ -71,7 +72,7 @@ function renderPointsList() {
         };
     });
 
-    // description edit button
+    // edit description
     document.querySelectorAll(".desc-btn").forEach(btn => {
         btn.onclick = () => {
             const idx = parseInt(btn.getAttribute("data-index"));
@@ -82,6 +83,24 @@ function renderPointsList() {
                 p.description = newDesc;
                 renderPointsList();
             }
+        };
+    });
+
+    // delete point and renumber
+    document.querySelectorAll(".del-btn").forEach(btn => {
+        btn.onclick = () => {
+            const idx = parseInt(btn.getAttribute("data-index"));
+
+            if (!confirm("Delete this point?")) return;
+
+            collectedPoints.splice(idx, 1);
+
+            // renumber labels sequentially
+            collectedPoints.forEach((pt, i) => {
+                pt.label = String.fromCharCode(65 + i);
+            });
+
+            renderPointsList();
         };
     });
 
@@ -97,12 +116,11 @@ function renderPointsList() {
         });
     };
 
-    // clear list handler
     document.getElementById('clearCoords').onclick = () => {
         if (!confirm("Clear all points?")) return;
 
         collectedPoints = [];
-        labelCounter = 65; // reset to 'A'
+        labelCounter = 65;
         renderPointsList();
     };
 }
