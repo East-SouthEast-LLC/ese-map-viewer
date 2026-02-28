@@ -332,7 +332,10 @@ if (!customPrintButton || !customPrintBox) {
         }
     }
 }
-			
+			    if (window.marker) {
+        highlightParcelFromMarker();
+    }
+	// end chatgpt
             // capture the canvas and generate the html for the page.
             const mapCanvas = map.getCanvas();
             const mapImageSrc = mapCanvas.toDataURL();
