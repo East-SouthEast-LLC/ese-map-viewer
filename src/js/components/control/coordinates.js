@@ -37,6 +37,39 @@
         return `${degrees}°${m}'${s}" ${hemisphere}`;
     }
 
+function showConfirmPopup(x, y, message, callback) {
+    const popup = document.createElement("div");
+    popup.className = "coord-confirm";
+    popup.style.position = "absolute";
+    popup.style.left = `${x}px`;
+    popup.style.top = `${y}px`;
+    popup.style.background = "#fff";
+    popup.style.border = "1px solid #ccc";
+    popup.style.padding = "4px 6px";
+    popup.style.zIndex = 9999;
+    popup.style.boxShadow = "0 2px 4px rgba(0,0,0,0.2)";
+    popup.style.fontSize = "12px";
+
+    popup.innerHTML = `
+        <div style="margin-bottom:4px;">${message}</div>
+        <div style="text-align:right;">
+            <button id="confirmNo">No</button>
+            <button id="confirmYes" style="margin-left:4px;">Yes</button>
+        </div>
+    `;
+
+    document.body.appendChild(popup);
+
+    popup.querySelector("#confirmNo").onclick = () => {
+        document.body.removeChild(popup);
+        callback(false);
+    };
+
+    popup.querySelector("#confirmYes").onclick = () => {
+        document.body.removeChild(popup);
+        callback(true);
+    };
+}
 
 function renderPointsList() {
     if (!collectedPoints.length) {
@@ -92,7 +125,21 @@ function renderPointsList() {
         btn.onclick = () => {
             const idx = parseInt(btn.getAttribute("data-index"));
 
-            if (!confirm("Delete this point?")) return;
+const rect = window.map.getCanvas().getBoundingClientRect();
+const x = rect.left + window.event.clientX;
+const y = rect.top + window.event.clientY;
+
+showConfirmPopup(x, y, "Delete this point?", (ok) => {
+    if (!ok) return;
+
+    collectedPoints.splice(idx, 1);
+
+    collectedPoints.forEach((pt, i) => {
+        pt.label = String.fromCharCode(65 + i);
+    });
+
+    renderPointsList();
+});
 
             collectedPoints.splice(idx, 1);
 
