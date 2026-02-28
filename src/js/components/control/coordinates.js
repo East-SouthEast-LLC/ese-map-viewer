@@ -57,6 +57,7 @@ function renderPointsList() {
     html += `
         <button id="copyCoords">Copy CSV</button>
         <button id="exportCSV">Export CSV</button>
+        <button id="clearCoords">Clear</button>
     `;
 
     coordinatesBox.innerHTML = html;
@@ -70,7 +71,7 @@ function renderPointsList() {
         };
     });
 
-    // description popup/edit
+    // description edit button
     document.querySelectorAll(".desc-btn").forEach(btn => {
         btn.onclick = () => {
             const idx = parseInt(btn.getAttribute("data-index"));
@@ -85,6 +86,7 @@ function renderPointsList() {
     });
 
     document.getElementById('exportCSV').onclick = exportToCSV;
+
     document.getElementById('copyCoords').onclick = () => {
         const csv = collectedPoints.map(p =>
             `"${p.label}","${p.description}",${p.latDecimal},${p.lonDecimal},"${p.latDMS}","${p.lonDMS}"`
@@ -93,6 +95,15 @@ function renderPointsList() {
         navigator.clipboard.writeText(csv).then(() => {
             alert("Copied to clipboard");
         });
+    };
+
+    // clear list handler
+    document.getElementById('clearCoords').onclick = () => {
+        if (!confirm("Clear all points?")) return;
+
+        collectedPoints = [];
+        labelCounter = 65; // reset to 'A'
+        renderPointsList();
     };
 }
 
