@@ -310,8 +310,8 @@ if (!customPrintButton || !customPrintBox) {
             }
             // let's try the draw order here to make the marker go on top of the satellite
 			if (map.getLayer('print-marker-layer')) {
-    map.moveLayer('print-marker-layer');
-}
+			map.moveLayer('print-marker-layer');
+			}
             // capture the canvas and generate the html for the page.
             const mapCanvas = map.getCanvas();
             const mapImageSrc = mapCanvas.toDataURL();
