@@ -102,9 +102,6 @@ function renderPointsList() {
         const latDMS = toDMS(lat, 'lat');
         const lngDMS = toDMS(lng, 'lon');
 
-        const description = prompt("Enter point description:");
-        if (!description) return;
-
         const label = String.fromCharCode(labelCounter);
         labelCounter++;
 
