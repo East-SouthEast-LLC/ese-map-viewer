@@ -122,24 +122,27 @@ function renderPointsList() {
 
     // delete point and renumber
     document.querySelectorAll(".del-btn").forEach(btn => {
-        btn.onclick = () => {
-            const idx = parseInt(btn.getAttribute("data-index"));
+btn.onclick = (e) => {
+    e.stopPropagation();
 
-const rect = window.map.getCanvas().getBoundingClientRect();
-const x = rect.left + window.event.clientX;
-const y = rect.top + window.event.clientY;
+    const idx = parseInt(btn.getAttribute("data-index"));
 
-showConfirmPopup(x, y, "Delete this point?", (ok) => {
-    if (!ok) return;
+    const rect = e.target.getBoundingClientRect();
+    const x = rect.left + rect.width;
+    const y = rect.top;
 
-    collectedPoints.splice(idx, 1);
+    showConfirmPopup(x, y, "Delete this point?", (ok) => {
+        if (!ok) return;
 
-    collectedPoints.forEach((pt, i) => {
-        pt.label = String.fromCharCode(65 + i);
+        collectedPoints.splice(idx, 1);
+
+        collectedPoints.forEach((pt, i) => {
+            pt.label = String.fromCharCode(65 + i);
+        });
+
+        renderPointsList();
     });
-
-    renderPointsList();
-});
+};
 
             collectedPoints.splice(idx, 1);
 
