@@ -49,7 +49,10 @@ document.getElementById('printButton').addEventListener('click', () => {
     // Log the print event to Google Analytics.
     trackEvent('print_map', {
     });
-
+            // let's try the draw order here to make the marker go on top of the satellite
+			if (map.getLayer('print-marker-layer')) {
+			map.moveLayer('print-marker-layer');
+			}
     // Wait for the map to be fully rendered before capturing.
     map.once('render', () => {
         const canvas = map.getCanvas();
