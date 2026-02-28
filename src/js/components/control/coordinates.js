@@ -38,11 +38,11 @@ labelCounter = 65
 
         return `${degrees}°${m}'${s}" ${hemisphere}`;
     }
-// create the geojson to view the points on the map
+// create the geojson to view the points on the map and refresh the map
 function buildGeoJSON() {
     return {
         type: "FeatureCollection",
-        features: pointList.map((pt, index) => ({
+        features: collectedPoints.map((pt, index) => ({
             type: "Feature",
             properties: {
                 id: index + 1,
@@ -50,10 +50,17 @@ function buildGeoJSON() {
             },
             geometry: {
                 type: "Point",
-                coordinates: [pt.lng, pt.lat]
+                coordinates: [pt.lonDecimal, pt.latDecimal]
             }
         }))
     };
+}
+
+function refreshMapPoints() {
+    const source = window.map.getSource('user-points');
+    if (source) {
+        source.setData(buildGeoJSON());
+    }
 }
 // 
     // small confirmation popup under cursor
@@ -154,6 +161,7 @@ function buildGeoJSON() {
                     if (!ok) return;
 
                     collectedPoints.splice(idx, 1);
+					refreshMapPoints();
 
 // after renumber
 collectedPoints.forEach((pt, i) => {
@@ -173,7 +181,7 @@ renderPointsList();
 
         document.getElementById('copyCoords').onclick = () => {
             const csv = collectedPoints.map(p =>
-                `"${p.label}","${p.description}",${p.latDecimal},${p.lonDecimal},"${p.latDMS}","${p.lonDMS}"`
+    ${String.fromCharCode(65 + index)}
             ).join("\n");
 
             navigator.clipboard.writeText(csv).then(() => {
@@ -186,6 +194,7 @@ renderPointsList();
 
             collectedPoints = [];
             labelCounter = 65;
+			refreshMapPoints();
             renderPointsList();
         };
     }
@@ -209,6 +218,7 @@ renderPointsList();
         };
 
         collectedPoints.push(point);
+		refreshMapPoints();
         renderPointsList();
         coordinatesBox.style.display = 'block';
     }
@@ -241,6 +251,25 @@ renderPointsList();
         coordinatesButton.classList.add('active');
         window.map.getCanvas().style.cursor = 'crosshair';
         window.map.on('click', handleMapClick);
+		
+		if (!window.map.getSource('user-points')) {
+    window.map.addSource('user-points', {
+        type: 'geojson',
+        data: buildGeoJSON()
+    });
+
+    window.map.addLayer({
+        id: 'user-points-layer',
+        type: 'circle',
+        source: 'user-points',
+        paint: {
+            'circle-radius': 6,
+            'circle-stroke-width': 2,
+            'circle-color': '#ff0000',
+            'circle-stroke-color': '#ffffff'
+        }
+    });
+}
     }
 
     function disable() {
