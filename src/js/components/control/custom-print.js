@@ -309,6 +309,30 @@ if (!customPrintButton || !customPrintBox) {
                 await new Promise(resolve => map.once('idle', resolve));
             }
             
+			
+			// highlight the parcel
+			if (window.marker) {
+    const pt = map.project(window.marker.getLngLat());
+
+    const buffer = 5;
+    const bbox = [
+        [pt.x - buffer, pt.y - buffer],
+        [pt.x + buffer, pt.y + buffer]
+    ];
+
+    const features = map.queryRenderedFeatures(bbox, {
+        layers: ['parcel-fill'] // polygon source layer
+    });
+
+    if (features.length) {
+        const parcelId = features[0].properties.MAP_PAR_ID;
+
+        if (parcelId) {
+            map.setFilter('parcel-highlight', ['==', 'MAP_PAR_ID', parcelId]);
+        }
+    }
+}
+			
             // capture the canvas and generate the html for the page.
             const mapCanvas = map.getCanvas();
             const mapImageSrc = mapCanvas.toDataURL();
