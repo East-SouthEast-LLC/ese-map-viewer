@@ -46,38 +46,18 @@ function getStandardPrintPageHTML(mapImageSrc) {
 // ============================================================================
 
 document.getElementById('printButton').addEventListener('click', () => {
-    trackEvent('print_map', {});
+    // Log the print event to Google Analytics.
+    trackEvent('print_map', {
+    });
 
-    // If marker exists, attempt to highlight the parcel first
-    if (window.marker) {
-        const pt = map.project(window.marker.getLngLat());
-
-        const buffer = 5;
-        const bbox = [
-            [pt.x - buffer, pt.y - buffer],
-            [pt.x + buffer, pt.y + buffer]
-        ];
-
-        const features = map.queryRenderedFeatures(bbox, {
-            layers: ['parcel-fill'] // your polygon layer
-        });
-
-        if (features.length) {
-            const parcelId = features[0].properties.MAP_PAR_ID;
-
-            if (parcelId) {
-                // Apply highlight filter BEFORE rendering the print image
-                map.setFilter('parcel-highlight', ['==', 'MAP_PAR_ID', parcelId]);
-            }
-        }
-    }
-
+    // Wait for the map to be fully rendered before capturing.
     map.once('render', () => {
         const canvas = map.getCanvas();
         const mapImageSrc = canvas.toDataURL();
         const win = window.open('', '_blank');
 
         if (win) {
+            // Write the new, clean HTML structure to the print window.
             win.document.write(`
                 <!DOCTYPE html>
                 <html>
@@ -94,6 +74,7 @@ document.getElementById('printButton').addEventListener('click', () => {
             win.document.title = 'Map Print';
             win.document.close();
 
+            // Wait for the content to load, then trigger the print dialog.
             win.onload = () => {
                 win.print();
                 win.close();
@@ -101,11 +82,9 @@ document.getElementById('printButton').addEventListener('click', () => {
         } else {
             alert("Popup blocked! Please allow popups for this site.");
         }
-
-        // OPTIONAL: reset highlight after printing if you don't want it persistent
-        // map.setFilter('parcel-highlight', ['==', 'MAP_PAR_ID', '']);
     });
 
+    // Ensure the map fully renders before capturing it.
     map.resize();
     map.triggerRepaint();
 });
