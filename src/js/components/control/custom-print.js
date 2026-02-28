@@ -309,8 +309,8 @@ if (!customPrintButton || !customPrintBox) {
                 await new Promise(resolve => map.once('idle', resolve));
             }
             // let's try the draw order here to make the marker go on top of the satellite
-			if (map.getLayer('print-marker')) {
-    map.moveLayer('print-marker');
+			if (map.getLayer('print-marker-layer')) {
+    map.moveLayer('print-marker-layer');
 }
             // capture the canvas and generate the html for the page.
             const mapCanvas = map.getCanvas();
