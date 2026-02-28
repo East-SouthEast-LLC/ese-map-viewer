@@ -123,33 +123,32 @@
         });
 
         // delete with confirmation popup
-        document.querySelectorAll(".del-btn").forEach(btn => {
-            btn.onclick = (e) => {
-                e.stopPropagation();
+document.querySelectorAll(".del-btn").forEach(btn => {
+    btn.onclick = (e) => {
+        e.stopPropagation();
 
-                const idx = parseInt(btn.getAttribute("data-index"));
-                const rect = e.target.getBoundingClientRect();
-                const x = rect.left + rect.width;
-                const y = rect.top;
+        const idx = parseInt(btn.getAttribute("data-index"));
+        const rect = e.target.getBoundingClientRect();
+        const x = rect.left + rect.width;
+        const y = rect.top;
 
-                showConfirmPopup(x, y, "Delete this point?", (ok) => {
-                    if (!ok) return;
+        showConfirmPopup(x, y, "Delete this point?", (ok) => {
+            if (!ok) return;
 
-                    collectedPoints.splice(idx, 1);
+            collectedPoints.splice(idx, 1);
 
-// after renumber
-collectedPoints.forEach((pt, i) => {
-    pt.label = String.fromCharCode(65 + i);
-});
+            collectedPoints.forEach((pt, i) => {
+                pt.label = String.fromCharCode(65 + i);
+            });
 
-if (collectedPoints.length === 0) {
-    labelCounter = 65; // reset to 'A'
-}
+            if (collectedPoints.length === 0) {
+                labelCounter = 65;
+            }
 
-renderPointsList();
-                });
-            };
+            renderPointsList();
         });
+    };
+});
 
         document.getElementById('exportCSV').onclick = exportToCSV;
 
