@@ -136,12 +136,16 @@
 
                     collectedPoints.splice(idx, 1);
 
-                    // renumber labels
-                    collectedPoints.forEach((pt, i) => {
-                        pt.label = String.fromCharCode(65 + i);
-                    });
+// after renumber
+collectedPoints.forEach((pt, i) => {
+    pt.label = String.fromCharCode(65 + i);
+});
 
-                    renderPointsList();
+if (collectedPoints.length === 0) {
+    labelCounter = 65; // reset to 'A'
+}
+
+renderPointsList();
                 });
             };
         });
