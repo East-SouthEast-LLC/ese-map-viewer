@@ -37,6 +37,43 @@
         return `${degrees}°${m}'${s}" ${hemisphere}`;
     }
 
+function showDescriptionPopup(x, y, callback) {
+    const popup = document.createElement("div");
+    popup.className = "coord-popup";
+    popup.style.position = "absolute";
+    popup.style.left = `${x}px`;
+    popup.style.top = `${y}px`;
+    popup.style.background = "#fff";
+    popup.style.border = "1px solid #ccc";
+    popup.style.padding = "6px";
+    popup.style.zIndex = 9999;
+    popup.style.boxShadow = "0 2px 6px rgba(0,0,0,0.2)";
+
+    popup.innerHTML = `
+        <input type="text" id="coordDescInput" placeholder="Description" style="width:160px; margin-bottom:4px;"><br>
+        <div style="text-align:right;">
+            <button id="coordCancel">Cancel</button>
+            <button id="coordOk">OK</button>
+        </div>
+    `;
+
+    document.body.appendChild(popup);
+
+    const input = popup.querySelector("#coordDescInput");
+    input.focus();
+
+    popup.querySelector("#coordCancel").onclick = () => {
+        document.body.removeChild(popup);
+        callback(null);
+    };
+
+    popup.querySelector("#coordOk").onclick = () => {
+        const val = input.value;
+        document.body.removeChild(popup);
+        callback(val);
+    };
+}
+
 function renderPointsList() {
     if (!collectedPoints.length) {
         coordinatesBox.innerHTML = "<em>No points yet.</em>";
@@ -125,7 +162,7 @@ function renderPointsList() {
     };
 }
 
- function handleMapClick(e) {
+function handleMapClick(e) {
     const { lat, lng } = e.lngLat;
 
     const latDMS = toDMS(lat, 'lat');
@@ -136,16 +173,27 @@ function renderPointsList() {
 
     const point = {
         label,
-        description: "",  // description set later
+        description: "",
         latDecimal: lat,
         lonDecimal: lng,
         latDMS,
         lonDMS: lngDMS
     };
 
-    collectedPoints.push(point);
-    renderPointsList();
-    coordinatesBox.style.display = 'block';
+    // popup under cursor
+    const rect = window.map.getCanvas().getBoundingClientRect();
+    const x = e.point.x + rect.left;
+    const y = e.point.y + rect.top;
+
+    showDescriptionPopup(x, y, (desc) => {
+        if (desc !== null) {
+            point.description = desc;
+        }
+
+        collectedPoints.push(point);
+        renderPointsList();
+        coordinatesBox.style.display = 'block';
+    });
 }
 
     function exportToCSV() {
