@@ -11,7 +11,9 @@
 
     let active = false;
     let collectedPoints = [];
-    let labelCounter = 65; // ASCII 'A'
+pt.label = ...
+labelCounter++
+labelCounter = 65
 
     coordinatesBox.style.display = 'none';
 
@@ -36,7 +38,24 @@
 
         return `${degrees}°${m}'${s}" ${hemisphere}`;
     }
-
+// create the geojson to view the points on the map
+function buildGeoJSON() {
+    return {
+        type: "FeatureCollection",
+        features: pointList.map((pt, index) => ({
+            type: "Feature",
+            properties: {
+                id: index + 1,
+                label: String.fromCharCode(65 + index)
+            },
+            geometry: {
+                type: "Point",
+                coordinates: [pt.lng, pt.lat]
+            }
+        }))
+    };
+}
+// 
     // small confirmation popup under cursor
     function showConfirmPopup(x, y, message, callback) {
         const popup = document.createElement("div");
