@@ -96,28 +96,28 @@ function renderPointsList() {
     };
 }
 
-    function handleMapClick(e) {
-        const { lat, lng } = e.lngLat;
+ function handleMapClick(e) {
+    const { lat, lng } = e.lngLat;
 
-        const latDMS = toDMS(lat, 'lat');
-        const lngDMS = toDMS(lng, 'lon');
+    const latDMS = toDMS(lat, 'lat');
+    const lngDMS = toDMS(lng, 'lon');
 
-        const label = String.fromCharCode(labelCounter);
-        labelCounter++;
+    const label = String.fromCharCode(labelCounter);
+    labelCounter++;
 
-        const point = {
-            label,
-            description,
-            latDecimal: lat,
-            lonDecimal: lng,
-            latDMS,
-            lonDMS: lngDMS
-        };
+    const point = {
+        label,
+        description: "",  // description set later
+        latDecimal: lat,
+        lonDecimal: lng,
+        latDMS,
+        lonDMS: lngDMS
+    };
 
-        collectedPoints.push(point);
-        renderPointsList();
-        coordinatesBox.style.display = 'block';
-    }
+    collectedPoints.push(point);
+    renderPointsList();
+    coordinatesBox.style.display = 'block';
+}
 
     function exportToCSV() {
         if (!collectedPoints.length) {
