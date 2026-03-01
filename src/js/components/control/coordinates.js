@@ -235,57 +235,63 @@
         URL.revokeObjectURL(url);
     }
 
-    function enable() {
-        active = true;
-        coordinatesButton.classList.add('active');
-        window.map.getCanvas().style.cursor = 'crosshair';
+function enable() {
+    active = true;
+    coordinatesButton.classList.add('active');
+    window.map.getCanvas().style.cursor = 'crosshair';
 
-        // create source + layer only once
+    function addSourceAndLayers() {
         if (!window.map.getSource('user-points')) {
             window.map.addSource('user-points', {
                 type: 'geojson',
-                data: {
-                    type: "FeatureCollection",
-                    features: []
-                }
+                data: { type: "FeatureCollection", features: [] }
             });
-
-// X marker layer
-window.map.addLayer({
-    id: 'user-points-marker',
-    type: 'symbol',
-    source: 'user-points',
-    layout: {
-        'text-field': 'X',
-        'text-size': 16,
-        'text-anchor': 'center'
-    },
-    paint: {
-        'text-color': '#ff0000'
-    }
-});
-
-// label layer (NE of point)
-window.map.addLayer({
-    id: 'user-points-label',
-    type: 'symbol',
-    source: 'user-points',
-    layout: {
-        'text-field': ['get', 'label'],
-        'text-size': 12,
-        'text-offset': [1, -1],   // NE offset
-        'text-anchor': 'top-left'
-    },
-    paint: {
-        'text-color': '#000000'
-    }
-});
         }
 
-        window.map.on('click', handleMapClick);
+        if (!window.map.getLayer('user-points-marker')) {
+            window.map.addLayer({
+                id: 'user-points-marker',
+                type: 'symbol',
+                source: 'user-points',
+                layout: {
+                    'text-field': 'X',
+                    'text-size': 16,
+                    'text-anchor': 'center'
+                },
+                paint: {
+                    'text-color': '#ff0000'
+                }
+            });
+        }
+
+        if (!window.map.getLayer('user-points-label')) {
+            window.map.addLayer({
+                id: 'user-points-label',
+                type: 'symbol',
+                source: 'user-points',
+                layout: {
+                    'text-field': ['get', 'label'],
+                    'text-size': 12,
+                    'text-offset': [1, -1],
+                    'text-anchor': 'top-left'
+                },
+                paint: {
+                    'text-color': '#000000'
+                }
+            });
+        }
 
         refreshMapPoints();
     }
+
+    if (window.map.isStyleLoaded()) {
+        addSourceAndLayers();
+    } else {
+        window.map.once('load', addSourceAndLayers);
+    }
+
+    window.map.on('click', handleMapClick);
+}
 
     function disable() {
         active = false;
