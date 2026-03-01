@@ -103,22 +103,22 @@ function renderPointsList() {
         html += `
             <div class="coord-row">
 
-                <!-- label button -->
+                <!-- label -->
                 <button class="label-btn" data-index="${index}">
                     ${String.fromCharCode(65 + index)}
                 </button>
 
-                <!-- coordinate display (two small lines) -->
+                <!-- coordinates (two lines) -->
                 <div class="coord-values">
                     <div>${p.latDecimal.toFixed(6)}</div>
                     <div>${p.lonDecimal.toFixed(6)}</div>
                 </div>
 
-                <!-- description -->
-                <button class="desc-btn" data-index="${index}">D</button>
-
-                <!-- delete -->
-                <button class="del-btn" data-index="${index}">X</button>
+                <!-- push buttons to far right -->
+                <div class="coord-actions">
+                    <button class="desc-btn" data-index="${index}">D</button>
+                    <button class="del-btn" data-index="${index}">X</button>
+                </div>
 
             </div>
         `;
