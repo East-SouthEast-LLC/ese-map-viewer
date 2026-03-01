@@ -816,7 +816,7 @@ COORDINATE BOX STUFF POINTS
 .desc-btn,
 .del-btn {
     width: 24px;
-    flex: 0 0 24px;
+    align-items: right;
 	height: 16px;
 }
 
