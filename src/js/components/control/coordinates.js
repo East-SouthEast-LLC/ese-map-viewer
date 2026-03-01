@@ -234,32 +234,37 @@
         coordinatesButton.classList.add('active');
         window.map.getCanvas().style.cursor = 'crosshair';
 
-        function addSourceAndLayers() {
-            if (!window.map.getSource('user-points')) {
-                window.map.addSource('user-points', {
-                    type: 'geojson',
-                    data: { type: "FeatureCollection", features: [] }
-                });
-            }
-
-            if (!window.map.getLayer('user-points-layer')) {
-window.map.addLayer({
-    id: 'user-points-layer',
-    type: 'symbol',
-    source: 'user-points',
-    layout: {
-        'text-field': '✕',
-        'text-size': 16,
-        'text-anchor': 'center'
-    },
-    paint: {
-        'text-color': '#ff0000'
+function addSourceAndLayers() {
+    // source
+    if (!window.map.getSource('user-points')) {
+        window.map.addSource('user-points', {
+            type: 'geojson',
+            data: { type: "FeatureCollection", features: [] }
+        });
     }
-});
-            }
 
-            refreshMapPoints();
+    // remove any old layer (circle or symbol)
+    if (window.map.getLayer('user-points-layer')) {
+        window.map.removeLayer('user-points-layer');
+    }
+
+    // add symbol cross layer
+    window.map.addLayer({
+        id: 'user-points-layer',
+        type: 'symbol',
+        source: 'user-points',
+        layout: {
+            'text-field': '✕',
+            'text-size': 16,
+            'text-anchor': 'center'
+        },
+        paint: {
+            'text-color': '#ff0000'
         }
+    });
+
+    refreshMapPoints();
+}
 
         if (window.map.isStyleLoaded()) {
             addSourceAndLayers();
