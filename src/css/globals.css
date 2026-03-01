@@ -772,60 +772,78 @@ DISCLAIMER POPUP STYLES
     background-color: #c9302c;
 }
 
-/* ============================================================
-COORDINATE BOX STUFF POINTS
-=============================================================== */
+/* =====================================
+   COORDINATES PANEL
+===================================== */
+
 #coordinates-box {
     font-family: Arial, sans-serif;
+    font-size: 0.85rem;
     padding: 8px;
 }
 
+/* Title */
 .coord-title {
     font-weight: bold;
     margin-bottom: 6px;
 }
 
+/* Each row */
 .coord-row {
     display: flex;
     align-items: center;
     gap: 6px;
+    margin-bottom: 4px;
 }
 
+/* Letter button (A, B, C...) */
 .label-btn {
     width: 24px;
+    height: 18px;
     flex: 0 0 24px;
-    height: 16px;
+    padding: 0;
+    font-size: 11px;
 }
 
+/* Coordinate values (stacked) */
 .coord-values {
     flex: 1;
     min-width: 120px;
     font-size: 11px;
     line-height: 1.2;
-
-    display: flex;
-    flex-direction: column;
 }
 
+/* Force lat/lon to stack even if global CSS interferes */
+.coord-values div {
+    display: block;
+}
+
+/* Right-side action buttons container */
 .coord-actions {
     margin-left: auto;
     display: flex;
     gap: 4px;
 }
 
+/* D and X buttons */
 .desc-btn,
 .del-btn {
-    width: 20px;
-    flex: 0 0 24px;
+    width: 18px;
+    height: 18px;
+    flex: 0 0 18px;
     padding: 0;
+    font-size: 11px;
 }
 
+/* General button sizing inside rows */
 .coord-row button {
     font-size: 11px;
 }
 
+/* Confirmation text styling */
 .coord-confirm {
     font-family: Arial, sans-serif;
+    font-size: 0.85rem;
 }
 
 
