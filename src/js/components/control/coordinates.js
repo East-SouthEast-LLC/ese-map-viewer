@@ -124,12 +124,13 @@ function renderPointsList() {
         `;
     });
 
-    html += `
-        <button id="copyCoords">Copy CSV</button>
-        <button id="exportCSV">Export CSV</button>
-        <button id="clearCoords">Clear</button>
-    `;
-
+html += `
+    <div class="coord-footer">
+        <button id="copyCoords" class="coord-main-btn">COPY</button>
+        <button id="exportCSV" class="coord-main-btn">EXPORT</button>
+        <button id="clearCoords" class="coord-main-btn">CLEAR</button>
+    </div>
+`;
     coordinatesBox.innerHTML = html;
 
     // center map on point
