@@ -772,9 +772,8 @@ DISCLAIMER POPUP STYLES
     background-color: #c9302c;
 }
 
-
 /* ============================================================
-COORDINATES POINT INTERFACE
+COORDINATE BOX STUFF POINTS
 =============================================================== */
 #coordinates-box {
     font-family: Arial, sans-serif;
@@ -795,27 +794,33 @@ COORDINATES POINT INTERFACE
 .coord-values {
     font-size: 11px;
     line-height: 1.2;
-    flex: 1;               /* take available space */
+    flex: 1;
     min-width: 120px;
+
+    /* stack lines */
+    display: flex;
+    flex-direction: column;
 }
 
 .coord-actions {
-    margin-left: auto;     /* push to far right */
+    margin-left: auto;
     display: flex;
     gap: 4px;
 }
 
 .coord-row button {
-    font-size: 12px;
-    padding: 2px 6px;
+    font-size: 11px;
+    padding: 0;          /* remove extra width */
+    height: 18px;
 }
 
 .label-btn {
     width: 20px;
 }
 
-.desc-btn, .del-btn {
-    width: 20px;
+.desc-btn,
+.del-btn {
+    width: 18px;         /* narrow buttons */
 }
 
 .coord-confirm {
