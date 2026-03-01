@@ -786,10 +786,16 @@ COORDINATES POINT INTERFACE
     margin-bottom: 6px;
 }
 
+.coord-values {
+    font-size: 11px;
+    line-height: 1.2;
+    min-width: 120px;
+}
+
 .coord-row {
     display: flex;
+    align-items: center;
     gap: 4px;
-    margin-bottom: 4px;
 }
 
 .coord-row button {
@@ -798,15 +804,11 @@ COORDINATES POINT INTERFACE
 }
 
 .label-btn {
-    min-width: 24px;
+    width: 26px;
 }
 
-.desc-btn {
-    flex: 1;
-}
-
-.del-btn {
-    color: #900;
+.desc-btn, .del-btn {
+    width: 24px;
 }
 
 .coord-confirm {
