@@ -846,6 +846,26 @@ DISCLAIMER POPUP STYLES
     font-size: 0.85rem;
 }
 
+/* =====================================
+   FOOTER BUTTONS (COPY / EXPORT / CLEAR)
+===================================== */
+
+.coord-footer {
+    display: flex;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.coord-main-btn {
+    flex: 1;              /* equal width */
+    height: 28px;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 0;
+    text-align: center;
+    cursor: pointer;
+}
+
 
 /* ============================================================
 MOBILE & TABLET RESPONSIVE STYLES
