@@ -97,7 +97,7 @@ function renderPointsList() {
         return;
     }
 
-    let html = `<div class="coord-title">Points</div>`;
+    let html = `<div class="coord-title">Points Under Construction</div>`;
 
     collectedPoints.forEach((p, index) => {
         html += `
