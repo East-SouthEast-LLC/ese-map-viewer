@@ -256,40 +256,20 @@ function enable() {
         }
 
         if (!window.map.getLayer('user-points-marker')) {
-            window.map.addLayer({
-                id: 'user-points-marker',
-                type: 'symbol',
-                source: 'user-points',
-                layout: {
-                    'text-field': 'X',
-                    'text-size': 16,
-                    'text-anchor': 'center'
-                },
-                paint: {
-                    'text-color': '#ff0000'
-                }
-            });
-        }
-
-        if (!window.map.getLayer('user-points-label')) {
-            window.map.addLayer({
-                id: 'user-points-label',
-                type: 'symbol',
-                source: 'user-points',
-                layout: {
-                    'text-field': ['get', 'label'],
-                    'text-size': 12,
-                    'text-offset': [1, -1],
-                    'text-anchor': 'top-left'
-                },
-                paint: {
-                    'text-color': '#000000'
-                }
-            });
-        }
-
-        refreshMapPoints();
+window.map.addLayer({
+    id: 'user-points-layer',
+    type: 'circle',
+    source: 'user-points',
+    paint: {
+        'circle-radius': 6,
+        'circle-stroke-width': 2,
+        'circle-color': '#ff0000',
+        'circle-stroke-color': '#ffffff'
     }
+});
+		}
+
+
 
     if (window.map.isStyleLoaded()) {
         addSourceAndLayers();
