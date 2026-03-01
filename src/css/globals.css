@@ -811,11 +811,11 @@ COORDINATES POINT INTERFACE
 }
 
 .label-btn {
-    width: 26px;
+    width: 20px;
 }
 
 .desc-btn, .del-btn {
-    width: 24px;
+    width: 20px;
 }
 
 .coord-confirm {
