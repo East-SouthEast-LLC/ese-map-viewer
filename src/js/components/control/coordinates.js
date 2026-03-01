@@ -72,26 +72,33 @@
         };
     }
 
-    // map refresh helper (GeoJSON)
-    function refreshMapPoints() {
-        if (!window.map.getSource('user-points')) return;
+function refreshMapPoints() {
+    if (!window.map.getSource('user-points')) return;
 
-        const geojson = {
-            type: "FeatureCollection",
-            features: collectedPoints.map((pt, index) => ({
-                type: "Feature",
-                properties: {
-                    label: String.fromCharCode(65 + index)
-                },
-                geometry: {
-                    type: "Point",
-                    coordinates: [pt.lonDecimal, pt.latDecimal]
-                }
-            }))
-        };
+    const geojson = {
+        type: "FeatureCollection",
+        features: collectedPoints.map((pt, index) => ({
+            type: "Feature",
+            properties: {
+                label: String.fromCharCode(65 + index)
+            },
+            geometry: {
+                type: "Point",
+                coordinates: [pt.lonDecimal, pt.latDecimal]
+            }
+        }))
+    };
 
-        window.map.getSource('user-points').setData(geojson);
-    }
+    // first paint
+    window.map.getSource('user-points').setData(geojson);
+
+    // small delayed repaint to avoid symbol delay
+    setTimeout(() => {
+        if (window.map.getSource('user-points')) {
+            window.map.getSource('user-points').setData(geojson);
+        }
+    }, 50);
+}
 
     function renderPointsList() {
         if (!collectedPoints.length) {
