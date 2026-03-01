@@ -102,7 +102,9 @@
         collectedPoints.forEach((p, index) => {
             html += `
                 <div class="coord-row">
-                    <button class="label-btn" data-index="${index}">${p.label}</button>
+<button class="label-btn" data-index="${index}">
+    ${String.fromCharCode(65 + index)}
+</button>
                     <button class="desc-btn" data-index="${index}">Description</button>
                     <button class="del-btn" data-index="${index}">Delete</button>
                 </div>
