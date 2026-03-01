@@ -255,19 +255,31 @@ function enable() {
             });
         }
 
-        if (!window.map.getLayer('user-points-marker')) {
-window.map.addLayer({
-    id: 'user-points-layer',
-    type: 'circle',
-    source: 'user-points',
-    paint: {
-        'circle-radius': 6,
-        'circle-stroke-width': 2,
-        'circle-color': '#ff0000',
-        'circle-stroke-color': '#ffffff'
+        if (!window.map.getLayer('user-points-layer')) {
+            window.map.addLayer({
+                id: 'user-points-layer',
+                type: 'circle',
+                source: 'user-points',
+                paint: {
+                    'circle-radius': 6,
+                    'circle-stroke-width': 2,
+                    'circle-color': '#ff0000',
+                    'circle-stroke-color': '#ffffff'
+                }
+            });
+        }
+
+        refreshMapPoints();
     }
-});
-		}
+
+    if (window.map.isStyleLoaded()) {
+        addSourceAndLayers();
+    } else {
+        window.map.once('load', addSourceAndLayers);
+    }
+
+    window.map.on('click', handleMapClick);
+}
 
 
 
