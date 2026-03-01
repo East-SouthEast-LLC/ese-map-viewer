@@ -109,16 +109,16 @@ function renderPointsList() {
                 </button>
 
                 <!-- coordinates (two lines) -->
-                <div class="coord-values">
-                    <div>${p.latDecimal.toFixed(6)}</div>
-                    <div>${p.lonDecimal.toFixed(6)}</div>
-                </div>
+<div class="coord-values">
+    <div>${p.latDecimal.toFixed(6)}</div>
+    <div>${p.lonDecimal.toFixed(6)}</div>
+</div>
 
                 <!-- push buttons to far right -->
-                <div class="coord-actions">
-                    <button class="desc-btn" data-index="${index}">D</button>
-                    <button class="del-btn" data-index="${index}">X</button>
-                </div>
+<div class="coord-actions">
+    <button class="desc-btn">D</button>
+    <button class="del-btn">X</button>
+</div>
 
             </div>
         `;
