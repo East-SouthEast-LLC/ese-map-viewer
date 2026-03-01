@@ -243,23 +243,40 @@ function addSourceAndLayers() {
         });
     }
 
-    // remove any old layer (circle or symbol)
+    // remove old layers (if they exist)
     if (window.map.getLayer('user-points-layer')) {
         window.map.removeLayer('user-points-layer');
     }
+    if (window.map.getLayer('user-points-label')) {
+        window.map.removeLayer('user-points-label');
+    }
 
-    // add symbol cross layer
+    // circle dot layer
     window.map.addLayer({
         id: 'user-points-layer',
+        type: 'circle',
+        source: 'user-points',
+        paint: {
+            'circle-radius': 6,
+            'circle-stroke-width': 2,
+            'circle-color': '#ff0000',
+            'circle-stroke-color': '#ffffff'
+        }
+    });
+
+    // label layer (NNE)
+    window.map.addLayer({
+        id: 'user-points-label',
         type: 'symbol',
         source: 'user-points',
         layout: {
-            'text-field': '✕',
-            'text-size': 16,
-            'text-anchor': 'center'
+            'text-field': ['get', 'label'],
+            'text-size': 12,
+            'text-anchor': 'top-left',
+            'text-offset': [1, -1]  // NNE offset
         },
         paint: {
-            'text-color': '#ff0000'
+            'text-color': '#000000'
         }
     });
 
