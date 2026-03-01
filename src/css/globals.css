@@ -786,15 +786,22 @@ COORDINATES POINT INTERFACE
     margin-bottom: 6px;
 }
 
-.coord-values {
-    font-size: 11px;
-    line-height: 1.2;
-    min-width: 120px;
-}
-
 .coord-row {
     display: flex;
     align-items: center;
+    gap: 6px;
+}
+
+.coord-values {
+    font-size: 11px;
+    line-height: 1.2;
+    flex: 1;               /* take available space */
+    min-width: 120px;
+}
+
+.coord-actions {
+    margin-left: auto;     /* push to far right */
+    display: flex;
     gap: 4px;
 }
 
