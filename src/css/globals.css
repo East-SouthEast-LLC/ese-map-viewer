@@ -794,7 +794,7 @@ COORDINATE BOX STUFF POINTS
 .label-btn {
     width: 24px;
     flex: 0 0 24px;
-	height: 24px;
+	height: 16px;
 }
 
 .coord-values {
@@ -817,7 +817,7 @@ COORDINATE BOX STUFF POINTS
 .del-btn {
     width: 24px;
     flex: 0 0 24px;
-	height: 24px;
+	height: 16px;
 }
 
 .coord-row button {
