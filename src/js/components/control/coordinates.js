@@ -243,17 +243,19 @@
             }
 
             if (!window.map.getLayer('user-points-layer')) {
-                window.map.addLayer({
-                    id: 'user-points-layer',
-                    type: 'circle',
-                    source: 'user-points',
-                    paint: {
-                        'circle-radius': 6,
-                        'circle-stroke-width': 2,
-                        'circle-color': '#ff0000',
-                        'circle-stroke-color': '#ffffff'
-                    }
-                });
+window.map.addLayer({
+    id: 'user-points-layer',
+    type: 'symbol',
+    source: 'user-points',
+    layout: {
+        'text-field': '✕',
+        'text-size': 16,
+        'text-anchor': 'center'
+    },
+    paint: {
+        'text-color': '#ff0000'
+    }
+});
             }
 
             refreshMapPoints();
