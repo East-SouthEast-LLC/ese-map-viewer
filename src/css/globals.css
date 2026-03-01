@@ -791,13 +791,17 @@ COORDINATE BOX STUFF POINTS
     gap: 6px;
 }
 
+.label-btn {
+    width: 24px;
+    flex: 0 0 24px;
+}
+
 .coord-values {
+    flex: 1;
     font-size: 11px;
     line-height: 1.2;
-    flex: 1;
-    min-width: 120px;
 
-    /* stack lines */
+    /* stack two lines */
     display: flex;
     flex-direction: column;
 }
@@ -808,19 +812,15 @@ COORDINATE BOX STUFF POINTS
     gap: 4px;
 }
 
-.coord-row button {
-    font-size: 11px;
-    padding: 0;          /* remove extra width */
-    height: 18px;
-}
-
-.label-btn {
-    width: 20px;
-}
-
 .desc-btn,
 .del-btn {
-    width: 18px;         /* narrow buttons */
+    width: 20px;
+    height: 20px;
+    padding: 0;
+}
+
+.coord-row button {
+    font-size: 11px;
 }
 
 .coord-confirm {
