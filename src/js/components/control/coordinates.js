@@ -72,7 +72,27 @@
             callback(true);
         };
     }
+// 
+function refreshMapPoints() {
+    if (!window.map.getSource('user-points')) return;
 
+    const geojson = {
+        type: "FeatureCollection",
+        features: collectedPoints.map((pt, index) => ({
+            type: "Feature",
+            properties: {
+                label: String.fromCharCode(65 + index)
+            },
+            geometry: {
+                type: "Point",
+                coordinates: [pt.lonDecimal, pt.latDecimal]
+            }
+        }))
+    };
+
+    window.map.getSource('user-points').setData(geojson);
+}
+//
     function renderPointsList() {
         if (!collectedPoints.length) {
             coordinatesBox.innerHTML = "<em>No points yet.</em>";
@@ -217,12 +237,40 @@ document.querySelectorAll(".del-btn").forEach(btn => {
         URL.revokeObjectURL(url);
     }
 
-    function enable() {
-        active = true;
-        coordinatesButton.classList.add('active');
-        window.map.getCanvas().style.cursor = 'crosshair';
-        window.map.on('click', handleMapClick);
+function enable() {
+    active = true;
+    coordinatesButton.classList.add('active');
+    window.map.getCanvas().style.cursor = 'crosshair';
+
+    // create source + layer only once
+    if (!window.map.getSource('user-points')) {
+        window.map.addSource('user-points', {
+            type: 'geojson',
+            data: {
+                type: "FeatureCollection",
+                features: []
+            }
+        });
+
+        window.map.addLayer({
+            id: 'user-points-layer',
+            type: 'circle',
+            source: 'user-points',
+            paint: {
+                'circle-radius': 6,
+                'circle-stroke-width': 2,
+                'circle-color': '#ff0000',
+                'circle-stroke-color': '#ffffff'
+            }
+        });
     }
+
+    // attach click handler
+    window.map.on('click', handleMapClick);
+
+    // initial render (in case points already exist)
+    refreshMapPoints();
+}
 
     function disable() {
         active = false;
