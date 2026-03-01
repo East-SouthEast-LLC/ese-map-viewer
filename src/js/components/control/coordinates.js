@@ -91,97 +91,113 @@
         window.map.getSource('user-points').setData(geojson);
     }
 
-    function renderPointsList() {
-        if (!collectedPoints.length) {
-            coordinatesBox.innerHTML = "<em>No points yet.</em>";
-            return;
-        }
+function renderPointsList() {
+    if (!collectedPoints.length) {
+        coordinatesBox.innerHTML = "<em>No points yet.</em>";
+        return;
+    }
 
-        let html = `<div class="coord-title">Points - Under Construction</div>`;
+    let html = `<div class="coord-title">Points</div>`;
 
-        collectedPoints.forEach((p, index) => {
-            html += `
-                <div class="coord-row">
-<button class="label-btn" data-index="${index}">
-    ${String.fromCharCode(65 + index)}
-</button>
-                    <button class="desc-btn" data-index="${index}">Description</button>
-                    <button class="del-btn" data-index="${index}">Delete</button>
-                </div>
-            `;
-        });
-
+    collectedPoints.forEach((p, index) => {
         html += `
-            <button id="copyCoords">Copy CSV</button>
-            <button id="exportCSV">Export CSV</button>
-            <button id="clearCoords">Clear</button>
+            <div class="coord-row">
+
+                <!-- label button -->
+                <button class="label-btn" data-index="${index}">
+                    ${String.fromCharCode(65 + index)}
+                </button>
+
+                <!-- coordinate display (two small lines) -->
+                <div class="coord-values">
+                    <div>${p.latDecimal.toFixed(6)}</div>
+                    <div>${p.lonDecimal.toFixed(6)}</div>
+                </div>
+
+                <!-- description -->
+                <button class="desc-btn" data-index="${index}">D</button>
+
+                <!-- delete -->
+                <button class="del-btn" data-index="${index}">X</button>
+
+            </div>
         `;
+    });
 
-        coordinatesBox.innerHTML = html;
+    html += `
+        <button id="copyCoords">Copy CSV</button>
+        <button id="exportCSV">Export CSV</button>
+        <button id="clearCoords">Clear</button>
+    `;
 
-        document.querySelectorAll(".label-btn").forEach(btn => {
-            btn.onclick = () => {
-                const idx = parseInt(btn.getAttribute("data-index"));
-                const p = collectedPoints[idx];
-                window.map.flyTo({ center: [p.lonDecimal, p.latDecimal], essential: true });
-            };
-        });
+    coordinatesBox.innerHTML = html;
 
-        document.querySelectorAll(".desc-btn").forEach(btn => {
-            btn.onclick = () => {
-                const idx = parseInt(btn.getAttribute("data-index"));
-                const p = collectedPoints[idx];
+    // center map on point
+    document.querySelectorAll(".label-btn").forEach(btn => {
+        btn.onclick = () => {
+            const idx = parseInt(btn.getAttribute("data-index"));
+            const p = collectedPoints[idx];
+            window.map.flyTo({ center: [p.lonDecimal, p.latDecimal], essential: true });
+        };
+    });
 
-                const newDesc = prompt("Edit description:", p.description);
-                if (newDesc !== null) {
-                    p.description = newDesc;
-                    renderPointsList();
-                }
-            };
-        });
+    // edit description
+    document.querySelectorAll(".desc-btn").forEach(btn => {
+        btn.onclick = () => {
+            const idx = parseInt(btn.getAttribute("data-index"));
+            const p = collectedPoints[idx];
 
-        document.querySelectorAll(".del-btn").forEach(btn => {
-            btn.onclick = (e) => {
-                e.stopPropagation();
+            const newDesc = prompt("Edit description:", p.description);
+            if (newDesc !== null) {
+                p.description = newDesc;
+                renderPointsList();
+            }
+        };
+    });
 
-                const idx = parseInt(btn.getAttribute("data-index"));
-                const rect = e.target.getBoundingClientRect();
-                const x = rect.left + rect.width;
-                const y = rect.top;
+    // delete
+    document.querySelectorAll(".del-btn").forEach(btn => {
+        btn.onclick = (e) => {
+            e.stopPropagation();
 
-                showConfirmPopup(x, y, "Delete this point?", (ok) => {
-                    if (!ok) return;
+            const idx = parseInt(btn.getAttribute("data-index"));
+            const rect = e.target.getBoundingClientRect();
+            const x = rect.left + rect.width;
+            const y = rect.top;
 
-                    collectedPoints.splice(idx, 1);
+            showConfirmPopup(x, y, "Delete this point?", (ok) => {
+                if (!ok) return;
 
-                    refreshMapPoints();
-                    renderPointsList();
-                });
-            };
-        });
+                collectedPoints.splice(idx, 1);
 
-        document.getElementById('exportCSV').onclick = exportToCSV;
-
-        document.getElementById('copyCoords').onclick = () => {
-            const csv = collectedPoints.map(p =>
-                `"${p.label}","${p.description}",${p.latDecimal},${p.lonDecimal},"${p.latDMS}","${p.lonDMS}"`
-            ).join("\n");
-
-            navigator.clipboard.writeText(csv).then(() => {
-                alert("Copied to clipboard");
+                refreshMapPoints();
+                renderPointsList();
             });
         };
+    });
 
-        document.getElementById('clearCoords').onclick = () => {
-            if (!confirm("Clear all points?")) return;
+    document.getElementById('exportCSV').onclick = exportToCSV;
 
-            collectedPoints = [];
-            labelCounter = 65;
+    document.getElementById('copyCoords').onclick = () => {
+        const csv = collectedPoints.map((p, index) =>
+            `"${String.fromCharCode(65 + index)}","${p.description}",${p.latDecimal},${p.lonDecimal}`
+        ).join("\n");
 
-            refreshMapPoints();
-            renderPointsList();
-        };
-    }
+        navigator.clipboard.writeText(csv).then(() => {
+            alert("Copied to clipboard");
+        });
+    };
+
+    document.getElementById('clearCoords').onclick = () => {
+        if (!confirm("Clear all points?")) return;
+
+        collectedPoints = [];
+        labelCounter = 65;
+
+        refreshMapPoints();
+        renderPointsList();
+    };
+}
 
     function handleMapClick(e) {
         const { lat, lng } = e.lngLat;
