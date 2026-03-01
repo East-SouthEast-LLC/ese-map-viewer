@@ -37,8 +37,7 @@
         return `${degrees}°${m}'${s}" ${hemisphere}`;
     }
 
-
-    // small confirmation popup under cursor
+    // popup under cursor
     function showConfirmPopup(x, y, message, callback) {
         const popup = document.createElement("div");
         popup.className = "coord-confirm";
@@ -72,27 +71,28 @@
             callback(true);
         };
     }
-// 
-function refreshMapPoints() {
-    if (!window.map.getSource('user-points')) return;
 
-    const geojson = {
-        type: "FeatureCollection",
-        features: collectedPoints.map((pt, index) => ({
-            type: "Feature",
-            properties: {
-                label: String.fromCharCode(65 + index)
-            },
-            geometry: {
-                type: "Point",
-                coordinates: [pt.lonDecimal, pt.latDecimal]
-            }
-        }))
-    };
+    // map refresh helper (GeoJSON)
+    function refreshMapPoints() {
+        if (!window.map.getSource('user-points')) return;
 
-    window.map.getSource('user-points').setData(geojson);
-}
-//
+        const geojson = {
+            type: "FeatureCollection",
+            features: collectedPoints.map((pt, index) => ({
+                type: "Feature",
+                properties: {
+                    label: String.fromCharCode(65 + index)
+                },
+                geometry: {
+                    type: "Point",
+                    coordinates: [pt.lonDecimal, pt.latDecimal]
+                }
+            }))
+        };
+
+        window.map.getSource('user-points').setData(geojson);
+    }
+
     function renderPointsList() {
         if (!collectedPoints.length) {
             coordinatesBox.innerHTML = "<em>No points yet.</em>";
@@ -143,32 +143,26 @@ function refreshMapPoints() {
         });
 
         // delete with confirmation popup
-document.querySelectorAll(".del-btn").forEach(btn => {
-    btn.onclick = (e) => {
-        e.stopPropagation();
+        document.querySelectorAll(".del-btn").forEach(btn => {
+            btn.onclick = (e) => {
+                e.stopPropagation();
 
-        const idx = parseInt(btn.getAttribute("data-index"));
-        const rect = e.target.getBoundingClientRect();
-        const x = rect.left + rect.width;
-        const y = rect.top;
+                const idx = parseInt(btn.getAttribute("data-index"));
+                const rect = e.target.getBoundingClientRect();
+                const x = rect.left + rect.width;
+                const y = rect.top;
 
-        showConfirmPopup(x, y, "Delete this point?", (ok) => {
-            if (!ok) return;
+                showConfirmPopup(x, y, "Delete this point?", (ok) => {
+                    if (!ok) return;
 
-            collectedPoints.splice(idx, 1);
+                    collectedPoints.splice(idx, 1);
 
-            collectedPoints.forEach((pt, i) => {
-                pt.label = String.fromCharCode(65 + i);
-            });
+                    refreshMapPoints();
 
-            if (collectedPoints.length === 0) {
-                labelCounter = 65;
-            }
-
-            renderPointsList();
+                    renderPointsList();
+                });
+            };
         });
-    };
-});
 
         document.getElementById('exportCSV').onclick = exportToCSV;
 
@@ -187,6 +181,8 @@ document.querySelectorAll(".del-btn").forEach(btn => {
 
             collectedPoints = [];
             labelCounter = 65;
+
+            refreshMapPoints();
             renderPointsList();
         };
     }
@@ -210,6 +206,8 @@ document.querySelectorAll(".del-btn").forEach(btn => {
         };
 
         collectedPoints.push(point);
+
+        refreshMapPoints();
         renderPointsList();
         coordinatesBox.style.display = 'block';
     }
@@ -237,40 +235,38 @@ document.querySelectorAll(".del-btn").forEach(btn => {
         URL.revokeObjectURL(url);
     }
 
-function enable() {
-    active = true;
-    coordinatesButton.classList.add('active');
-    window.map.getCanvas().style.cursor = 'crosshair';
+    function enable() {
+        active = true;
+        coordinatesButton.classList.add('active');
+        window.map.getCanvas().style.cursor = 'crosshair';
 
-    // create source + layer only once
-    if (!window.map.getSource('user-points')) {
-        window.map.addSource('user-points', {
-            type: 'geojson',
-            data: {
-                type: "FeatureCollection",
-                features: []
-            }
-        });
+        // create source + layer only once
+        if (!window.map.getSource('user-points')) {
+            window.map.addSource('user-points', {
+                type: 'geojson',
+                data: {
+                    type: "FeatureCollection",
+                    features: []
+                }
+            });
 
-        window.map.addLayer({
-            id: 'user-points-layer',
-            type: 'circle',
-            source: 'user-points',
-            paint: {
-                'circle-radius': 6,
-                'circle-stroke-width': 2,
-                'circle-color': '#ff0000',
-                'circle-stroke-color': '#ffffff'
-            }
-        });
+            window.map.addLayer({
+                id: 'user-points-layer',
+                type: 'circle',
+                source: 'user-points',
+                paint: {
+                    'circle-radius': 6,
+                    'circle-stroke-width': 2,
+                    'circle-color': '#ff0000',
+                    'circle-stroke-color': '#ffffff'
+                }
+            });
+        }
+
+        window.map.on('click', handleMapClick);
+
+        refreshMapPoints();
     }
-
-    // attach click handler
-    window.map.on('click', handleMapClick);
-
-    // initial render (in case points already exist)
-    refreshMapPoints();
-}
 
     function disable() {
         active = false;
