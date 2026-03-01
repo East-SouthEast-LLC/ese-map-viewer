@@ -37,7 +37,6 @@
         return `${degrees}°${m}'${s}" ${hemisphere}`;
     }
 
-    // popup under cursor
     function showConfirmPopup(x, y, message, callback) {
         const popup = document.createElement("div");
         popup.className = "coord-confirm";
@@ -72,33 +71,25 @@
         };
     }
 
-function refreshMapPoints() {
-    if (!window.map.getSource('user-points')) return;
+    function refreshMapPoints() {
+        if (!window.map.getSource('user-points')) return;
 
-    const geojson = {
-        type: "FeatureCollection",
-        features: collectedPoints.map((pt, index) => ({
-            type: "Feature",
-            properties: {
-                label: String.fromCharCode(65 + index)
-            },
-            geometry: {
-                type: "Point",
-                coordinates: [pt.lonDecimal, pt.latDecimal]
-            }
-        }))
-    };
+        const geojson = {
+            type: "FeatureCollection",
+            features: collectedPoints.map((pt, index) => ({
+                type: "Feature",
+                properties: {
+                    label: String.fromCharCode(65 + index)
+                },
+                geometry: {
+                    type: "Point",
+                    coordinates: [pt.lonDecimal, pt.latDecimal]
+                }
+            }))
+        };
 
-    // first paint
-    window.map.getSource('user-points').setData(geojson);
-
-    // small delayed repaint to avoid symbol delay
-    setTimeout(() => {
-        if (window.map.getSource('user-points')) {
-            window.map.getSource('user-points').setData(geojson);
-        }
-    }, 50);
-}
+        window.map.getSource('user-points').setData(geojson);
+    }
 
     function renderPointsList() {
         if (!collectedPoints.length) {
@@ -126,7 +117,6 @@ function refreshMapPoints() {
 
         coordinatesBox.innerHTML = html;
 
-        // center map on point
         document.querySelectorAll(".label-btn").forEach(btn => {
             btn.onclick = () => {
                 const idx = parseInt(btn.getAttribute("data-index"));
@@ -135,7 +125,6 @@ function refreshMapPoints() {
             };
         });
 
-        // edit description
         document.querySelectorAll(".desc-btn").forEach(btn => {
             btn.onclick = () => {
                 const idx = parseInt(btn.getAttribute("data-index"));
@@ -149,7 +138,6 @@ function refreshMapPoints() {
             };
         });
 
-        // delete with confirmation popup
         document.querySelectorAll(".del-btn").forEach(btn => {
             btn.onclick = (e) => {
                 e.stopPropagation();
@@ -165,7 +153,6 @@ function refreshMapPoints() {
                     collectedPoints.splice(idx, 1);
 
                     refreshMapPoints();
-
                     renderPointsList();
                 });
             };
@@ -242,55 +229,44 @@ function refreshMapPoints() {
         URL.revokeObjectURL(url);
     }
 
-function enable() {
-    active = true;
-    coordinatesButton.classList.add('active');
-    window.map.getCanvas().style.cursor = 'crosshair';
+    function enable() {
+        active = true;
+        coordinatesButton.classList.add('active');
+        window.map.getCanvas().style.cursor = 'crosshair';
 
-    function addSourceAndLayers() {
-        if (!window.map.getSource('user-points')) {
-            window.map.addSource('user-points', {
-                type: 'geojson',
-                data: { type: "FeatureCollection", features: [] }
-            });
+        function addSourceAndLayers() {
+            if (!window.map.getSource('user-points')) {
+                window.map.addSource('user-points', {
+                    type: 'geojson',
+                    data: { type: "FeatureCollection", features: [] }
+                });
+            }
+
+            if (!window.map.getLayer('user-points-layer')) {
+                window.map.addLayer({
+                    id: 'user-points-layer',
+                    type: 'circle',
+                    source: 'user-points',
+                    paint: {
+                        'circle-radius': 6,
+                        'circle-stroke-width': 2,
+                        'circle-color': '#ff0000',
+                        'circle-stroke-color': '#ffffff'
+                    }
+                });
+            }
+
+            refreshMapPoints();
         }
 
-        if (!window.map.getLayer('user-points-layer')) {
-            window.map.addLayer({
-                id: 'user-points-layer',
-                type: 'circle',
-                source: 'user-points',
-                paint: {
-                    'circle-radius': 6,
-                    'circle-stroke-width': 2,
-                    'circle-color': '#ff0000',
-                    'circle-stroke-color': '#ffffff'
-                }
-            });
+        if (window.map.isStyleLoaded()) {
+            addSourceAndLayers();
+        } else {
+            window.map.once('load', addSourceAndLayers);
         }
 
-        refreshMapPoints();
+        window.map.on('click', handleMapClick);
     }
-
-    if (window.map.isStyleLoaded()) {
-        addSourceAndLayers();
-    } else {
-        window.map.once('load', addSourceAndLayers);
-    }
-
-    window.map.on('click', handleMapClick);
-}
-
-
-
-    if (window.map.isStyleLoaded()) {
-        addSourceAndLayers();
-    } else {
-        window.map.once('load', addSourceAndLayers);
-    }
-
-    window.map.on('click', handleMapClick);
-}
 
     function disable() {
         active = false;
