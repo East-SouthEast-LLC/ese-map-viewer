@@ -14,7 +14,7 @@
     let labelCounter = 65; // ASCII 'A'
     let currentCoordSystem = 'WGS84';
 
-    // Append coordinatesBox to body
+    // Append coordinatesBox to body and style
     document.body.appendChild(coordinatesBox);
     Object.assign(coordinatesBox.style, {
         position: 'absolute',
@@ -29,14 +29,14 @@
     });
 
     // Position box under Share Map button
-function updateBoxPosition() {
-    if (!shareButton) return;
-    const rect = shareButton.getBoundingClientRect();
-    const boxWidth = coordinatesBox.offsetWidth || 240; // fallback width
-    const centerX = rect.left + rect.width / 2;
-    coordinatesBox.style.left = `${centerX - boxWidth/2}px`;
-    coordinatesBox.style.top = `${rect.bottom + 4}px`;
-}
+    function updateBoxPosition() {
+        if (!shareButton) return;
+        const rect = shareButton.getBoundingClientRect();
+        const boxWidth = coordinatesBox.offsetWidth || 240;
+        const centerX = rect.left + rect.width / 2;
+        coordinatesBox.style.left = `${centerX - boxWidth/2}px`;
+        coordinatesBox.style.top = `${rect.bottom + 4}px`;
+    }
 
     function toDMS(dec, type) {
         const absolute = Math.abs(dec);
@@ -50,9 +50,9 @@ function updateBoxPosition() {
         return `${degrees}°${String(minutes).padStart(2,'0')}'${String(seconds).padStart(7,'0')}" ${hemisphere}`;
     }
 
+    // Placeholder: extend to convert projected coordinates
     function convertCoordinates(lat, lon, system) {
         if(system==='WGS84') return `${lat.toFixed(6)}, ${lon.toFixed(6)}`;
-        // Placeholder for projected coordinates
         return `${lat.toFixed(3)}, ${lon.toFixed(3)} (${system})`;
     }
 
@@ -89,11 +89,28 @@ function updateBoxPosition() {
         window.map.getSource('user-points').setData(geojson);
     }
 
+    function exportToCSV() {
+        if (!collectedPoints.length) {
+            alert("No points to export.");
+            return;
+        }
+        let csv = "Label,Description,Latitude,Longitude\n";
+        collectedPoints.forEach((p,i)=>{
+            csv += `"${String.fromCharCode(65+i)}","${p.description}",${p.latDecimal},${p.lonDecimal}\n`;
+        });
+        const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "coordinates_export.csv";
+        link.click();
+        URL.revokeObjectURL(url);
+    }
+
     function renderPointsList(){
         updateBoxPosition();
-        coordinatesBox.style.display = 'block'; // always visible
+        coordinatesBox.style.display = 'block';
 
-        // Header + dropdown
         let html = `
             <div class="coord-title">Points Under Construction</div>
             <div class="coord-dropdown" style="margin-bottom:6px;">
@@ -114,7 +131,6 @@ function updateBoxPosition() {
             </div>
         `;
 
-        // Points
         collectedPoints.forEach((p,index)=>{
             const coordDisplay = convertCoordinates(p.latDecimal, p.lonDecimal, currentCoordSystem);
             html += `
@@ -132,7 +148,6 @@ function updateBoxPosition() {
             `;
         });
 
-        // Footer buttons
         html += `
             <div class="coord-footer" style="margin-top:6px;">
                 <button id="copyCoords" class="coord-main-btn">COPY</button>
@@ -143,10 +158,12 @@ function updateBoxPosition() {
 
         coordinatesBox.innerHTML = html;
 
+        // Dropdown change
         const select = document.getElementById('coordSystemSelect');
         select.value = currentCoordSystem;
         select.onchange = ()=>{currentCoordSystem=select.value; renderPointsList();};
 
+        // Row buttons
         coordinatesBox.onclick = (e)=>{
             const target = e.target;
             const row = target.closest('.coord-row');
@@ -170,12 +187,19 @@ function updateBoxPosition() {
             }
         };
 
-        document.getElementById('copyCoords').onclick = ()=>{
-            const csv = collectedPoints.map((p,i)=>`"${String.fromCharCode(65+i)}","${p.description}",${p.latDecimal},${p.lonDecimal}`).join("\n");
-            navigator.clipboard.writeText(csv).then(()=>alert("Copied to clipboard"));
-        };
-        document.getElementById('exportCSV').onclick = exportToCSV;
-        document.getElementById('clearCoords').onclick = ()=>{
+        // Footer buttons
+        const copyBtn = document.getElementById('copyCoords');
+        const exportBtn = document.getElementById('exportCSV');
+        const clearBtn = document.getElementById('clearCoords');
+
+        if(copyBtn){
+            copyBtn.onclick = () => {
+                const csv = collectedPoints.map((p,i)=>`"${String.fromCharCode(65+i)}","${p.description}",${p.latDecimal},${p.lonDecimal}`).join("\n");
+                navigator.clipboard.writeText(csv).then(()=>alert("Copied to clipboard"));
+            };
+        }
+        if(exportBtn) exportBtn.onclick = exportToCSV;
+        if(clearBtn) clearBtn.onclick = ()=>{
             if(!confirm("Clear all points?")) return;
             collectedPoints=[];
             labelCounter=65;
@@ -186,10 +210,8 @@ function updateBoxPosition() {
 
     function handleMapClick(e){
         const {lat,lng} = e.lngLat;
-        const latDMS = toDMS(lat,'lat');
-        const lngDMS = toDMS(lng,'lon');
         const label = String.fromCharCode(labelCounter++);
-        const point = {label, description:"", latDecimal:lat, lonDecimal:lng, latDMS, lonDMS:lngDMS};
+        const point = {label, description:"", latDecimal:lat, lonDecimal:lng, latDMS:toDMS(lat,'lat'), lonDMS:toDMS(lng,'lon')};
         collectedPoints.push(point);
         refreshMapPoints();
         renderPointsList();
@@ -231,14 +253,8 @@ function updateBoxPosition() {
         window.map.off('click', handleMapClick);
     }
 
-    // Show the list immediately on click
-coordinatesButton.addEventListener('click', ()=>{
-    if(active){
-        disable();          // hide the menu
-    } else {
-        enable();           // activate map clicks
-        renderPointsList(); // show list, centered
-    }
-});
+    coordinatesButton.addEventListener('click', ()=>{
+        active ? disable() : (enable(), renderPointsList());
+    });
 
 })();
