@@ -13,12 +13,10 @@
     let labelCounter = 65; // ASCII 'A'
     let currentCoordSystem = 'WGS84';
 
-    // Ensure coordinatesBox is attached to body, not map container
+    // Append coordinatesBox to body
     document.body.appendChild(coordinatesBox);
     Object.assign(coordinatesBox.style, {
         position: 'absolute',
-        top: '50px',
-        right: '20px',
         width: '280px',
         maxHeight: '80vh',
         overflowY: 'auto',
@@ -28,6 +26,13 @@
         zIndex: 9999,
         display: 'none'
     });
+
+    // Position box below the button
+    function updateBoxPosition() {
+        const rect = coordinatesButton.getBoundingClientRect();
+        coordinatesBox.style.left = `${rect.left}px`;
+        coordinatesBox.style.top = `${rect.bottom + 4}px`; // small gap
+    }
 
     function toDMS(dec, type) {
         const absolute = Math.abs(dec);
@@ -43,7 +48,7 @@
 
     function convertCoordinates(lat, lon, system) {
         if(system==='WGS84') return `${lat.toFixed(6)}, ${lon.toFixed(6)}`;
-        // Placeholder for SPCS/Proj4 conversion
+        // Placeholder for projected coordinates (SPCS/NAD/etc.)
         return `${lat.toFixed(3)}, ${lon.toFixed(3)} (${system})`;
     }
 
@@ -81,6 +86,7 @@
     }
 
     function renderPointsList(){
+        updateBoxPosition();
         coordinatesBox.style.display = collectedPoints.length ? 'block' : 'none';
         if(!collectedPoints.length){
             coordinatesBox.innerHTML = "<em>No points yet.</em>";
@@ -114,7 +120,6 @@
                     <button class="label-btn" data-index="${index}">${String.fromCharCode(65+index)}</button>
                     <div class="coord-values">
                         <div>${coordDisplay}</div>
-                        <div>${p.latDMS}, ${p.lonDMS}</div>
                     </div>
                     <div class="coord-actions">
                         <button class="desc-btn">D</button>
@@ -131,6 +136,7 @@
                 <button id="clearCoords" class="coord-main-btn">CLEAR</button>
             </div>
         `;
+
         coordinatesBox.innerHTML = html;
 
         const select = document.getElementById('coordSystemSelect');
