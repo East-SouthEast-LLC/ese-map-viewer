@@ -97,9 +97,28 @@ function renderPointsList() {
         return;
     }
 
-    let html = `<div class="coord-title">Points Under Construction</div>`;
+    // Dropdown above the points list
+    let html = `
+        <div class="coord-title">Points Under Construction</div>
 
+        <div class="coord-dropdown" style="margin-bottom:6px;">
+            <label for="coordSystemSelect">Coordinate System:</label>
+            <select id="coordSystemSelect">
+                <option value="WGS84">WGS84</option>
+                <option value="NAD83_USFt">NAD83 USFt</option>
+                <option value="NAD83_m">NAD83 m</option>
+                <option value="NAD27_USFt">NAD27 USFt</option>
+                <option value="NAD27_m">NAD27 m</option>
+                <option value="NARTF22_USFt">NARTF22 USFt</option>
+                <option value="NARTF22_m">NARTF22 m</option>
+            </select>
+        </div>
+    `;
+
+    // Loop through points
     collectedPoints.forEach((p, index) => {
+        const coordDisplay = convertCoordinates(p.latDecimal, p.lonDecimal, currentCoordSystem);
+
         html += `
             <div class="coord-row">
 
@@ -108,10 +127,10 @@ function renderPointsList() {
                     ${String.fromCharCode(65 + index)}
                 </button>
 
-                <!-- coordinates (two lines) -->
+                <!-- coordinates -->
                 <div class="coord-values">
-                    <div>${p.latDecimal.toFixed(6)}</div>
-                    <div>${p.lonDecimal.toFixed(6)}</div>
+                    <div>${coordDisplay}</div>
+                    <div>${p.latDMS}, ${p.lonDMS}</div>
                 </div>
 
                 <!-- action buttons -->
@@ -124,8 +143,9 @@ function renderPointsList() {
         `;
     });
 
+    // Footer buttons
     html += `
-        <div class="coord-footer">
+        <div class="coord-footer" style="margin-top:6px;">
             <button id="copyCoords" class="coord-main-btn">COPY</button>
             <button id="exportCSV" class="coord-main-btn">EXPORT</button>
             <button id="clearCoords" class="coord-main-btn">CLEAR</button>
@@ -133,6 +153,14 @@ function renderPointsList() {
     `;
 
     coordinatesBox.innerHTML = html;
+
+    // Coordinate system selection
+    const select = document.getElementById('coordSystemSelect');
+    select.value = currentCoordSystem;
+    select.onchange = () => {
+        currentCoordSystem = select.value;
+        renderPointsList(); // re-render points with new system
+    };
 
     // Delegated click events
     coordinatesBox.onclick = (e) => {
@@ -190,6 +218,24 @@ function renderPointsList() {
         refreshMapPoints();
         renderPointsList();
     };
+}
+
+// Stub for coordinate conversion
+function convertCoordinates(lat, lon, system) {
+    switch(system) {
+        case 'WGS84':
+            return `${lat.toFixed(6)}, ${lon.toFixed(6)}`;
+        case 'NAD83_USFt':
+        case 'NAD83_m':
+        case 'NAD27_USFt':
+        case 'NAD27_m':
+        case 'NARTF22_USFt':
+        case 'NARTF22_m':
+            // Placeholder: replace with actual projection conversion logic
+            return `${lat.toFixed(3)}, ${lon.toFixed(3)} (${system})`;
+        default:
+            return `${lat.toFixed(6)}, ${lon.toFixed(6)}`;
+    }
 }
 
     function handleMapClick(e) {
