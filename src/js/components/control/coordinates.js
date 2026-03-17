@@ -2,6 +2,7 @@
 
     const coordinatesButton = document.getElementById('coordinatesButton');
     const coordinatesBox = document.getElementById('coordinates-box');
+    const shareButton = document.getElementById('shareButton'); // adjust if your Share Map button ID differs
 
     if (!coordinatesButton || !coordinatesBox || !window.map) {
         console.warn("coordinates tool: elements or map not found");
@@ -27,11 +28,12 @@
         display: 'none'
     });
 
-    // Position box below the button
+    // Position box under Share Map button
     function updateBoxPosition() {
-        const rect = coordinatesButton.getBoundingClientRect();
+        if (!shareButton) return;
+        const rect = shareButton.getBoundingClientRect();
         coordinatesBox.style.left = `${rect.left}px`;
-        coordinatesBox.style.top = `${rect.bottom + 4}px`; // small gap
+        coordinatesBox.style.top = `${rect.bottom + 4}px`;
     }
 
     function toDMS(dec, type) {
@@ -48,7 +50,7 @@
 
     function convertCoordinates(lat, lon, system) {
         if(system==='WGS84') return `${lat.toFixed(6)}, ${lon.toFixed(6)}`;
-        // Placeholder for projected coordinates (SPCS/NAD/etc.)
+        // Placeholder for projected coordinates
         return `${lat.toFixed(3)}, ${lon.toFixed(3)} (${system})`;
     }
 
@@ -87,7 +89,7 @@
 
     function renderPointsList(){
         updateBoxPosition();
-        coordinatesBox.style.display = collectedPoints.length ? 'block' : 'none';
+        coordinatesBox.style.display = 'block'; // always visible when button clicked
         if(!collectedPoints.length){
             coordinatesBox.innerHTML = "<em>No points yet.</em>";
             return;
@@ -227,6 +229,10 @@
         window.map.off('click', handleMapClick);
     }
 
-    coordinatesButton.addEventListener('click',()=>{active?disable():enable();});
+    // Show the list immediately on click
+    coordinatesButton.addEventListener('click', ()=>{
+        active ? disable() : enable();
+        renderPointsList();
+    });
 
 })();
