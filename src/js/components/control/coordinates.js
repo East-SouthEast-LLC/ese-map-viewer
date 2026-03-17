@@ -92,12 +92,15 @@
     }
 
 function renderPointsList() {
+    // Show the coordinates box if there are points, hide if empty
+    coordinatesBox.style.display = collectedPoints.length ? 'block' : 'none';
+
     if (!collectedPoints.length) {
         coordinatesBox.innerHTML = "<em>No points yet.</em>";
         return;
     }
 
-    // Dropdown above the points list
+    // Dropdown for coordinate system selection
     let html = `
         <div class="coord-title">Points Under Construction</div>
 
@@ -105,17 +108,23 @@ function renderPointsList() {
             <label for="coordSystemSelect">Coordinate System:</label>
             <select id="coordSystemSelect">
                 <option value="WGS84">WGS84</option>
-                <option value="NAD83_USFt">NAD83 USFt</option>
-                <option value="NAD83_m">NAD83 m</option>
-                <option value="NAD27_USFt">NAD27 USFt</option>
-                <option value="NAD27_m">NAD27 m</option>
-                <option value="NARTF22_USFt">NARTF22 USFt</option>
-                <option value="NARTF22_m">NARTF22 m</option>
+                <option value="NARTF22_m">NARTF22 meters</option>
+                <option value="NARTF22_USFt">NARTF22 US feet</option>
+
+                <option value="NAD83_Mainland_m">NAD83 Mainland meters</option>
+                <option value="NAD83_Mainland_USFt">NAD83 Mainland US feet</option>
+                <option value="NAD83_Island_m">NAD83 Island meters</option>
+                <option value="NAD83_Island_USFt">NAD83 Island US feet</option>
+
+                <option value="NAD27_Mainland_m">NAD27 Mainland meters</option>
+                <option value="NAD27_Mainland_USFt">NAD27 Mainland US feet</option>
+                <option value="NAD27_Island_m">NAD27 Island meters</option>
+                <option value="NAD27_Island_USFt">NAD27 Island US feet</option>
             </select>
         </div>
     `;
 
-    // Loop through points
+    // Render each point
     collectedPoints.forEach((p, index) => {
         const coordDisplay = convertCoordinates(p.latDecimal, p.lonDecimal, currentCoordSystem);
 
@@ -152,6 +161,7 @@ function renderPointsList() {
         </div>
     `;
 
+    // Update the innerHTML
     coordinatesBox.innerHTML = html;
 
     // Coordinate system selection
@@ -171,7 +181,7 @@ function renderPointsList() {
         const idx = parseInt(row.querySelector('.label-btn').dataset.index);
         const point = collectedPoints[idx];
 
-        // Fly to point
+        // Fly to point on map
         if (target.classList.contains('label-btn')) {
             window.map.flyTo({ center: [point.lonDecimal, point.latDecimal], essential: true });
         }
@@ -220,22 +230,14 @@ function renderPointsList() {
     };
 }
 
-// Stub for coordinate conversion
+// Stub conversion function (replace with Proj4js SPCS conversions)
 function convertCoordinates(lat, lon, system) {
-    switch(system) {
-        case 'WGS84':
-            return `${lat.toFixed(6)}, ${lon.toFixed(6)}`;
-        case 'NAD83_USFt':
-        case 'NAD83_m':
-        case 'NAD27_USFt':
-        case 'NAD27_m':
-        case 'NARTF22_USFt':
-        case 'NARTF22_m':
-            // Placeholder: replace with actual projection conversion logic
-            return `${lat.toFixed(3)}, ${lon.toFixed(3)} (${system})`;
-        default:
-            return `${lat.toFixed(6)}, ${lon.toFixed(6)}`;
+    if (system === "WGS84") {
+        return `${lat.toFixed(6)}, ${lon.toFixed(6)}`;
     }
+
+    // For projected systems, just placeholder display for now
+    return `${lat.toFixed(3)}, ${lon.toFixed(3)} (${system})`;
 }
 
     function handleMapClick(e) {
