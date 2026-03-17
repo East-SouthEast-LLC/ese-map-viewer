@@ -29,12 +29,14 @@
     });
 
     // Position box under Share Map button
-    function updateBoxPosition() {
-        if (!shareButton) return;
-        const rect = shareButton.getBoundingClientRect();
-        coordinatesBox.style.left = `${rect.left}px`;
-        coordinatesBox.style.top = `${rect.bottom + 4}px`; // small gap below button
-    }
+function updateBoxPosition() {
+    if (!shareButton) return;
+    const rect = shareButton.getBoundingClientRect();
+    const boxWidth = coordinatesBox.offsetWidth; // get the width of the box
+    const centerX = rect.left + rect.width / 2;   // center of Share Map button
+    coordinatesBox.style.left = `${centerX - boxWidth / 2}px`; // center the box
+    coordinatesBox.style.top = `${rect.bottom + 4}px`;         // small gap below the button
+}
 
     function toDMS(dec, type) {
         const absolute = Math.abs(dec);
