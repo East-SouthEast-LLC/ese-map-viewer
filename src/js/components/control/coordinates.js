@@ -32,10 +32,10 @@
 function updateBoxPosition() {
     if (!shareButton) return;
     const rect = shareButton.getBoundingClientRect();
-    const boxWidth = coordinatesBox.offsetWidth; // get the width of the box
-    const centerX = rect.left + rect.width / 2;   // center of Share Map button
-    coordinatesBox.style.left = `${centerX - boxWidth / 2}px`; // center the box
-    coordinatesBox.style.top = `${rect.bottom + 4}px`;         // small gap below the button
+    const boxWidth = coordinatesBox.offsetWidth || 240; // fallback width
+    const centerX = rect.left + rect.width / 2;
+    coordinatesBox.style.left = `${centerX - boxWidth/2}px`;
+    coordinatesBox.style.top = `${rect.bottom + 4}px`;
 }
 
     function toDMS(dec, type) {
@@ -232,9 +232,13 @@ function updateBoxPosition() {
     }
 
     // Show the list immediately on click
-    coordinatesButton.addEventListener('click', ()=>{
-        active ? disable() : enable();
-        renderPointsList();
-    });
+coordinatesButton.addEventListener('click', ()=>{
+    if(active){
+        disable();          // hide the menu
+    } else {
+        enable();           // activate map clicks
+        renderPointsList(); // show list, centered
+    }
+});
 
 })();
