@@ -5,7 +5,6 @@
 
     if (!coordinatesButton || !coordinatesBox || !window.map) {
         console.warn("coordinates tool: elements or map not found");
-        if (coordinatesBox) coordinatesBox.style.display = 'none';
         return;
     }
 
@@ -14,19 +13,22 @@
     let labelCounter = 65; // ASCII 'A'
     let currentCoordSystem = 'WGS84';
 
-    // Ensure box is on top
-    coordinatesBox.style.position = 'absolute';
-    coordinatesBox.style.zIndex = 9999;
-    coordinatesBox.style.background = '#fff';
-    coordinatesBox.style.border = '1px solid #ccc';
-    coordinatesBox.style.padding = '6px';
-    coordinatesBox.style.maxHeight = '80vh';
-    coordinatesBox.style.overflowY = 'auto';
+    // Ensure coordinatesBox is attached to body, not map container
     document.body.appendChild(coordinatesBox);
+    Object.assign(coordinatesBox.style, {
+        position: 'absolute',
+        top: '50px',
+        right: '20px',
+        width: '280px',
+        maxHeight: '80vh',
+        overflowY: 'auto',
+        background: '#fff',
+        border: '1px solid #ccc',
+        padding: '6px',
+        zIndex: 9999,
+        display: 'none'
+    });
 
-    coordinatesBox.style.display = 'none';
-
-    // Convert decimal lat/lon to DMS
     function toDMS(dec, type) {
         const absolute = Math.abs(dec);
         const degrees = Math.floor(absolute);
@@ -34,31 +36,25 @@
         const minutes = Math.floor(minutesFull);
         const seconds = ((minutesFull - minutes) * 60).toFixed(4);
         let hemisphere = '';
-        if (type === 'lat') hemisphere = dec >= 0 ? 'N' : 'S';
-        else if (type === 'lon') hemisphere = dec >= 0 ? 'E' : 'W';
+        if(type==='lat') hemisphere = dec >= 0 ? 'N' : 'S';
+        if(type==='lon') hemisphere = dec >= 0 ? 'E' : 'W';
         return `${degrees}°${String(minutes).padStart(2,'0')}'${String(seconds).padStart(7,'0')}" ${hemisphere}`;
     }
 
-    // Stub for projected coordinate conversion
     function convertCoordinates(lat, lon, system) {
-        if(system === "WGS84") return `${lat.toFixed(6)}, ${lon.toFixed(6)}`;
-        // Placeholder for actual SPCS / Proj4js conversions
+        if(system==='WGS84') return `${lat.toFixed(6)}, ${lon.toFixed(6)}`;
+        // Placeholder for SPCS/Proj4 conversion
         return `${lat.toFixed(3)}, ${lon.toFixed(3)} (${system})`;
     }
 
-    function showConfirmPopup(x, y, message, callback) {
+    function showConfirmPopup(x, y, message, callback){
         const popup = document.createElement("div");
-        popup.className = "coord-confirm";
-        popup.style.position = "absolute";
-        popup.style.left = `${x}px`;
-        popup.style.top = `${y}px`;
-        popup.style.background = "#fff";
-        popup.style.border = "1px solid #ccc";
-        popup.style.padding = "4px 6px";
-        popup.style.zIndex = 10000;
-        popup.style.boxShadow = "0 2px 4px rgba(0,0,0,0.2)";
-        popup.style.fontSize = "12px";
-
+        Object.assign(popup.style, {
+            position:'absolute', left:`${x}px`, top:`${y}px`,
+            background:'#fff', border:'1px solid #ccc',
+            padding:'4px 6px', zIndex:10000,
+            boxShadow:'0 2px 4px rgba(0,0,0,0.2)', fontSize:'12px'
+        });
         popup.innerHTML = `
             <div style="margin-bottom:4px;">${message}</div>
             <div style="text-align:right;">
@@ -67,31 +63,26 @@
             </div>
         `;
         document.body.appendChild(popup);
-
-        popup.querySelector("#confirmNo").onclick = () => { document.body.removeChild(popup); callback(false); };
-        popup.querySelector("#confirmYes").onclick = () => { document.body.removeChild(popup); callback(true); };
+        popup.querySelector("#confirmNo").onclick = ()=>{document.body.removeChild(popup); callback(false);};
+        popup.querySelector("#confirmYes").onclick = ()=>{document.body.removeChild(popup); callback(true);};
     }
 
-    function refreshMapPoints() {
-        if (!window.map.getSource('user-points')) return;
-
+    function refreshMapPoints(){
+        if(!window.map.getSource('user-points')) return;
         const geojson = {
-            type: "FeatureCollection",
-            features: collectedPoints.map((pt, index) => ({
-                type: "Feature",
-                properties: { label: String.fromCharCode(65 + index) },
-                geometry: { type: "Point", coordinates: [pt.lonDecimal, pt.latDecimal] }
+            type:"FeatureCollection",
+            features: collectedPoints.map((pt,index)=>({
+                type:"Feature",
+                properties:{label:String.fromCharCode(65+index)},
+                geometry:{type:"Point", coordinates:[pt.lonDecimal, pt.latDecimal]}
             }))
         };
-
         window.map.getSource('user-points').setData(geojson);
     }
 
-    function renderPointsList() {
-        // Show box if points exist
+    function renderPointsList(){
         coordinatesBox.style.display = collectedPoints.length ? 'block' : 'none';
-
-        if(!collectedPoints.length) {
+        if(!collectedPoints.length){
             coordinatesBox.innerHTML = "<em>No points yet.</em>";
             return;
         }
@@ -140,14 +131,12 @@
                 <button id="clearCoords" class="coord-main-btn">CLEAR</button>
             </div>
         `;
-
         coordinatesBox.innerHTML = html;
 
         const select = document.getElementById('coordSystemSelect');
         select.value = currentCoordSystem;
-        select.onchange = () => { currentCoordSystem = select.value; renderPointsList(); };
+        select.onchange = ()=>{currentCoordSystem=select.value; renderPointsList();};
 
-        // Delegated click handling
         coordinatesBox.onclick = (e)=>{
             const target = e.target;
             const row = target.closest('.coord-row');
@@ -155,16 +144,12 @@
             const idx = parseInt(row.querySelector('.label-btn').dataset.index);
             const point = collectedPoints[idx];
 
-            if(target.classList.contains('label-btn')) {
-                window.map.flyTo({center:[point.lonDecimal, point.latDecimal], essential:true});
-            }
-
-            if(target.classList.contains('desc-btn')) {
+            if(target.classList.contains('label-btn')) window.map.flyTo({center:[point.lonDecimal, point.latDecimal], essential:true});
+            if(target.classList.contains('desc-btn')){
                 const newDesc = prompt("Edit description:", point.description);
-                if(newDesc !== null) { point.description=newDesc; renderPointsList(); }
+                if(newDesc!==null){point.description=newDesc; renderPointsList();}
             }
-
-            if(target.classList.contains('del-btn')) {
+            if(target.classList.contains('del-btn')){
                 const rect = target.getBoundingClientRect();
                 showConfirmPopup(rect.left+rect.width, rect.top, "Delete this point?", ok=>{
                     if(!ok) return;
@@ -236,6 +221,6 @@
         window.map.off('click', handleMapClick);
     }
 
-    coordinatesButton.addEventListener('click',()=>{ active?disable():enable(); });
+    coordinatesButton.addEventListener('click',()=>{active?disable():enable();});
 
 })();
