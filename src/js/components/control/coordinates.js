@@ -50,13 +50,7 @@
         return `${degrees}°${String(minutes).padStart(2,'0')}'${String(seconds).padStart(7,'0')}" ${hemisphere}`;
     }
 
-// Include proj4.js in your page first: <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.8.0/proj4.js"></script>
-
-function convertCoordinates(lat, lon, system){
-    if(system==='WGS84') return `${lat.toFixed(6)}, ${lon.toFixed(6)}`;
-    if(!(system in projections)) return `${lat.toFixed(6)}, ${lon.toFixed(6)} (${system})`;
-
-
+// projections
 const projections = {
     // --- WGS84 remains decimal lat/lon ---
     WGS84: null, // no conversion needed
@@ -80,6 +74,10 @@ const projections = {
     NAD27_Island_USFt: "+proj=lcc +lat_1=20 +lat_2=21 +lat_0=19 +lon_0=-155 +x_0=0 +y_0=0 +datum=NAD27 +towgs84=-8,160,176,0,0,0,0 +units=us-ft +no_defs"
 };
 
+// Include proj4.js in your page first: <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.8.0/proj4.js"></script>
+
+function convertCoordinates(lat, lon, system){
+    if(system==='WGS84') return `${lat.toFixed(6)}, ${lon.toFixed(6)}`;
     if(!(system in projections)) return `${lat.toFixed(6)}, ${lon.toFixed(6)} (${system})`;
 
     const proj = projections[system];
