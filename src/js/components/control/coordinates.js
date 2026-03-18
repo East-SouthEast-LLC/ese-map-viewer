@@ -51,20 +51,21 @@
     }
 // Conversion factors
 const METERS_TO_USFT = 3937 / 1200;   // US survey feet
-const METERS_TO_INTFT = 10000 / 3048; // international feet (used only if needed)
-
+const METERS_TO_INTFT = 10000 / 3048; // international feet
 
 // EPSG-based projections (metric only)
 const epsgProjections = {
     WGS84: 'EPSG:4326',
     NARTF22_m: 'EPSG:10966',            // NARTF22 (2022) meters
-    NARTF22_iFt: 'EPSG:10966',          // convert to international feet manually if needed
+    NARTF22_iFt: 'EPSG:10966',          // convert to international feet manually
     NAD83_Mainland_m: 'EPSG:6491',      // NAD83(2011) Mainland meters
-    NAD83_Mainland_USFt: 'EPSG:6491',   // will convert meters → US survey feet
+    NAD83_Mainland_USFt: 'EPSG:6491',   // convert meters → US survey feet
     NAD27_Mainland_m: 'EPSG:26786',     // NAD27 Mainland meters
-    NAD27_Mainland_USFt: 'EPSG:26786',  // will convert meters → US survey feet
+    NAD27_Mainland_USFt: 'EPSG:26786',  // convert meters → US survey feet
     NAD83_Island_m: 'EPSG:6489',        // NAD83(2011) Island meters
-    NAD27_Island_m: 'EPSG:26787'        // NAD27 Island meters
+    NAD83_Island_USFt: 'EPSG:6489',     // convert meters → US survey feet
+    NAD27_Island_m: 'EPSG:26787',       // NAD27 Island meters
+    NAD27_Island_USFt: 'EPSG:26787'     // convert meters → US survey feet
 };
 
 // Convert coordinates function
@@ -78,12 +79,15 @@ function convertCoordinates(lat, lon, system){
     try {
         let [x, y] = proj4('EPSG:4326', proj, [lon, lat]); // proj4 expects [lon, lat]
 
-        // Apply US survey foot conversion only for NAD83/NAD27 mainland USFt
-        if(system === 'NAD83_Mainland_USFt' || system === 'NAD27_Mainland_USFt'){
+        // Apply US survey foot conversion
+        if(system === 'NAD83_Mainland_USFt' || system === 'NAD27_Mainland_USFt' ||
+           system === 'NAD83_Island_USFt'    || system === 'NAD27_Island_USFt'){
             x *= METERS_TO_USFT;
             y *= METERS_TO_USFT;
         }
-		        if(system === 'NARTF22_iFt'){
+
+        // Apply international foot conversion
+        if(system === 'NARTF22_iFt'){
             x *= METERS_TO_INTFT;
             y *= METERS_TO_INTFT;
         }
