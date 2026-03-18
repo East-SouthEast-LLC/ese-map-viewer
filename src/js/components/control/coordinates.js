@@ -53,8 +53,9 @@
 // Include proj4.js in your page first: <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.8.0/proj4.js"></script>
 
 function convertCoordinates(lat, lon, system){
-    // WGS84 decimal lat/lon
     if(system==='WGS84') return `${lat.toFixed(6)}, ${lon.toFixed(6)}`;
+    if(!(system in projections)) return `${lat.toFixed(6)}, ${lon.toFixed(6)} (${system})`;
+
 
 const projections = {
     // --- WGS84 remains decimal lat/lon ---
