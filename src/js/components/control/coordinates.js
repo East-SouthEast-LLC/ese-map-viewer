@@ -49,16 +49,19 @@
         if(type==='lon') hemisphere = dec >= 0 ? 'E' : 'W';
         return `${degrees}°${String(minutes).padStart(2,'0')}'${String(seconds).padStart(7,'0')}" ${hemisphere}`;
     }
+// Conversion factors
+const METERS_TO_USFT = 3937 / 1200;   // US survey feet
+const METERS_TO_INTFT = 10000 / 3048; // international feet (used only if needed)
 
-// EPSG-based conversions (approximate, not for legal surveys)
+// EPSG-based projections
 const epsgProjections = {
-    WGS84: 'EPSG:4326',           // lat/lon
-    NARTF22_m: 'EPSG:6530',       // MassGIS NARTF22 meters
-    NARTF22_USFt: 'EPSG:6531',    // NARTF22 US feet
-    NAD83_Mainland_m: 'EPSG:6491', // NAD83 Massachusetts Mainland meters
-    NAD83_Mainland_USFt: 'EPSG:2249', // NAD83 Massachusetts Mainland US feet
-    NAD27_Mainland_m: 'EPSG:26986',   // NAD27 Mainland meters (approx)
-    NAD27_Mainland_USFt: 'EPSG:2249', // rough US feet (note: not exact)
+    WGS84: 'EPSG:4326',
+    NARTF22_m: 'EPSG:6530',             // meters
+    NARTF22_iFt: 'EPSG:6531',           // international feet
+    NAD83_Mainland_m: 'EPSG:26986',
+    NAD83_Mainland_USFt: 'EPSG:26986',  // convert meters → US survey feet
+    NAD27_Mainland_m: 'EPSG:26786',
+    NAD27_Mainland_USFt: 'EPSG:26786',  // convert meters → US survey feet
     // Island zones (placeholders)
     NAD83_Island_m: 'EPSG:6492',
     NAD83_Island_USFt: 'EPSG:6533',
@@ -66,21 +69,28 @@ const epsgProjections = {
     NAD27_Island_USFt: 'EPSG:6534'
 };
 
-// convertCoordinates using EPSG codes
+// Convert coordinates function
 function convertCoordinates(lat, lon, system){
-    if(!(system in epsgProjections)) return `${lat.toFixed(6)}, ${lon.toFixed(6)} (${system})`;
-
-    if(system === 'WGS84') return `${lat.toFixed(6)}, ${lon.toFixed(6)}`;
+    if(system === 'WGS84' || !(system in epsgProjections)){
+        return `${lat.toFixed(6)}, ${lon.toFixed(6)} (${system})`;
+    }
 
     const proj = epsgProjections[system];
 
     try {
-        const [x, y] = proj4('EPSG:4326', proj, [lon, lat]); // proj4 expects [lon, lat]
-        // add thousands separators
+        let [x, y] = proj4('EPSG:4326', proj, [lon, lat]); // proj4 expects [lon, lat]
+
+        // Apply US survey foot conversion only for NAD83/NAD27 mainland USFt
+        if(system === 'NAD83_Mainland_USFt' || system === 'NAD27_Mainland_USFt'){
+            x *= METERS_TO_USFT;
+            y *= METERS_TO_USFT;
+        }
+
+        // Thousands separators
         const xStr = x.toFixed(3).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         const yStr = y.toFixed(3).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         return `${xStr}, ${yStr} (${system})`;
-    } catch (err) {
+    } catch(err) {
         console.warn("Projection failed:", err);
         return `${lat.toFixed(6)}, ${lon.toFixed(6)} (${system} failed)`;
     }
