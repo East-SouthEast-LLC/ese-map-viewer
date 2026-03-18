@@ -50,11 +50,32 @@
         return `${degrees}°${String(minutes).padStart(2,'0')}'${String(seconds).padStart(7,'0')}" ${hemisphere}`;
     }
 
-    // Placeholder: extend to convert projected coordinates
-    function convertCoordinates(lat, lon, system) {
-        if(system==='WGS84') return `${lat.toFixed(6)}, ${lon.toFixed(6)}`;
-        return `${lat.toFixed(3)}, ${lon.toFixed(3)} (${system})`;
-    }
+// Include proj4.js in your page first: <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.8.0/proj4.js"></script>
+
+function convertCoordinates(lat, lon, system){
+    // WGS84 decimal lat/lon
+    if(system==='WGS84') return `${lat.toFixed(6)}, ${lon.toFixed(6)}`;
+
+    // Define projections
+    const projections = {
+        NARTF22_m: "+proj=tmerc +lat_0=0 +lon_0=-69.75 +k=0.9999 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs",
+        NARTF22_USFt: "+proj=tmerc +lat_0=0 +lon_0=-69.75 +k=0.9999 +x_0=0 +y_0=0 +datum=NAD83 +to_meter=0.3048 +units=us-ft +no_defs",
+        NAD83_Mainland_m: "+proj=lcc +lat_1=41.71666666666667 +lat_2=42.68333333333333 +lat_0=41 +lon_0=-71.5 +x_0=200000 +y_0=750000 +datum=NAD83 +units=m +no_defs",
+        NAD83_Mainland_USFt: "+proj=lcc +lat_1=41.71666666666667 +lat_2=42.68333333333333 +lat_0=41 +lon_0=-71.5 +x_0=200000 +y_0=750000 +datum=NAD83 +to_meter=0.3048 +units=us-ft +no_defs",
+        NAD83_Island_m: "+proj=lcc +lat_1=20 +lat_2=21 +lat_0=19 +lon_0=-155 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs",
+        NAD83_Island_USFt: "+proj=lcc +lat_1=20 +lat_2=21 +lat_0=19 +lon_0=-155 +x_0=0 +y_0=0 +datum=NAD83 +to_meter=0.3048 +units=us-ft +no_defs",
+        NAD27_Mainland_m: "+proj=lcc +lat_1=41.71666666666667 +lat_2=42.68333333333333 +lat_0=41 +lon_0=-71.5 +x_0=200000 +y_0=750000 +datum=NAD27 +units=m +no_defs",
+        NAD27_Mainland_USFt: "+proj=lcc +lat_1=41.71666666666667 +lat_2=42.68333333333333 +lat_0=41 +lon_0=-71.5 +x_0=200000 +y_0=750000 +datum=NAD27 +to_meter=0.3048 +units=us-ft +no_defs",
+        NAD27_Island_m: "+proj=lcc +lat_1=20 +lat_2=21 +lat_0=19 +lon_0=-155 +x_0=0 +y_0=0 +datum=NAD27 +units=m +no_defs",
+        NAD27_Island_USFt: "+proj=lcc +lat_1=20 +lat_2=21 +lat_0=19 +lon_0=-155 +x_0=0 +y_0=0 +datum=NAD27 +to_meter=0.3048 +units=us-ft +no_defs"
+    };
+
+    if(!(system in projections)) return `${lat.toFixed(6)}, ${lon.toFixed(6)} (${system})`;
+
+    const proj = projections[system];
+    const [x, y] = proj4("WGS84", proj, [lon, lat]); // note: proj4 takes [lon, lat]
+    return `${x.toFixed(3)}, ${y.toFixed(3)} (${system})`;
+}
 
     function showConfirmPopup(x, y, message, callback){
         const popup = document.createElement("div");
