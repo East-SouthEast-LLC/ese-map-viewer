@@ -56,19 +56,28 @@ function convertCoordinates(lat, lon, system){
     // WGS84 decimal lat/lon
     if(system==='WGS84') return `${lat.toFixed(6)}, ${lon.toFixed(6)}`;
 
-    // Define projections
-    const projections = {
-        NARTF22_m: "+proj=tmerc +lat_0=0 +lon_0=-69.75 +k=0.9999 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs",
-        NARTF22_USFt: "+proj=tmerc +lat_0=0 +lon_0=-69.75 +k=0.9999 +x_0=0 +y_0=0 +datum=NAD83 +to_meter=0.3048 +units=us-ft +no_defs",
-        NAD83_Mainland_m: "+proj=lcc +lat_1=41.71666666666667 +lat_2=42.68333333333333 +lat_0=41 +lon_0=-71.5 +x_0=200000 +y_0=750000 +datum=NAD83 +units=m +no_defs",
-        NAD83_Mainland_USFt: "+proj=lcc +lat_1=41.71666666666667 +lat_2=42.68333333333333 +lat_0=41 +lon_0=-71.5 +x_0=200000 +y_0=750000 +datum=NAD83 +to_meter=0.3048 +units=us-ft +no_defs",
-        NAD83_Island_m: "+proj=lcc +lat_1=20 +lat_2=21 +lat_0=19 +lon_0=-155 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs",
-        NAD83_Island_USFt: "+proj=lcc +lat_1=20 +lat_2=21 +lat_0=19 +lon_0=-155 +x_0=0 +y_0=0 +datum=NAD83 +to_meter=0.3048 +units=us-ft +no_defs",
-        NAD27_Mainland_m: "+proj=lcc +lat_1=41.71666666666667 +lat_2=42.68333333333333 +lat_0=41 +lon_0=-71.5 +x_0=200000 +y_0=750000 +datum=NAD27 +units=m +no_defs",
-        NAD27_Mainland_USFt: "+proj=lcc +lat_1=41.71666666666667 +lat_2=42.68333333333333 +lat_0=41 +lon_0=-71.5 +x_0=200000 +y_0=750000 +datum=NAD27 +to_meter=0.3048 +units=us-ft +no_defs",
-        NAD27_Island_m: "+proj=lcc +lat_1=20 +lat_2=21 +lat_0=19 +lon_0=-155 +x_0=0 +y_0=0 +datum=NAD27 +units=m +no_defs",
-        NAD27_Island_USFt: "+proj=lcc +lat_1=20 +lat_2=21 +lat_0=19 +lon_0=-155 +x_0=0 +y_0=0 +datum=NAD27 +to_meter=0.3048 +units=us-ft +no_defs"
-    };
+const projections = {
+    // --- WGS84 remains decimal lat/lon ---
+    WGS84: null, // no conversion needed
+
+    // --- NARTF22 (Massachusetts TM) ---
+    NARTF22_m: "+proj=tmerc +lat_0=42.0 +lon_0=-71.5 +k=1.0 +x_0=200000 +y_0=750000 +datum=NAD83 +units=m +no_defs",
+    NARTF22_USFt: "+proj=tmerc +lat_0=42.0 +lon_0=-71.5 +k=1.0 +x_0=656167 +y_0=2460629 +datum=NAD83 +units=us-ft +no_defs",
+
+    // --- NAD83 Mainland (Massachusetts LCC) ---
+    NAD83_Mainland_m: "+proj=lcc +lat_1=41.71666666666667 +lat_2=42.68333333333333 +lat_0=41 +lon_0=-71.5 +x_0=200000 +y_0=750000 +datum=NAD83 +units=m +no_defs",
+    NAD83_Mainland_USFt: "+proj=lcc +lat_1=41.71666666666667 +lat_2=42.68333333333333 +lat_0=41 +lon_0=-71.5 +x_0=656167 +y_0=2460629 +datum=NAD83 +units=us-ft +no_defs",
+
+    // --- NAD27 Mainland (Massachusetts LCC) with rough datum shift ---
+    NAD27_Mainland_m: "+proj=lcc +lat_1=41.71666666666667 +lat_2=42.68333333333333 +lat_0=41 +lon_0=-71.5 +x_0=200000 +y_0=750000 +datum=NAD27 +towgs84=-8,160,176,0,0,0,0 +units=m +no_defs",
+    NAD27_Mainland_USFt: "+proj=lcc +lat_1=41.71666666666667 +lat_2=42.68333333333333 +lat_0=41 +lon_0=-71.5 +x_0=656167 +y_0=2460629 +datum=NAD27 +towgs84=-8,160,176,0,0,0,0 +units=us-ft +no_defs",
+
+    // --- Optional Island placeholders ---
+    NAD83_Island_m: "+proj=lcc +lat_1=20 +lat_2=21 +lat_0=19 +lon_0=-155 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs",
+    NAD83_Island_USFt: "+proj=lcc +lat_1=20 +lat_2=21 +lat_0=19 +lon_0=-155 +x_0=0 +y_0=0 +datum=NAD83 +units=us-ft +no_defs",
+    NAD27_Island_m: "+proj=lcc +lat_1=20 +lat_2=21 +lat_0=19 +lon_0=-155 +x_0=0 +y_0=0 +datum=NAD27 +towgs84=-8,160,176,0,0,0,0 +units=m +no_defs",
+    NAD27_Island_USFt: "+proj=lcc +lat_1=20 +lat_2=21 +lat_0=19 +lon_0=-155 +x_0=0 +y_0=0 +datum=NAD27 +towgs84=-8,160,176,0,0,0,0 +units=us-ft +no_defs"
+};
 
     if(!(system in projections)) return `${lat.toFixed(6)}, ${lon.toFixed(6)} (${system})`;
 
