@@ -53,20 +53,18 @@
 const METERS_TO_USFT = 3937 / 1200;   // US survey feet
 const METERS_TO_INTFT = 10000 / 3048; // international feet (used only if needed)
 
-// EPSG-based projections
+
+// EPSG-based projections (metric only)
 const epsgProjections = {
     WGS84: 'EPSG:4326',
-    NARTF22_m: 'EPSG:6530',             // meters
-    NARTF22_iFt: 'EPSG:6531',           // international feet
-    NAD83_Mainland_m: 'EPSG:26986',
-    NAD83_Mainland_USFt: 'EPSG:26986',  // convert meters → US survey feet
-    NAD27_Mainland_m: 'EPSG:26786',
-    NAD27_Mainland_USFt: 'EPSG:26786',  // convert meters → US survey feet
-    // Island zones (placeholders)
-    NAD83_Island_m: 'EPSG:6492',
-    NAD83_Island_USFt: 'EPSG:6533',
-    NAD27_Island_m: 'EPSG:6493',
-    NAD27_Island_USFt: 'EPSG:6534'
+    NARTF22_m: 'EPSG:10966',            // NARTF22 (2022) meters
+    NARTF22_iFt: 'EPSG:10966',          // convert to international feet manually if needed
+    NAD83_Mainland_m: 'EPSG:6491',      // NAD83(2011) Mainland meters
+    NAD83_Mainland_USFt: 'EPSG:6491',   // will convert meters → US survey feet
+    NAD27_Mainland_m: 'EPSG:26786',     // NAD27 Mainland meters
+    NAD27_Mainland_USFt: 'EPSG:26786',  // will convert meters → US survey feet
+    NAD83_Island_m: 'EPSG:6489',        // NAD83(2011) Island meters
+    NAD27_Island_m: 'EPSG:26787'        // NAD27 Island meters
 };
 
 // Convert coordinates function
@@ -85,10 +83,15 @@ function convertCoordinates(lat, lon, system){
             x *= METERS_TO_USFT;
             y *= METERS_TO_USFT;
         }
+		        if(system === 'NARTF22_iFt'){
+            x *= METERS_TO_INTFT;
+            y *= METERS_TO_INTFT;
+        }
 
         // Thousands separators
         const xStr = x.toFixed(3).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         const yStr = y.toFixed(3).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
         return `${xStr}, ${yStr} (${system})`;
     } catch(err) {
         console.warn("Projection failed:", err);
