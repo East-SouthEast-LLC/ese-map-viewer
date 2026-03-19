@@ -272,23 +272,33 @@ collectedPoints.forEach((p,index)=>{
             navigator.clipboard.writeText(csv).then(()=>alert("Copied to clipboard"));
         };
     }
-    if(exportBtn){
-        exportBtn.onclick = ()=>{
-            if(!collectedPoints.length){ alert("No points to export."); return; }
-            let csv = "Label,Coordinates,Description\n";
-            collectedPoints.forEach((p,i)=>{
-                const coordDisplay = convertCoordinates(p.latDecimal,p.lonDecimal,currentCoordSystem);
-                csv += `${String.fromCharCode(65+i)}","${coordDisplay},"${p.description}"\n`;
-            });
-            const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement("a");
-            link.href = url;
-            link.download = "coordinates_export.csv";
-            link.click();
-            URL.revokeObjectURL(url);
-        };
-    }
+if(exportBtn){
+    exportBtn.onclick = () => {
+        if(!collectedPoints.length){ 
+            alert("No points to export."); 
+            return; 
+        }
+
+        let csv = "Label,Coordinates,Description\n";
+
+        collectedPoints.forEach((p,i)=>{
+            const coordDisplay = convertCoordinates(p.latDecimal, p.lonDecimal, currentCoordSystem);
+            const label = String.fromCharCode(65 + i);
+            const desc = p.description ? p.description : "";
+
+            // Plain text, no quotes
+            csv += `${label},${coordDisplay},${desc}\n`;
+        });
+
+        const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "coordinates_export.csv";
+        link.click();
+        URL.revokeObjectURL(url);
+    };
+}
     if(clearBtn){
         clearBtn.onclick = ()=>{
             if(!confirm("Clear all points?")) return;
