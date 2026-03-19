@@ -170,6 +170,7 @@ function renderPointsList(){
 // i removed the NAD27 options, see above
     let html = `
         <div class="coord-title">Collected Points</div>
+		<div class="coord-disclaimer">Transformations are approximate.</div>
         <div class="coord-dropdown" style="margin-bottom:6px;">
             <label for="coordSystemSelect">Coordinate System:</label>
             <select id="coordSystemSelect">
