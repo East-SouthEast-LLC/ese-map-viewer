@@ -153,7 +153,7 @@ function exportToCSV() {
     }
 
     // Header line
-    let csv = "Label,Description,Latitude,Longitude\n";
+    let csv = "Label,Latitude,Longitude,Description\n";
 
     collectedPoints.forEach((p, i) => {
         const label = String.fromCharCode(65 + i);
