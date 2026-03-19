@@ -61,7 +61,7 @@ proj4.defs("EPSG:6491", "+proj=lcc +lat_0=41 +lon_0=-71.5 +lat_1=42.683333333333
 proj4.defs("EPSG:6489", "+proj=lcc +lat_0=41 +lon_0=-71.5 +lat_1=41.7166666666667 +lat_2=42.6833333333333 +x_0=182880.365760731 +y_0=0 +datum=NAD27 +units=us-ft +no_defs");
 proj4.defs("EPSG:26786", "+proj=lcc +lat_0=41 +lon_0=-71.5 +lat_1=41.7166666666667 +lat_2=42.6833333333333 +x_0=55742.04697 +y_0=0 +ellps=clrk66 +units=m +no_defs +type=crs");
 proj4.defs("EPSG:26787", "+proj=lcc +lat_0=41 +lon_0=-70.5 +lat_1=41.2833333333333 +lat_2=41.4833333333333 +x_0=18592.8 +y_0=0 +datum=NAD27 +ellps=clrk66 +units=m +no_defs");
-proj4.defs("EPSG:10966", "+proj=lcc +lat_0=42.0666666667 +lon_0=-71.5 +k_0=0.99999 +x_0=533400 +y_0=228600 +ellps=GRS80 +units=m +no_defs"");
+proj4.defs("EPSG:10966", "+proj=lcc +lat_0=42.0666666667 +lon_0=-71.5 +k_0=0.99999 +x_0=533400 +y_0=228600 +ellps=GRS80 +units=m +no_defs");
 // EPSG-based projections (metric only)
 const epsgProjections = {
     WGS84: 'EPSG:4326',
