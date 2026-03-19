@@ -172,7 +172,7 @@ function renderPointsList(){
             <select id="coordSystemSelect">
                 <option value="WGS84">WGS84</option>
                 <option value="NARTF22_m">NARTF22 meters</option>
-                <option value="NARTF22_USFt">NARTF22 US feet</option>
+                <option value="NARTF22_iFt">NARTF22 International feet</option>
                 <option value="NAD83_Mainland_m">NAD83 Mainland meters</option>
                 <option value="NAD83_Mainland_USFt">NAD83 Mainland US feet</option>
                 <option value="NAD83_Island_m">NAD83 Island meters</option>
