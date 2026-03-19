@@ -146,23 +146,33 @@ function convertCoordinates(lat, lon, system){
         window.map.getSource('user-points').setData(geojson);
     }
 
-    function exportToCSV() {
-        if (!collectedPoints.length) {
-            alert("No points to export.");
-            return;
-        }
-        let csv = "Label,Description,Latitude,Longitude\n";
-        collectedPoints.forEach((p,i)=>{
-            csv += `"${String.fromCharCode(65+i)}","${p.description}",${p.latDecimal},${p.lonDecimal}\n`;
-        });
-        const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = "coordinates_export.csv";
-        link.click();
-        URL.revokeObjectURL(url);
+function exportToCSV() {
+    if (!collectedPoints.length) {
+        alert("No points to export.");
+        return;
     }
+
+    // Header line
+    let csv = "Label,Description,Latitude,Longitude\n";
+
+    collectedPoints.forEach((p, i) => {
+        const label = String.fromCharCode(65 + i);
+        const desc = p.description ? p.description : "";
+        const lat = p.latDecimal;
+        const lon = p.lonDecimal;
+
+        // Concatenate fields without quotes
+        csv += `${label},${lat},${lon},${desc}\n`;
+    });
+
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "coordinates_export.csv";
+    link.click();
+    URL.revokeObjectURL(url);
+}
 
 function renderPointsList(){
     updateBoxPosition();
