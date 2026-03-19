@@ -275,10 +275,10 @@ collectedPoints.forEach((p,index)=>{
     if(exportBtn){
         exportBtn.onclick = ()=>{
             if(!collectedPoints.length){ alert("No points to export."); return; }
-            let csv = "Label,Description,Coordinates\n";
+            let csv = "Label,Coordinates,Description\n";
             collectedPoints.forEach((p,i)=>{
                 const coordDisplay = convertCoordinates(p.latDecimal,p.lonDecimal,currentCoordSystem);
-                csv += `"${String.fromCharCode(65+i)}","${p.description}","${coordDisplay}"\n`;
+                csv += `${String.fromCharCode(65+i)}","${coordDisplay},"${p.description}"\n`;
             });
             const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
             const url = URL.createObjectURL(blob);
