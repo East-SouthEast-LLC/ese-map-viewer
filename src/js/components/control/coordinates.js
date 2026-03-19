@@ -57,8 +57,7 @@ proj4.defs("EPSG:6491", "+proj=lcc +lat_0=41 +lon_0=-71.5 +lat_1=42.683333333333
 proj4.defs("EPSG:6489", "+proj=lcc +lat_0=41 +lon_0=-70.5 +lat_1=41.4833333333333 +lat_2=41.2833333333333 +x_0=500000 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs");
 proj4.defs("EPSG:26786", "+proj=lcc +lat_0=41 +lon_0=-71.5 +lat_1=41.7166666666667 +lat_2=42.6833333333333 +x_0=182880.365760732 +y_0=0 +datum=NAD27 +units=us-ft +no_defs");
 proj4.defs("EPSG:26787", "+proj=lcc +lat_0=41 +lon_0=-70.5 +lat_1=41.2833333333333 +lat_2=41.4833333333333 +x_0=60960.1219202439 +y_0=0 +datum=NAD27 +units=us-ft +no_defs");
-proj4.defs("EPSG:10966", "+proj=lcc +lat_0=41 +lon_0=-71.5 +lat_1=42.6833333333333 +lat_2=41.7166666666667 +x_0=200000 +y_0=750000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs");
-//proj4.defs("EPSG:10966", "+proj=lcc +lat_1=42.68333333333333 +lat_2=41.71666666666667 +lat_0=41 +lon_0=-71.5 +x_0=200000 +y_0=750000 +ellps=GRS80 +units=m +no_defs");
+proj4.defs("EPSG:10966", "+proj=lcc +lat_1=42.68333333333333 +lat_2=41.71666666666667 +lat_0=41 +lon_0=-71.5 +x_0=200000 +y_0=750000 +ellps=GRS80 +units=m +no_defs");
 // EPSG-based projections (metric only)
 const epsgProjections = {
     WGS84: 'EPSG:4326',
@@ -103,7 +102,7 @@ function convertCoordinates(lat, lon, system){
         const xStr = x.toFixed(3).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         const yStr = y.toFixed(3).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
-        return `${xStr}, ${yStr} (${system})`;
+        return `${yStr}, ${xStr} (${system})`;
     } catch(err) {
         console.warn("Projection failed:", err);
         return `${lat.toFixed(6)}, ${lon.toFixed(6)} (${system} failed)`;
