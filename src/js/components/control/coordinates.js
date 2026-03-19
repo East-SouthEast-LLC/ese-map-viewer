@@ -84,18 +84,17 @@ function convertCoordinates(lat, lon, system){
     try {
         let [x, y] = proj4('EPSG:4326', proj, [lon, lat]); // proj4 expects [lon, lat]
 
-        // Apply US survey foot conversion
-        if(system === 'NAD83_Mainland_USFt' || system === 'NAD27_Mainland_USFt' ||
-           system === 'NAD83_Island_USFt'    || system === 'NAD27_Island_USFt'){
-            x *= METERS_TO_USFT;
-            y *= METERS_TO_USFT;
-        }
+// Apply US survey foot conversion
+if(system.endsWith('_USFt')){
+    x *= METERS_TO_USFT;
+    y *= METERS_TO_USFT;
+}
 
-        // Apply international foot conversion
-        if(system === 'NARTF22_iFt'){
-            x *= METERS_TO_INTFT;
-            y *= METERS_TO_INTFT;
-        }
+// Apply international foot conversion
+if(system.endsWith('_iFt')){
+    x *= METERS_TO_INTFT;
+    y *= METERS_TO_INTFT;
+}
 
         // Thousands separators
         const xStr = x.toFixed(3).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
