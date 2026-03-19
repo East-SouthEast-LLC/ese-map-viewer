@@ -54,16 +54,20 @@ const METERS_TO_USFT = 3937 / 1200;   // US survey feet
 const METERS_TO_INTFT = 10000 / 3048; // international feet
 // Make sure Proj4js is loaded
 proj4.defs("EPSG:6491", "+proj=lcc +lat_0=41 +lon_0=-71.5 +lat_1=42.6833333333333 +lat_2=41.7166666666667 +x_0=200000 +y_0=750000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs");
+proj4.defs("EPSG:6489", "+proj=lcc +lat_0=41 +lon_0=-70.5 +lat_1=41.4833333333333 +lat_2=41.2833333333333 +x_0=500000 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs");
+proj4.defs("EPSG:26786", "+proj=lcc +lat_0=41 +lon_0=-71.5 +lat_1=41.7166666666667 +lat_2=42.6833333333333 +x_0=182880.365760732 +y_0=0 +datum=NAD27 +units=us-ft +no_defs");
+proj4.defs("EPSG:26787", "+proj=lcc +lat_0=41 +lon_0=-70.5 +lat_1=41.2833333333333 +lat_2=41.4833333333333 +x_0=60960.1219202439 +y_0=0 +datum=NAD27 +units=us-ft +no_defs");
+proj4.defs("EPSG:10966", "+proj=lcc +lat_1=42.68333333333333 +lat_2=41.71666666666667 +lat_0=41 +lon_0=-71.5 +x_0=200000 +y_0=750000 +ellps=GRS80 +units=m +no_defs");
 // EPSG-based projections (metric only)
 const epsgProjections = {
     WGS84: 'EPSG:4326',
     NARTF22_m: 'EPSG:10966',            // NARTF22 (2022) meters
     NARTF22_iFt: 'EPSG:10966',          // convert to international feet manually
-    NAD83_Mainland_m: 'EPSG:6491',      // NAD83(2011) Mainland meters
+    NAD83_Mainland_m: 'EPSG:6491',      // NAD83 Mainland meters
     NAD83_Mainland_USFt: 'EPSG:6491',   // convert meters → US survey feet
     NAD27_Mainland_m: 'EPSG:26786',     // NAD27 Mainland meters
     NAD27_Mainland_USFt: 'EPSG:26786',  // convert meters → US survey feet
-    NAD83_Island_m: 'EPSG:6489',        // NAD83(2011) Island meters
+    NAD83_Island_m: 'EPSG:6489',        // NAD83 Island meters
     NAD83_Island_USFt: 'EPSG:6489',     // convert meters → US survey feet
     NAD27_Island_m: 'EPSG:26787',       // NAD27 Island meters
     NAD27_Island_USFt: 'EPSG:26787'     // convert meters → US survey feet
