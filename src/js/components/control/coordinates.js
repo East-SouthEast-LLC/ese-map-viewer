@@ -53,6 +53,10 @@
 const METERS_TO_USFT = 3937 / 1200;   // US survey feet
 const METERS_TO_INTFT = 10000 / 3048; // international feet
 // Make sure Proj4js is loaded
+
+// I am having trouble getting the NAD27 references defined, so I am cutting them but leaving the code here for someday when we return to such adventures.
+// Be sure to add the options back into the dropdown.
+
 proj4.defs("EPSG:6491", "+proj=lcc +lat_0=41 +lon_0=-71.5 +lat_1=42.6833333333333 +lat_2=41.7166666666667 +x_0=200000 +y_0=750000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs");
 proj4.defs("EPSG:6489", "+proj=lcc +lat_0=41 +lon_0=-71.5 +lat_1=41.7166666666667 +lat_2=42.6833333333333 +x_0=182880.365760731 +y_0=0 +datum=NAD27 +units=us-ft +no_defs");
 proj4.defs("EPSG:26786", "+proj=lcc +lat_0=41 +lon_0=-71.5 +lat_1=41.7166666666667 +lat_2=42.6833333333333 +x_0=55742.04697 +y_0=0 +ellps=clrk66 +units=m +no_defs +type=crs");
@@ -163,7 +167,7 @@ function convertCoordinates(lat, lon, system){
 function renderPointsList(){
     updateBoxPosition();
     coordinatesBox.style.display = 'block';
-
+// i removed the NAD27 options, see above
     let html = `
         <div class="coord-title">Collected Points</div>
         <div class="coord-dropdown" style="margin-bottom:6px;">
@@ -176,10 +180,6 @@ function renderPointsList(){
                 <option value="NAD83_Mainland_USFt">NAD83 Mainland US feet</option>
                 <option value="NAD83_Island_m">NAD83 Island meters</option>
                 <option value="NAD83_Island_USFt">NAD83 Island US feet</option>
-                <option value="NAD27_Mainland_m">NAD27 Mainland meters</option>
-                <option value="NAD27_Mainland_USFt">NAD27 Mainland US feet</option>
-                <option value="NAD27_Island_m">NAD27 Island meters</option>
-                <option value="NAD27_Island_USFt">NAD27 Island US feet</option>
             </select>
         </div>
     `;
