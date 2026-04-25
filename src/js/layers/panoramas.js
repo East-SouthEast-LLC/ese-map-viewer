@@ -7,6 +7,7 @@ async function addPanoramasLayer() {
     try {
         const response = await fetch('https://east-southeast-llc.github.io/ese-map-viewer/assets/data/pano_correction_data.json');
         const panoData = await response.json();
+		window.panoramaData = panoData;
 
         proj4.defs("EPSG:26986", "+proj=lcc +lat_1=42.68333333333333 +lat_2=41.71666666666667 +lat_0=41 +lon_0=-71.5 +x_0=200000 +y_0=750000 +ellps=GRS80 +datum=NAD83 +units=m +no_defs");
         proj4.defs("EPSG:4326", "+proj=longlat +datum=WGS84 +no_defs");
