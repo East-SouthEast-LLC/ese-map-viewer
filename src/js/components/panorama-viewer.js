@@ -16,10 +16,9 @@ function preloadPanoImages(currentIndex) {
   const nextPanoFile = window.panoramaOrder[nextIndex];
   const prevPanoFile = window.panoramaOrder[prevIndex];
   const nextImage = new Image();
-	nextImage.src = window.panoramaData?.[nextPanoFile]?.url || `https://www.ese-llc.com/s/${nextPanoFile}`;
+  nextImage.src = window.panoramaData?.[nextPanoFile]?.url || `https://www.ese-llc.com/s/${nextPanoFile}`;
   const prevImage = new Image();
-	prevImage.src = window.panoramaData?.[prevPanoFile]?.url || `https://www.ese-llc.com/s/${prevPanoFile}`;
-
+  prevImage.src = window.panoramaData?.[prevPanoFile]?.url || `https://www.ese-llc.com/s/${prevPanoFile}`;
 }
 
 function highlightViewedPano(panoId) {
@@ -42,10 +41,16 @@ function openPanoModal(currentIndex) {
   const filename = window.panoramaOrder[currentIndex];
   window.lastViewedPanoId = filename;
   trackEvent("view_panorama", { pano_id: filename });
-const panoViewerUrl = window.panoramaData?.[filename]?.url || `https://www.ese-llc.com/s/${filename}`;
 
-  // --- diagnostic line added ---
-  console.log("debug: generated pano viewer url:", panoViewerUrl);
+  // Get the full image URL from panoramaData, fall back to Squarespace
+  const imageUrl = window.panoramaData?.[filename]?.url || `https://www.ese-llc.com/s/${filename}`;
+
+  // Pass the full image URL as a parameter to the pano viewer page
+  // The viewer page handles Pannellum initialization and correction data lookup
+  const panoViewerUrl = `https://east-southeast-llc.github.io/ese-pano-viewer/docs/index.html?pano=${encodeURIComponent(imageUrl)}`;
+
+  console.log("debug: image url:", imageUrl);
+  console.log("debug: viewer url:", panoViewerUrl);
 
   const modal = document.createElement("div");
   modal.id = "pano-modal";
