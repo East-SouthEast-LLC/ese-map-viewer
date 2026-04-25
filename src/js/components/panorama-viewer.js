@@ -42,8 +42,7 @@ function openPanoModal(currentIndex) {
   const filename = window.panoramaOrder[currentIndex];
   window.lastViewedPanoId = filename;
   trackEvent("view_panorama", { pano_id: filename });
-const panoViewerUrl = data[filename]?.url || `https://www.ese-llc.com/s/${filename}`;
-
+const panoViewerUrl = window.panoramaData?.[filename]?.url || `https://www.ese-llc.com/s/${filename}`;
 
   // --- diagnostic line added ---
   console.log("debug: generated pano viewer url:", panoViewerUrl);
