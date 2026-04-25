@@ -16,9 +16,10 @@ function preloadPanoImages(currentIndex) {
   const nextPanoFile = window.panoramaOrder[nextIndex];
   const prevPanoFile = window.panoramaOrder[prevIndex];
   const nextImage = new Image();
-  nextImage.src = `https://www.ese-llc.com/s/${nextPanoFile}`;
+	nextImage.src = window.panoramaData?.[nextPanoFile]?.url || `https://www.ese-llc.com/s/${nextPanoFile}`;
   const prevImage = new Image();
-  prevImage.src = `https://www.ese-llc.com/s/${prevPanoFile}`;
+	prevImage.src = window.panoramaData?.[prevPanoFile]?.url || `https://www.ese-llc.com/s/${prevPanoFile}`;
+
 }
 
 function highlightViewedPano(panoId) {
@@ -41,8 +42,8 @@ function openPanoModal(currentIndex) {
   const filename = window.panoramaOrder[currentIndex];
   window.lastViewedPanoId = filename;
   trackEvent("view_panorama", { pano_id: filename });
-//  const panoViewerUrl = `https://www.ese-llc.com/pano-viewer?pano=${filename}`;
-  const panoViewerUrl = `${filename}`;
+const panoViewerUrl = data[filename]?.url || `https://www.ese-llc.com/s/${filename}`;
+
 
   // --- diagnostic line added ---
   console.log("debug: generated pano viewer url:", panoViewerUrl);
