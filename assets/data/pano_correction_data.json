@@ -52588,5 +52588,53 @@
       "y": -0.106634,
       "z": 0.682023
     }
+  },
+  "STAGE_HARBOR_ROAD_2026-04-22_00000.jpg": {
+    "id": 0,
+    "url": "https://pub-d8f97cda49514ea882c5f06ffdb4a86b.r2.dev/STAGE_HARBOR_ROAD_2026-04-22/STAGE_HARBOR_ROAD_2026-04-22_00000.jpg",
+    "timestamp": 1776874643.662,
+    "position": {
+      "x": 328051.960171,
+      "y": 826862.707025,
+      "z": 5.807477
+    },
+    "orientation": {
+      "w": 0.316057,
+      "x": 0.174375,
+      "y": 0.002925,
+      "z": 0.932573
+    }
+  },
+  "STAGE_HARBOR_ROAD_2026-04-22_00001.jpg": {
+    "id": 1,
+    "url": "https://pub-d8f97cda49514ea882c5f06ffdb4a86b.r2.dev/STAGE_HARBOR_ROAD_2026-04-22/STAGE_HARBOR_ROAD_2026-04-22_00001.jpg",
+    "timestamp": 1776874650.757314,
+    "position": {
+      "x": 328048.977927,
+      "y": 826869.288681,
+      "z": 5.750673
+    },
+    "orientation": {
+      "w": 0.642609,
+      "x": 0.203558,
+      "y": -0.169125,
+      "z": 0.719038
+    }
+  },
+  "STAGE_HARBOR_ROAD_2026-04-22_00002.jpg": {
+    "id": 2,
+    "url": "https://pub-d8f97cda49514ea882c5f06ffdb4a86b.r2.dev/STAGE_HARBOR_ROAD_2026-04-22/STAGE_HARBOR_ROAD_2026-04-22_00002.jpg",
+    "timestamp": 1776874662.54251,
+    "position": {
+      "x": 328044.066208,
+      "y": 826880.186819,
+      "z": 6.084969
+    },
+    "orientation": {
+      "w": -0.319027,
+      "x": 0.225427,
+      "y": 0.04548,
+      "z": 0.919422
+    }
   }
 }
