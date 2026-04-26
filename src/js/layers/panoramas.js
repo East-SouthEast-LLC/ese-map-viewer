@@ -5,7 +5,7 @@ window.panoramaOrder = [];
 
 async function addPanoramasLayer() {
     try {
-        const response = await fetch('https://east-southeast-llc.github.io/ese-map-viewer/assets/data/pano_correction_data.json');
+        const response = await fetch('https://pub-d8f97cda49514ea882c5f06ffdb4a86b.r2.dev/pano_data.json');
         const panoData = await response.json();
 		window.panoramaData = panoData;
 
