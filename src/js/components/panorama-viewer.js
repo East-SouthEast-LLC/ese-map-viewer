@@ -142,10 +142,21 @@ function openPanoModal(currentIndex) {
   // Initialize Pannellum directly in the modal div
   pannellumViewer = pannellum.viewer('pannellum-container', config);
 
-  preloadPanoImages(currentIndex);
+  // Delay preloading neighbors until the target image has fully loaded.
+  // This prevents a CORS preflight race condition where all three images
+  // fire simultaneous requests before any preflight response is cached.
+  pannellumViewer.on('load', function() {
+    preloadPanoImages(currentIndex);
+  });
 }
 
 function initializePanoramaViewer() {
+  // Warm up the CORS preflight to R2 before any panorama is clicked.
+  // This ensures the browser has a cached preflight response ready,
+  // preventing the first image load from losing the preflight race.
+  fetch('https://pub-d8f97cda49514ea882c5f06ffdb4a86b.r2.dev/', { method: 'HEAD', mode: 'cors' })
+    .catch(() => {}); // silent — we don't care about the result
+
   map.on("click", "panoramas", function (e) {
     if (e.features.length > 0) {
       const feature = e.features[0];
