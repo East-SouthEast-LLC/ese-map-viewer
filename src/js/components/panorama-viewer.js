@@ -26,18 +26,7 @@ function navigateToPano(newIndex) {
   openPanoModal(newIndex);
 }
 
-function preloadPanoImages(currentIndex) {
-  if (!window.panoramaOrder || window.panoramaOrder.length === 0) return;
-  const totalPanos = window.panoramaOrder.length;
-  const nextIndex = (currentIndex + 1) % totalPanos;
-  const prevIndex = (currentIndex - 1 + totalPanos) % totalPanos;
-  const nextPanoFile = window.panoramaOrder[nextIndex];
-  const prevPanoFile = window.panoramaOrder[prevIndex];
-  const nextImage = new Image();
-  nextImage.src = window.panoramaData?.[nextPanoFile]?.url || `https://www.ese-llc.com/s/${nextPanoFile}`;
-  const prevImage = new Image();
-  prevImage.src = window.panoramaData?.[prevPanoFile]?.url || `https://www.ese-llc.com/s/${prevPanoFile}`;
-}
+
 
 function highlightViewedPano(panoId) {
   if (panoId && map.getSource("panoramas-source")) {
@@ -141,13 +130,6 @@ function openPanoModal(currentIndex) {
 
   // Initialize Pannellum directly in the modal div
   pannellumViewer = pannellum.viewer('pannellum-container', config);
-
-  // Delay preloading neighbors until the target image has fully loaded.
-  // This prevents a CORS preflight race condition where all three images
-  // fire simultaneous requests before any preflight response is cached.
-  pannellumViewer.on('load', function() {
-    preloadPanoImages(currentIndex);
-  });
 }
 
 function initializePanoramaViewer() {
