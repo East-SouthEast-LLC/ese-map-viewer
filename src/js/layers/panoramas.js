@@ -3,11 +3,16 @@
 // make panoramaOrder a global variable
 window.panoramaOrder = [];
 
+// Ready gate — resolves when panoramaData is fully loaded
+let _panoramaDataResolve;
+window.panoramaDataReady = new Promise(resolve => { _panoramaDataResolve = resolve; });
+
 async function addPanoramasLayer() {
     try {
         const response = await fetch('https://pub-d8f97cda49514ea882c5f06ffdb4a86b.r2.dev/pano_data.json');
         const panoData = await response.json();
-		window.panoramaData = panoData;
+        window.panoramaData = panoData;
+        _panoramaDataResolve(); // signal that data is ready
 
         proj4.defs("EPSG:26986", "+proj=lcc +lat_1=42.68333333333333 +lat_2=41.71666666666667 +lat_0=41 +lon_0=-71.5 +x_0=200000 +y_0=750000 +ellps=GRS80 +datum=NAD83 +units=m +no_defs");
         proj4.defs("EPSG:4326", "+proj=longlat +datum=WGS84 +no_defs");
