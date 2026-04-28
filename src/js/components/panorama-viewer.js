@@ -43,8 +43,12 @@ function highlightViewedPano(panoId) {
   }
 }
 
-function openPanoModal(currentIndex) {
+async function openPanoModal(currentIndex) {
   if (currentIndex < 0 || currentIndex >= window.panoramaOrder.length) return;
+
+  // Wait for panoramaData to be fully loaded before resolving URLs
+  await window.panoramaDataReady;
+
   const filename = window.panoramaOrder[currentIndex];
   window.lastViewedPanoId = filename;
   trackEvent("view_panorama", { pano_id: filename });
