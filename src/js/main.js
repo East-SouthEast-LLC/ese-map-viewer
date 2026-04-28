@@ -229,16 +229,6 @@ map.moveLayer('print-marker-layer');
                         await loadLayerScript(layer.scriptName);
                     }
                     
-                    // Load panorama correction data so panorama-viewer.js can look up URLs
-                    try {
-                        const panoDataResponse = await fetch('https://east-southeast-llc.github.io/ese-map-viewer/assets/data/pano_correction_data.json');
-                        window.panoramaData = await panoDataResponse.json();
-                        console.log("Panorama data loaded:", Object.keys(window.panoramaData).length, "entries");
-                    } catch (e) {
-                        console.warn("Could not load panorama data:", e);
-                        window.panoramaData = {};
-                    }
-
                     const controlScripts = [
                         "https://east-southeast-llc.github.io/ese-map-viewer/src/js/utils/map-helpers.js",
                         "https://east-southeast-llc.github.io/ese-map-viewer/src/js/components/control/marker.js",
