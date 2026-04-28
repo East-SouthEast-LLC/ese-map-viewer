@@ -1,5 +1,5 @@
 // docs/layers/panoramas.js
-
+// trivial change
 // make panoramaOrder a global variable
 window.panoramaOrder = [];
 
