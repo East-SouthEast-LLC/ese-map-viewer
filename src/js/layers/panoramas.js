@@ -79,6 +79,20 @@ function updateDotColors(panoData, minTs, maxTs) {
     }
 }
 
+function updateSourceDotColors() {
+    if (!map.getLayer('panoramas')) return;
+    const dotColor = window.panoSource === 'r2' ? '#00aaff' : '#ff8800';
+    // Only update if we're in default color mode — date mode manages its own colors
+    if (window.panoColorMode === 'default') {
+        map.setPaintProperty('panoramas', 'circle-color', [
+            'case',
+            ['boolean', ['feature-state', 'viewed'], false],
+            '#FFFF00',
+            dotColor
+        ]);
+    }
+}
+
 // --- Controls UI ---
 
 function createPanoControls(minTs, maxTs, panoData) {
@@ -115,7 +129,7 @@ function createPanoControls(minTs, maxTs, panoData) {
 
     const sourceBtn = document.createElement('button');
     sourceBtn.id = 'pano-source-btn';
-    sourceBtn.textContent = '☁ R2';
+    sourceBtn.textContent = 'ON (R2)';
     sourceBtn.style.cssText = `
         flex: 1; padding: 4px 8px; border-radius: 4px; border: none;
         cursor: pointer; background: #0066cc; color: white;
@@ -123,8 +137,9 @@ function createPanoControls(minTs, maxTs, panoData) {
     `;
     sourceBtn.onclick = () => {
         window.panoSource = window.panoSource === 'r2' ? 'squarespace' : 'r2';
-        sourceBtn.textContent = window.panoSource === 'r2' ? '☁ R2' : '□ Squarespace';
+        sourceBtn.textContent = window.panoSource === 'r2' ? 'ON (R2)' : 'OFF (Squarespace)';
         sourceBtn.style.background = window.panoSource === 'r2' ? '#0066cc' : '#cc6600';
+        updateSourceDotColors();
     };
 
     sourceRow.appendChild(sourceLabel);
@@ -300,16 +315,6 @@ async function addPanoramasLayer() {
 
         map.on('mouseenter', 'panoramas', () => { map.getCanvas().style.cursor = 'pointer'; });
         map.on('mouseleave', 'panoramas', () => { map.getCanvas().style.cursor = ''; });
-
-        // Handle share links that restore layer visibility without a menu click —
-        // once the map is idle, check if the layer is already visible and show controls.
-        map.once('idle', function() {
-            const visibility = map.getLayoutProperty('panoramas', 'visibility');
-            const panoControls = document.getElementById('pano-controls');
-            if (panoControls && visibility === 'visible') {
-                panoControls.style.display = 'block';
-            }
-        });
 
     } catch (error) {
         console.error("failed to load and create panoramas layer:", error);
