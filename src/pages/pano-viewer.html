@@ -59,12 +59,12 @@
   }
 </style>
 
-<!-- Reverting to CDN for reliability -->
+<!-- Pannellum self-hosted on Cloudflare R2 -->
 <link
   rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css"
+  href="https://pub-d8f97cda49514ea882c5f06ffdb4a86b.r2.dev/_pannellum-2.5.6/pannellum/pannellum.css"
 />
-<script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
+<script src="https://pub-d8f97cda49514ea882c5f06ffdb4a86b.r2.dev/_pannellum-2.5.6/pannellum/pannellum.js"></script>
 
 <div id="panorama"></div>
 <div id="error-message"></div>
@@ -83,30 +83,32 @@
     const panoFile = urlParams.get("pano");
 
     if (!panoFile) {
-        // intended state: no pano selected yet, so just do nothing or show blank
-        return;
+      // intended state: no pano selected yet, so just do nothing or show blank
+      return;
     }
 
-    const correctionDataUrl =
-      "https://east-southeast-llc.github.io/ese-map-viewer/assets/data/pano_correction_data.json";
+    const panoDataUrl =
+      "https://pub-d8f97cda49514ea882c5f06ffdb4a86b.r2.dev/pano_data.json";
 
     try {
-      const response = await fetch(correctionDataUrl);
+      const response = await fetch(panoDataUrl);
       if (!response.ok)
-        throw new Error(`Correction Data HTTP error! status: ${response.status}`);
+        throw new Error(`Pano data HTTP error! status: ${response.status}`);
       const panoData = await response.json();
       const pose = panoData[panoFile];
 
+      // Use the R2 URL stored in pano_data.json, fall back to Squarespace for legacy images
+      const imageUrl = pose?.url || `https://www.ese-llc.com/s/${panoFile}`;
+
       const viewerConfig = {
         type: "equirectangular",
-        panorama: `https://www.ese-llc.com/s/${panoFile}`,
+        panorama: imageUrl,
         autoLoad: true,
         showControls: false,
-        // Ensure we catch internal Pannellum errors
         strings: {
-            loadingLabel: "Loading Panorama...",
-            loadButtonLabel: "Click to Load",
-            loadingError: "Error loading panorama image. Check console for CORS details."
+          loadingLabel: "Loading Panorama...",
+          loadButtonLabel: "Click to Load",
+          loadingError: "Error loading panorama image. Check console for CORS details."
         }
       };
 
@@ -126,16 +128,13 @@
       }
 
       const viewer = pannellum.viewer("panorama", viewerConfig);
-      
-      // Listener for generic errors if Pannellum exposes them efficiently, 
-      // otherwise the 'loadingError' string covers the UI.
+
       viewer.on('error', function(e) {
-          showError("Pannellum Error: " + e);
+        showError("Pannellum Error: " + e);
       });
-      
+
       viewer.on('load', function() {
-          // Success
-          console.log("Panorama loaded successfully.");
+        console.log("Panorama loaded successfully.");
       });
 
     } catch (error) {
