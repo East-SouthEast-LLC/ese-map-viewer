@@ -137,11 +137,6 @@ async function openPanoModal(currentIndex) {
 }
 
 function initializePanoramaViewer() {
-  // Warm up the CORS preflight to R2 before any panorama is clicked.
-  // This ensures the browser has a cached preflight response ready,
-  // preventing the first image load from losing the preflight race.
-  //fetch('https://pub-d8f97cda49514ea882c5f06ffdb4a86b.r2.dev/', { method: 'HEAD', mode: 'cors' })
-  //  .catch(() => {}); // silent — we don't care about the result
 
   map.on("click", "panoramas", function (e) {
     if (e.features.length > 0) {
