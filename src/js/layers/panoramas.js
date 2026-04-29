@@ -301,6 +301,16 @@ async function addPanoramasLayer() {
         map.on('mouseenter', 'panoramas', () => { map.getCanvas().style.cursor = 'pointer'; });
         map.on('mouseleave', 'panoramas', () => { map.getCanvas().style.cursor = ''; });
 
+        // Handle share links that restore layer visibility without a menu click —
+        // once the map is idle, check if the layer is already visible and show controls.
+        map.once('idle', function() {
+            const visibility = map.getLayoutProperty('panoramas', 'visibility');
+            const panoControls = document.getElementById('pano-controls');
+            if (panoControls && visibility === 'visible') {
+                panoControls.style.display = 'block';
+            }
+        });
+
     } catch (error) {
         console.error("failed to load and create panoramas layer:", error);
     }
