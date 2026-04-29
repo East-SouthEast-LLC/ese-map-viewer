@@ -7,7 +7,7 @@ let _panoramaDataResolve;
 window.panoramaDataReady = new Promise(resolve => { _panoramaDataResolve = resolve; });
 
 // Global source override: 'r2' or 'squarespace'
-window.panoSource = 'r2';
+window.panoSource = 'off'; // 'on' = show R2/Squarespace colors, 'off' = default/date colors
 
 // Global color mode: 'default' or 'date'
 window.panoColorMode = 'default';
@@ -48,6 +48,17 @@ function buildColorExpression(panoData, minTs, maxTs) {
     return expr;
 }
 
+function buildSourceColorExpression(panoData) {
+    // Blue = has R2 url, Orange = Squarespace only (no url entry)
+    const expr = ['match', ['get', 'filename']];
+    for (const [filename, data] of Object.entries(panoData)) {
+        const color = data.url ? '#00aaff' : '#ff8800';
+        expr.push(filename, color);
+    }
+    expr.push('#00ffff'); // fallback
+    return expr;
+}
+
 function buildFilterExpression(minTs, maxTs) {
     return [
         'all',
@@ -60,9 +71,16 @@ function tsToDateStr(ts) {
     return new Date(ts).toISOString().slice(0, 10);
 }
 
-function updateDotColors(panoData, minTs, maxTs) {
-    if (!map.getLayer('panoramas')) return;
-    if (window.panoColorMode === 'date') {
+function applyDotColors(panoData, minTs, maxTs) {
+    // Source ON overrides everything
+    if (window.panoSource === 'on') {
+        map.setPaintProperty('panoramas', 'circle-color', [
+            'case',
+            ['boolean', ['feature-state', 'viewed'], false],
+            '#FFFF00',
+            buildSourceColorExpression(panoData)
+        ]);
+    } else if (window.panoColorMode === 'date') {
         map.setPaintProperty('panoramas', 'circle-color', [
             'case',
             ['boolean', ['feature-state', 'viewed'], false],
@@ -79,18 +97,9 @@ function updateDotColors(panoData, minTs, maxTs) {
     }
 }
 
-function updateSourceDotColors() {
+function updateDotColors(panoData, minTs, maxTs) {
     if (!map.getLayer('panoramas')) return;
-    const dotColor = window.panoSource === 'r2' ? '#00aaff' : '#ff8800';
-    // Only update if we're in default color mode — date mode manages its own colors
-    if (window.panoColorMode === 'default') {
-        map.setPaintProperty('panoramas', 'circle-color', [
-            'case',
-            ['boolean', ['feature-state', 'viewed'], false],
-            '#FFFF00',
-            dotColor
-        ]);
-    }
+    applyDotColors(panoData, minTs, maxTs);
 }
 
 // --- Controls UI ---
@@ -129,17 +138,18 @@ function createPanoControls(minTs, maxTs, panoData) {
 
     const sourceBtn = document.createElement('button');
     sourceBtn.id = 'pano-source-btn';
-    sourceBtn.textContent = 'ON (R2)';
+    sourceBtn.textContent = 'OFF';
     sourceBtn.style.cssText = `
         flex: 1; padding: 4px 8px; border-radius: 4px; border: none;
-        cursor: pointer; background: #0066cc; color: white;
+        cursor: pointer; background: #444; color: #aaa;
         font-size: 11px; font-weight: bold;
     `;
     sourceBtn.onclick = () => {
-        window.panoSource = window.panoSource === 'r2' ? 'squarespace' : 'r2';
-        sourceBtn.textContent = window.panoSource === 'r2' ? 'ON (R2)' : 'OFF (Squarespace)';
-        sourceBtn.style.background = window.panoSource === 'r2' ? '#0066cc' : '#cc6600';
-        updateSourceDotColors();
+        window.panoSource = window.panoSource === 'on' ? 'off' : 'on';
+        sourceBtn.textContent = window.panoSource === 'on' ? 'ON' : 'OFF';
+        sourceBtn.style.background = window.panoSource === 'on' ? '#0066cc' : '#444';
+        sourceBtn.style.color = window.panoSource === 'on' ? 'white' : '#aaa';
+        applyDotColors(window.panoPanoData, window.panoMinTs, window.panoMaxTs);
     };
 
     sourceRow.appendChild(sourceLabel);
@@ -165,7 +175,7 @@ function createPanoControls(minTs, maxTs, panoData) {
         window.panoColorMode = window.panoColorMode === 'default' ? 'date' : 'default';
         colorBtn.textContent = window.panoColorMode === 'date' ? '● By Date' : '● Default';
         colorBtn.style.color = window.panoColorMode === 'date' ? '#ff9900' : '#00ffff';
-        updateDotColors(panoData, minTs, maxTs);
+        applyDotColors(panoData, minTs, maxTs);
         legendDiv.style.display = window.panoColorMode === 'date' ? 'flex' : 'none';
     };
 
