@@ -53,8 +53,12 @@ async function openPanoModal(currentIndex) {
   window.lastViewedPanoId = filename;
   trackEvent("view_panorama", { pano_id: filename });
 
-  // Get the full image URL — R2 for new images, Squarespace fallback for old
-  const imageUrl = window.panoramaData?.[filename]?.url || `https://www.ese-llc.com/s/${filename}`;
+  // Get the full image URL based on source toggle (window.panoSource):
+  // R2 mode   — use URL stored in pano_data.json, fall back to Squarespace for legacy images
+  // Squarespace mode — force Squarespace path regardless of JSON entry
+  const squarespaceUrl = `https://www.ese-llc.com/s/${filename}`;
+  const r2Url = window.panoramaData?.[filename]?.url || squarespaceUrl;
+  const imageUrl = (window.panoSource === 'squarespace') ? squarespaceUrl : r2Url;
   console.log("Loading panorama:", filename, "from:", imageUrl);
 
   // Build the modal
