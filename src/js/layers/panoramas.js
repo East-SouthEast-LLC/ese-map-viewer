@@ -323,6 +323,18 @@ async function addPanoramasLayer() {
 
         createPanoControls(minTs, maxTs, panoData);
 
+        // Handle share links — controls div now exists, check visibility immediately
+        // and again on idle in case share link restores state after this point.
+        function syncPanoControlsVisibility() {
+            const visibility = map.getLayoutProperty('panoramas', 'visibility');
+            const panoControls = document.getElementById('pano-controls');
+            if (panoControls) {
+                panoControls.style.display = visibility === 'visible' ? 'block' : 'none';
+            }
+        }
+        syncPanoControlsVisibility();
+        map.once('idle', syncPanoControlsVisibility);
+
         map.on('mouseenter', 'panoramas', () => { map.getCanvas().style.cursor = 'pointer'; });
         map.on('mouseleave', 'panoramas', () => { map.getCanvas().style.cursor = ''; });
 
