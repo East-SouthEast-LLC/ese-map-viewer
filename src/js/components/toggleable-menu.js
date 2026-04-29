@@ -120,6 +120,39 @@ if (clickedLayer === 'updates') {
                     });
                 }
                 
+                // Show/hide panorama controls box with the panoramas layer
+                if (clickedLayer === 'panoramas') {
+                    const panoControls = document.getElementById('pano-controls');
+                    if (panoControls) {
+                        panoControls.style.display = newVisibility === 'visible' ? 'block' : 'none';
+                    }
+                    // Reset sliders and color mode when hiding
+                    if (newVisibility === 'none') {
+                        window.panoColorMode = 'default';
+                        const colorBtn = document.getElementById('pano-color-btn');
+                        if (colorBtn) { colorBtn.textContent = '● Default'; colorBtn.style.color = '#00ffff'; }
+                        const minSlider = document.getElementById('pano-min-slider');
+                        const maxSlider = document.getElementById('pano-max-slider');
+                        if (minSlider && maxSlider) {
+                            minSlider.value = window.panoMinTs;
+                            maxSlider.value = window.panoMaxTs;
+                            const sliderValues = document.getElementById('pano-slider-values');
+                            if (sliderValues) {
+                                sliderValues.textContent = `${new Date(window.panoMinTs).toISOString().slice(0,10)} – ${new Date(window.panoMaxTs).toISOString().slice(0,10)}`;
+                            }
+                        }
+                        map.setFilter('panoramas', null); // clear any active date filter
+                        if (window.panoPanoData) {
+                            map.setPaintProperty('panoramas', 'circle-color', [
+                                'case',
+                                ['boolean', ['feature-state', 'viewed'], false],
+                                '#FFFF00',
+                                '#00ffff'
+                            ]);
+                        }
+                    }
+                }
+
                 if (clickedLayer === 'private properties upland') {
                     if (typeof window.toggleUplandControls === 'function') {
                         window.toggleUplandControls(newVisibility === 'visible');
