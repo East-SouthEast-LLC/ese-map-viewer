@@ -65,6 +65,25 @@ function applyUrlParams(map) {
             return; // continue to the next layer
         }
 
+        // Special case: panoramas layer may not be ready yet (async JSON fetch).
+        // Wait for panoramaDataReady before setting visibility and showing controls.
+        if (decodedLayerId === 'panoramas') {
+            window.panoramaDataReady.then(() => {
+                if (map.getLayer('panoramas')) {
+                    map.setLayoutProperty('panoramas', 'visibility', 'visible');
+                    setDependentLayersVisibility('panoramas', 'visible');
+                    document.querySelectorAll('#menu a').forEach(button => {
+                        if (button.dataset.layerId === 'panoramas') {
+                            button.classList.add('active');
+                        }
+                    });
+                    const panoControls = document.getElementById('pano-controls');
+                    if (panoControls) panoControls.style.display = 'block';
+                }
+            });
+            return; // handled above — skip generic logic below
+        }
+
         if (map.getLayer(decodedLayerId)) {
             map.setLayoutProperty(decodedLayerId, 'visibility', 'visible');
             setDependentLayersVisibility(decodedLayerId, 'visible');
