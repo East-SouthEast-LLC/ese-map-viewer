@@ -505,6 +505,12 @@
     "legendConfig": null
   },
   {
+  "id": "pano-projects",
+  "scriptName": "pano-projects.js",
+  "drawOrder": 99,
+  "label": "Pano Projects"
+},
+  {
     "id": "conservancy districts",
     "displayName": "Conservancy Districts",
     "scriptName": "conservancydistricts.js",
