@@ -1,18 +1,19 @@
 // src/js/layers/pano-projects.js
 // Loads pano_index.geojson from R2 and renders project hull polygons.
 // - Hover: custom div popup with project info, arrow nav for overlapping hulls
-// - Click: fade hull, load per-project pano_data.geojson as dots, show close button
-// - Close button (NE corner of hull): unload dots, restore hull opacity
+// - Click hull: fade hull, load per-project pano_data.geojson as dots, show close button at centroid
+// - Click dot: open project panorama viewer (prev/next within project)
+// - Click close button: unload dots, restore hull opacity
 
 (async function () {
 
-  const R2_BASE = 'https://pano.ese-llc.com';
+  const R2_BASE  = 'https://pano.ese-llc.com';
   const INDEX_URL = `${R2_BASE}/pano_index.geojson?nocache=${Date.now()}`;
 
   // ── State ──────────────────────────────────────────────────────────────────
-  const openProjects = new Map(); // projectId → { dotSourceId, dotLayerId, closeBtnEl }
-  let hoverFeatures  = [];        // features under cursor
-  let hoverIndex     = 0;         // which one is shown in popup
+  const openProjects = new Map(); // projectId → { dotSourceId, dotLayerId, closeBtnEl, features }
+  let hoverFeatures  = [];
+  let hoverIndex     = 0;
   let hoverPopupEl   = null;
 
   // ── Fetch index ────────────────────────────────────────────────────────────
@@ -38,7 +39,6 @@
     promoteId: 'id',
   });
 
-  // Fill — semi-transparent grey, fades further when project is open
   map.addLayer({
     id: 'pano-projects-fill',
     type: 'fill',
@@ -48,13 +48,12 @@
       'fill-color': '#888888',
       'fill-opacity': [
         'case',
-        ['boolean', ['feature-state', 'open'], false], 0.10,
-        0.25
+        ['boolean', ['feature-state', 'open'], false], 0.08,
+        0.22,
       ],
     },
   });
 
-  // Outline
   map.addLayer({
     id: 'pano-projects-outline',
     type: 'line',
@@ -65,8 +64,8 @@
       'line-width': 1.5,
       'line-opacity': [
         'case',
-        ['boolean', ['feature-state', 'open'], false], 0.4,
-        0.85
+        ['boolean', ['feature-state', 'open'], false], 0.35,
+        0.85,
       ],
     },
   });
@@ -97,8 +96,8 @@
 
   function renderHoverPopup() {
     if (!hoverFeatures.length || !hoverPopupEl) return;
-    const f    = hoverFeatures[hoverIndex];
-    const p    = f.properties;
+    const f     = hoverFeatures[hoverIndex];
+    const p     = f.properties;
     const total = hoverFeatures.length;
 
     const nav = total > 1 ? `
@@ -110,15 +109,14 @@
 
     hoverPopupEl.innerHTML = `
       <div style="font-weight:bold;font-size:13px;margin-bottom:4px;">${p.name || p.id}</div>
-      ${p.town    ? `<div style="color:#aaa;">${p.town}</div>` : ''}
-      ${p.owner   ? `<div style="color:#aaa;">${p.owner}</div>` : ''}
-      ${p.date    ? `<div style="color:#aaa;margin-top:2px;">${p.date}</div>` : ''}
+      ${p.town        ? `<div style="color:#aaa;">${p.town}</div>` : ''}
+      ${p.owner       ? `<div style="color:#aaa;">${p.owner}</div>` : ''}
+      ${p.date        ? `<div style="color:#aaa;margin-top:2px;">${p.date}</div>` : ''}
       <div style="margin-top:4px;color:#ccc;">${(p.image_count || 0).toLocaleString()} images</div>
       ${p.description ? `<div style="margin-top:4px;color:#bbb;font-style:italic;">${p.description}</div>` : ''}
       ${nav}
     `;
 
-    // Arrow buttons need pointer-events
     if (total > 1) {
       hoverPopupEl.style.pointerEvents = 'auto';
       hoverPopupEl.querySelector('#pano-hover-prev').addEventListener('click', (e) => {
@@ -138,17 +136,14 @@
 
   function positionHoverPopup(point) {
     if (!hoverPopupEl) return;
-    const mapEl   = document.getElementById('map');
-    const rect    = mapEl.getBoundingClientRect();
-    const offsetX = 14;
-    const offsetY = -10;
-    let left = point.x + offsetX;
-    let top  = point.y + offsetY;
-    // keep within map bounds
-    const popW = 270;
-    if (left + popW > rect.width) left = point.x - popW - offsetX;
-    hoverPopupEl.style.left = `${left}px`;
-    hoverPopupEl.style.top  = `${top}px`;
+    const mapEl  = document.getElementById('map');
+    const rect   = mapEl.getBoundingClientRect();
+    const popW   = 270;
+    let left = point.x + 14;
+    let top  = point.y - 10;
+    if (left + popW > rect.width) left = point.x - popW - 14;
+    hoverPopupEl.style.left    = `${left}px`;
+    hoverPopupEl.style.top     = `${top}px`;
     hoverPopupEl.style.display = 'block';
   }
 
@@ -157,12 +152,7 @@
   map.on('mousemove', 'pano-projects-fill', (e) => {
     map.getCanvas().style.cursor = 'pointer';
     const features = map.queryRenderedFeatures(e.point, { layers: ['pano-projects-fill'] });
-    // Sort: most recent date first
-    features.sort((a, b) => {
-      const da = a.properties.date || '';
-      const db = b.properties.date || '';
-      return db.localeCompare(da);
-    });
+    features.sort((a, b) => (b.properties.date || '').localeCompare(a.properties.date || ''));
     hoverFeatures = features;
     hoverIndex    = 0;
     renderHoverPopup();
@@ -176,54 +166,58 @@
     hoverIndex    = 0;
   });
 
-  // ── Close button (NE corner of hull bbox) ─────────────────────────────────
-  function getBboxNE(feature) {
-    const coords = feature.geometry.coordinates[0];
-    let maxLng = -Infinity, maxLat = -Infinity;
-    for (const [lng, lat] of coords) {
-      if (lng > maxLng) maxLng = lng;
-      if (lat > maxLat) maxLat = lat;
+  // ── Close button at centroid ───────────────────────────────────────────────
+  function getCentroid(feature) {
+    const p = feature.properties;
+    // centroid stored as [lon, lat] array in properties
+    if (p.centroid) {
+      try {
+        const c = typeof p.centroid === 'string' ? JSON.parse(p.centroid) : p.centroid;
+        if (Array.isArray(c) && c.length === 2) return c;
+      } catch (_) {}
     }
-    return [maxLng, maxLat];
+    // fallback: compute from hull coords
+    const coords = feature.geometry.coordinates[0];
+    const lon = coords.reduce((s, c) => s + c[0], 0) / coords.length;
+    const lat = coords.reduce((s, c) => s + c[1], 0) / coords.length;
+    return [lon, lat];
   }
 
   function createCloseButton(projectId, lngLat) {
     const point = map.project(lngLat);
-    const el = document.createElement('div');
-    el.className = 'pano-project-close-btn';
+    const el    = document.createElement('div');
+    el.className       = 'pano-project-close-btn';
     el.dataset.projectId = projectId;
-    el.style.cssText = `
+    el.style.cssText   = `
       position: absolute;
       left: ${point.x}px;
       top: ${point.y}px;
-      width: 24px;
-      height: 24px;
+      width: 26px;
+      height: 26px;
       border-radius: 50%;
-      background: #555;
+      background: #444;
       border: 2px solid #ccc;
       color: #fff;
-      font-size: 13px;
-      font-weight: bold;
+      font-size: 14px;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
       z-index: 950;
       transform: translate(-50%, -50%);
-      box-shadow: 0 1px 4px rgba(0,0,0,0.5);
+      box-shadow: 0 1px 5px rgba(0,0,0,0.55);
       user-select: none;
     `;
     el.innerHTML = '⊗';
-    el.title = 'Close project';
+    el.title     = 'Close project';
 
     el.addEventListener('click', (e) => {
       e.stopPropagation();
       closeProject(projectId);
     });
 
-    // Reposition on map move
     function reposition() {
-      const p = map.project(lngLat);
+      const p      = map.project(lngLat);
       el.style.left = `${p.x}px`;
       el.style.top  = `${p.y}px`;
     }
@@ -234,20 +228,18 @@
     return el;
   }
 
-  // ── Open project (load dots) ───────────────────────────────────────────────
+  // ── Open project ───────────────────────────────────────────────────────────
   async function openProject(feature) {
     const props     = feature.properties;
     const projectId = props.id;
 
-    if (openProjects.has(projectId)) return; // already open
+    if (openProjects.has(projectId)) return;
 
-    // Fade hull
     map.setFeatureState(
       { source: 'pano-projects-source', id: projectId },
       { open: true }
     );
 
-    // Load per-project GeoJSON
     const dataUrl = `${props.data_url}?nocache=${Date.now()}`;
     let projectData;
     try {
@@ -263,6 +255,9 @@
     const dotSourceId = `pano-dots-source-${projectId}`;
     const dotLayerId  = `pano-dots-${projectId}`;
 
+    // Keep sorted feature array for prev/next navigation
+    const features = projectData.features || [];
+
     map.addSource(dotSourceId, { type: 'geojson', data: projectData, promoteId: 'key' });
 
     map.addLayer({
@@ -270,33 +265,44 @@
       type: 'circle',
       source: dotSourceId,
       paint: {
-        'circle-radius': ['case', ['boolean', ['feature-state', 'viewed'], false], 10, 6],
-        'circle-color':  ['case', ['boolean', ['feature-state', 'viewed'], false], '#FFFF00', '#00ffff'],
+        'circle-radius':       ['case', ['boolean', ['feature-state', 'viewed'], false], 10, 6],
+        'circle-color':        ['case', ['boolean', ['feature-state', 'viewed'], false], '#FFFF00', '#00ffff'],
         'circle-stroke-color': '#ffffff',
         'circle-stroke-width': 2,
-        'circle-opacity': ['case', ['boolean', ['feature-state', 'viewed'], false], 0.9, 0.75],
-        'circle-pitch-scale': 'map',
+        'circle-opacity':      ['case', ['boolean', ['feature-state', 'viewed'], false], 0.9, 0.75],
+        'circle-pitch-scale':  'map',
       },
     });
 
-    // Close button at NE corner of hull
-    const neLngLat = getBboxNE(feature);
-    // Offset slightly NE in lng/lat degrees
-    const closeLngLat = [neLngLat[0] + 0.0003, neLngLat[1] + 0.0002];
-    const closeBtnEl  = createCloseButton(projectId, closeLngLat);
+    // Close button at centroid
+    const centroidLngLat = getCentroid(feature);
+    const closeBtnEl     = createCloseButton(projectId, centroidLngLat);
 
-    openProjects.set(projectId, { dotSourceId, dotLayerId, closeBtnEl, closeLngLat });
+    openProjects.set(projectId, { dotSourceId, dotLayerId, closeBtnEl, features });
 
-    // Dot click → open panorama viewer (matches existing panoramas layer behavior)
+    // Dot click → open project panorama viewer
     map.on('click', dotLayerId, (e) => {
       const f = e.features[0];
       if (!f) return;
       e.originalEvent._panoHandled = true;
-      const filename = f.properties.key;
-      const url      = f.properties.url;
-      if (url && typeof window.openPanorama === 'function') {
-        window.openPanorama(filename, url);
+
+      // Find index in the sorted features array by key
+      const key   = f.properties.key;
+      const index = features.findIndex(feat => feat.properties.key === key);
+
+      if (typeof openProjectPanoModal === 'function') {
+        openProjectPanoModal(features, index !== -1 ? index : 0);
+      } else {
+        console.warn('[pano-projects] openProjectPanoModal not available');
       }
+
+      // Highlight viewed dot
+      map.setFeatureState({ source: dotSourceId, id: key }, { viewed: true });
+      setTimeout(() => {
+        if (map.getSource(dotSourceId)) {
+          map.setFeatureState({ source: dotSourceId, id: key }, { viewed: false });
+        }
+      }, 12000);
     });
 
     map.on('mouseenter', dotLayerId, () => { map.getCanvas().style.cursor = 'pointer'; });
@@ -308,7 +314,7 @@
     if (!openProjects.has(projectId)) return;
     const { dotSourceId, dotLayerId, closeBtnEl } = openProjects.get(projectId);
 
-    if (map.getLayer(dotLayerId))  map.removeLayer(dotLayerId);
+    if (map.getLayer(dotLayerId))   map.removeLayer(dotLayerId);
     if (map.getSource(dotSourceId)) map.removeSource(dotSourceId);
 
     if (closeBtnEl) {
