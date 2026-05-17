@@ -22,6 +22,12 @@
     }
   },
   {
+  "id": "pano-projects",
+  "scriptName": "pano-projects.js",
+  "drawOrder": 99,
+  "label": "Pano Projects"
+}
+  {
     "id": "parcels",
     "displayName": "Parcels",
     "scriptName": "parcels.js",
