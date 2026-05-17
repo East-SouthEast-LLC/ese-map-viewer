@@ -228,7 +228,7 @@ map.moveLayer('print-marker-layer');
                     for (const layer of townLayers) {
                         await loadLayerScript(layer.scriptName);
                     }
-                    
+                    await loadScript(`https://east-southeast-llc.github.io/ese-map-viewer/src/js/layers/pano-projects.js`);
                     const controlScripts = [
                         "https://east-southeast-llc.github.io/ese-map-viewer/src/js/utils/map-helpers.js",
                         "https://east-southeast-llc.github.io/ese-map-viewer/src/js/components/control/marker.js",
