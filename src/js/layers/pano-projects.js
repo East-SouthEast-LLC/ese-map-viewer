@@ -1,5 +1,8 @@
 // src/js/layers/pano-projects.js
 // Loads pano_index.geojson from R2 and renders project hull polygons.
+// - Public projects always visible
+// - Private projects visible only when a valid access code is present
+// - Private unlocked hulls render in blue
 // - Hover: custom div popup with project info, arrow nav for overlapping hulls
 // - Click hull: fade hull, load per-project pano_data.geojson as dots, show close button at centroid
 // - Click dot: open project panorama viewer (prev/next within project)
@@ -7,16 +10,24 @@
 
 (async function () {
 
-  const R2_BASE  = 'https://pano.ese-llc.com';
+  const R2_BASE   = 'https://pano.ese-llc.com';
   const INDEX_URL = `${R2_BASE}/pano_index.geojson?nocache=${Date.now()}`;
 
-  // ── State ──────────────────────────────────────────────────────────────────
-  const openProjects = new Map(); // projectId → { dotSourceId, dotLayerId, closeBtnEl, features }
+  // ── Access code promise ──────────────────────────────────────────────────────
+  // Create the promise now so decode-url.js can resolve it later.
+  if (!window.panoAccessCodeReady) {
+    let resolve;
+    window.panoAccessCodeReady = new Promise(r => { resolve = r; });
+    window._resolvePanoAccessCode = resolve;
+  }
+
+  // ── State ────────────────────────────────────────────────────────────────────
+  const openProjects = new Map();
   let hoverFeatures  = [];
   let hoverIndex     = 0;
   let hoverPopupEl   = null;
 
-  // ── Fetch index ────────────────────────────────────────────────────────────
+  // ── Fetch index ──────────────────────────────────────────────────────────────
   let indexData;
   try {
     const res = await fetch(INDEX_URL);
@@ -24,28 +35,66 @@
     indexData = await res.json();
   } catch (err) {
     console.error('[pano-projects] Failed to load pano_index.geojson:', err);
+    window._resolvePanoAccessCode?.(null); // unblock in case decode-url never runs
     return;
   }
 
   if (!indexData?.features?.length) {
     console.warn('[pano-projects] pano_index.geojson is empty — nothing to draw.');
+    window._resolvePanoAccessCode?.(null);
     return;
   }
 
-  // ── Add hull source + layers ───────────────────────────────────────────────
+  // ── Wait for access code resolution ─────────────────────────────────────────
+  const accessCode = await window.panoAccessCodeReady;
+
+  // ── Filter features based on access code ────────────────────────────────────
+  function isUnlocked(feature) {
+    const p = feature.properties;
+    if (!p.private) return true; // public — always visible
+
+    if (!accessCode) return false;
+
+    // Master code unlocks everything
+    if (accessCode.scope === 'master') return true;
+
+    // Account-wide code unlocks all projects (owned by that account)
+    if (accessCode.scope === 'account') return true;
+
+    // Project-scoped code — match project_id
+    if (accessCode.scope === 'project' && accessCode.project_id === p.id) return true;
+
+    return false;
+  }
+
+  const visibleFeatures = indexData.features.filter(isUnlocked);
+
+  if (!visibleFeatures.length) {
+    console.log('[pano-projects] No visible projects for current access level.');
+    return;
+  }
+
+  const filteredIndex = { ...indexData, features: visibleFeatures };
+
+  // ── Add hull source + layers ─────────────────────────────────────────────────
   map.addSource('pano-projects-source', {
     type: 'geojson',
-    data: indexData,
+    data: filteredIndex,
     promoteId: 'id',
   });
 
+  // Fill — color depends on public vs private-unlocked
   map.addLayer({
     id: 'pano-projects-fill',
     type: 'fill',
     source: 'pano-projects-source',
     layout: { visibility: 'none' },
     paint: {
-      'fill-color': '#888888',
+      'fill-color': [
+        'case',
+        ['==', ['get', 'private'], true], '#4488ff', // private unlocked → blue
+        '#888888',                                     // public → grey
+      ],
       'fill-opacity': [
         'case',
         ['boolean', ['feature-state', 'open'], false], 0.08,
@@ -60,7 +109,11 @@
     source: 'pano-projects-source',
     layout: { visibility: 'none' },
     paint: {
-      'line-color': '#555555',
+      'line-color': [
+        'case',
+        ['==', ['get', 'private'], true], '#2266dd', // private unlocked → blue outline
+        '#555555',                                     // public → grey outline
+      ],
       'line-width': 1.5,
       'line-opacity': [
         'case',
@@ -70,7 +123,52 @@
     },
   });
 
-  // ── Hover popup ────────────────────────────────────────────────────────────
+  // ── ACCESS CODE INPUT UI ─────────────────────────────────────────────────────
+  // Show the input box only if no valid code is active
+  if (!accessCode) {
+    const codeBox = document.createElement('div');
+    codeBox.id = 'pano-access-box';
+    codeBox.style.cssText = `
+      position: absolute;
+      bottom: 36px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 950;
+      display: flex;
+      gap: 6px;
+      background: rgba(0,0,0,0.75);
+      padding: 8px 12px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    `;
+    codeBox.innerHTML = `
+      <input id="pano-code-input" placeholder="ACCESS CODE"
+        style="font-family:monospace;font-size:12px;padding:5px 10px;border-radius:4px;
+               border:1px solid #555;background:#111;color:#fff;width:140px;outline:none;">
+      <button id="pano-code-go"
+        style="font-family:monospace;font-size:12px;padding:5px 14px;border-radius:4px;
+               border:none;background:#4488ff;color:#fff;cursor:pointer;font-weight:600;">
+        GO
+      </button>
+    `;
+    document.getElementById('map').appendChild(codeBox);
+
+    async function submitCode() {
+      const val = document.getElementById('pano-code-input').value.trim();
+      if (!val) return;
+      // Reload page with code as URL param — decode-url will validate and store
+      const url = new URL(window.location.href);
+      url.searchParams.set('code', val);
+      window.location.href = url.toString();
+    }
+
+    document.getElementById('pano-code-go').addEventListener('click', submitCode);
+    document.getElementById('pano-code-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter') submitCode();
+    });
+  }
+
+  // ── Hover popup ──────────────────────────────────────────────────────────────
   function createHoverPopup() {
     const el = document.createElement('div');
     el.id = 'pano-project-hover';
@@ -100,6 +198,10 @@
     const p     = f.properties;
     const total = hoverFeatures.length;
 
+    const privateBadge = p.private
+      ? `<span style="background:#1a3a7a;color:#88aaff;font-size:9px;padding:1px 5px;border-radius:2px;margin-left:4px;">PRIVATE</span>`
+      : '';
+
     const nav = total > 1 ? `
       <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;border-top:1px solid #444;padding-top:6px;">
         <button id="pano-hover-prev" style="background:none;border:1px solid #666;color:#ccc;border-radius:4px;padding:2px 8px;cursor:pointer;font-size:11px;">◀</button>
@@ -108,7 +210,7 @@
       </div>` : '';
 
     hoverPopupEl.innerHTML = `
-      <div style="font-weight:bold;font-size:13px;margin-bottom:4px;">${p.name || p.id}</div>
+      <div style="font-weight:bold;font-size:13px;margin-bottom:4px;">${p.name || p.id}${privateBadge}</div>
       ${p.town        ? `<div style="color:#aaa;">${p.town}</div>` : ''}
       ${p.owner       ? `<div style="color:#aaa;">${p.owner}</div>` : ''}
       ${p.date        ? `<div style="color:#aaa;margin-top:2px;">${p.date}</div>` : ''}
@@ -136,9 +238,9 @@
 
   function positionHoverPopup(point) {
     if (!hoverPopupEl) return;
-    const mapEl  = document.getElementById('map');
-    const rect   = mapEl.getBoundingClientRect();
-    const popW   = 270;
+    const mapEl = document.getElementById('map');
+    const rect  = mapEl.getBoundingClientRect();
+    const popW  = 270;
     let left = point.x + 14;
     let top  = point.y - 10;
     if (left + popW > rect.width) left = point.x - popW - 14;
@@ -166,17 +268,15 @@
     hoverIndex    = 0;
   });
 
-  // ── Close button at centroid ───────────────────────────────────────────────
+  // ── Close button at centroid ─────────────────────────────────────────────────
   function getCentroid(feature) {
     const p = feature.properties;
-    // centroid stored as [lon, lat] array in properties
     if (p.centroid) {
       try {
         const c = typeof p.centroid === 'string' ? JSON.parse(p.centroid) : p.centroid;
         if (Array.isArray(c) && c.length === 2) return c;
       } catch (_) {}
     }
-    // fallback: compute from hull coords
     const coords = feature.geometry.coordinates[0];
     const lon = coords.reduce((s, c) => s + c[0], 0) / coords.length;
     const lat = coords.reduce((s, c) => s + c[1], 0) / coords.length;
@@ -186,9 +286,9 @@
   function createCloseButton(projectId, lngLat) {
     const point = map.project(lngLat);
     const el    = document.createElement('div');
-    el.className       = 'pano-project-close-btn';
+    el.className         = 'pano-project-close-btn';
     el.dataset.projectId = projectId;
-    el.style.cssText   = `
+    el.style.cssText     = `
       position: absolute;
       left: ${point.x}px;
       top: ${point.y}px;
@@ -217,7 +317,7 @@
     });
 
     function reposition() {
-      const p      = map.project(lngLat);
+      const p       = map.project(lngLat);
       el.style.left = `${p.x}px`;
       el.style.top  = `${p.y}px`;
     }
@@ -228,7 +328,7 @@
     return el;
   }
 
-  // ── Open project ───────────────────────────────────────────────────────────
+  // ── Open project ─────────────────────────────────────────────────────────────
   async function openProject(feature) {
     const props     = feature.properties;
     const projectId = props.id;
@@ -254,9 +354,7 @@
 
     const dotSourceId = `pano-dots-source-${projectId}`;
     const dotLayerId  = `pano-dots-${projectId}`;
-
-    // Keep sorted feature array for prev/next navigation
-    const features = projectData.features || [];
+    const features    = projectData.features || [];
 
     map.addSource(dotSourceId, { type: 'geojson', data: projectData, promoteId: 'key' });
 
@@ -274,19 +372,16 @@
       },
     });
 
-    // Close button at centroid
     const centroidLngLat = getCentroid(feature);
     const closeBtnEl     = createCloseButton(projectId, centroidLngLat);
 
     openProjects.set(projectId, { dotSourceId, dotLayerId, closeBtnEl, features });
 
-    // Dot click → open project panorama viewer
     map.on('click', dotLayerId, (e) => {
       const f = e.features[0];
       if (!f) return;
       e.originalEvent._panoHandled = true;
 
-      // Find index in the sorted features array by key
       const key   = f.properties.key;
       const index = features.findIndex(feat => feat.properties.key === key);
 
@@ -296,7 +391,6 @@
         console.warn('[pano-projects] openProjectPanoModal not available');
       }
 
-      // Highlight viewed dot
       map.setFeatureState({ source: dotSourceId, id: key }, { viewed: true });
       setTimeout(() => {
         if (map.getSource(dotSourceId)) {
@@ -309,7 +403,7 @@
     map.on('mouseleave', dotLayerId, () => { map.getCanvas().style.cursor = ''; });
   }
 
-  // ── Close project ──────────────────────────────────────────────────────────
+  // ── Close project ────────────────────────────────────────────────────────────
   function closeProject(projectId) {
     if (!openProjects.has(projectId)) return;
     const { dotSourceId, dotLayerId, closeBtnEl } = openProjects.get(projectId);
@@ -330,15 +424,13 @@
     openProjects.delete(projectId);
   }
 
-  // ── Click hull → open project ──────────────────────────────────────────────
+  // ── Click hull → open project ────────────────────────────────────────────────
   map.on('click', 'pano-projects-fill', (e) => {
     if (e.originalEvent._panoHandled) return;
     const features = map.queryRenderedFeatures(e.point, { layers: ['pano-projects-fill'] });
-    for (const f of features) {
-      openProject(f);
-    }
+    for (const f of features) openProject(f);
   });
 
-  console.log(`[pano-projects] Loaded ${indexData.features.length} project(s).`);
+  console.log(`[pano-projects] Loaded ${visibleFeatures.length} of ${indexData.features.length} project(s).`);
 
 })();

@@ -1,14 +1,12 @@
-// docs/control-share.js
+// src/js/components/control/share.js
 
 function obtainZoom() {
     return map.getZoom();
 }
 
-// updated to accept a 'coords' object as a parameter
 function generateShareLink(map, zoomLevel, coords, layerIds) {
     const baseUrl = window.eseMapBaseUrl || (window.location.origin + window.location.pathname);
     
-    // check if the usgs quad layer is active and add it to the list
     const usgsButton = document.querySelector('[data-layer-id="usgs quad"]');
     if (usgsButton && usgsButton.classList.contains('active')) {
         if (!layerIds.includes('usgs quad')) {
@@ -18,13 +16,18 @@ function generateShareLink(map, zoomLevel, coords, layerIds) {
     
     let encodedLayerIds = layerIds.map(layerId => encodeURIComponent(layerId));
     
-    // check if coords exist before trying to use them
     if (!coords) {
         console.error("Coordinates are missing for generating share link.");
         return `${baseUrl}?error=missing_coords`;
     }
     
     let shareUrl = `${baseUrl}?zoom=${zoomLevel}&lat=${coords.lat}&lng=${coords.lng}&layers=${encodedLayerIds.join(',')}`;
+
+    // Include active access code in share URL so recipient gets the same view
+    if (window.panoAccessCode && window.panoAccessCode.scope !== 'master') {
+        shareUrl += `&code=${encodeURIComponent(window.panoAccessCode.code)}`;
+    }
+
     return shareUrl;
 }
 
@@ -75,9 +78,7 @@ function showSharePopup(shareLink) {
 }
 
 document.getElementById('shareButton').addEventListener('click', function() {
-    // Log the share event to Google Analytics.
-    trackEvent('share_map', {
-    });
+    trackEvent('share_map', {});
 
     if (window.marker) {
         map.flyTo({ center: window.marker.getLngLat(), essential: true });
@@ -85,10 +86,7 @@ document.getElementById('shareButton').addEventListener('click', function() {
 
     let currentMarkerCoordinates = dropPinAtCenter();
     let zoomLevel = obtainZoom();
-
     let visibleLayerIds = listVisibleLayers(map, window.toggleableLayerIds.filter(id => id !== 'tools'));
-    
-    // updated to pass the coordinates object to the function
     let shareLink = generateShareLink(map, zoomLevel, currentMarkerCoordinates, visibleLayerIds);
 
     showSharePopup(shareLink);
