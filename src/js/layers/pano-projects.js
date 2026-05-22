@@ -76,6 +76,11 @@
 
   const filteredIndex = { ...indexData, features: visibleFeatures };
 
+  // ── Expose index + open function for decode-url.js and share.js ─────────────
+  window.panoProjectIndex  = indexData;   // full index (all features, pre-filter)
+  window.openPanoProject   = openProject; // callable by decode-url after load
+  window.openPanoProjectId = null;        // tracks currently open project
+
   // ── Add hull source + layers ─────────────────────────────────────────────────
   map.addSource('pano-projects-source', {
     type: 'geojson',
@@ -376,6 +381,7 @@
     const closeBtnEl     = createCloseButton(projectId, centroidLngLat);
 
     openProjects.set(projectId, { dotSourceId, dotLayerId, closeBtnEl, features });
+    window.openPanoProjectId = projectId;
 
     map.on('click', dotLayerId, (e) => {
       const f = e.features[0];
@@ -422,6 +428,7 @@
     );
 
     openProjects.delete(projectId);
+    if (window.openPanoProjectId === projectId) window.openPanoProjectId = null;
   }
 
   // ── Click hull → open project ────────────────────────────────────────────────

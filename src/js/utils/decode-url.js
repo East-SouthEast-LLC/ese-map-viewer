@@ -196,6 +196,51 @@ function applyUrlParams(map) {
     }
   });
 
+  // ── Project param — fly to + open project after index and access code ready ──
+  const projectId = urlParams.get('project');
+  if (projectId) {
+    // Wait for both the access code and the project index to be available
+    window.panoAccessCodeReady.then(() => {
+      // pano-projects.js exposes openPanoProject and panoProjectIndex on window
+      // but they may not be set yet if the layer isn't visible — poll briefly
+      let attempts = 0;
+      const tryOpen = setInterval(() => {
+        attempts++;
+        const feature = window.panoProjectIndex?.features?.find(
+          f => f.properties.id === projectId
+        );
+        if (feature && typeof window.openPanoProject === 'function') {
+          clearInterval(tryOpen);
+          // Make the layer visible first if it isn't
+          if (map.getLayer('pano-projects-fill')) {
+            map.setLayoutProperty('pano-projects-fill', 'visibility', 'visible');
+            map.setLayoutProperty('pano-projects-outline', 'visibility', 'visible');
+            document.querySelectorAll('#menu a').forEach(btn => {
+              if (btn.dataset.layerId === 'pano-projects') btn.classList.add('active');
+            });
+          }
+          // Fly to centroid then open
+          const coords = feature.properties.centroid
+            ? (typeof feature.properties.centroid === 'string'
+                ? JSON.parse(feature.properties.centroid)
+                : feature.properties.centroid)
+            : feature.geometry.coordinates[0].reduce(
+                (acc, c) => [acc[0] + c[0], acc[1] + c[1]],
+                [0, 0]
+              ).map(v => v / feature.geometry.coordinates[0].length);
+
+          map.flyTo({ center: coords, zoom: 17, essential: true });
+          map.once('moveend', () => window.openPanoProject(feature));
+
+        } else if (attempts > 40) {
+          // Give up after ~4 seconds
+          clearInterval(tryOpen);
+          console.warn('[decode-url] Project not found or openPanoProject unavailable:', projectId);
+        }
+      }, 100);
+    });
+  }
+
   const cleanUrl = window.location.origin + window.location.pathname;
   window.history.replaceState({}, document.title, cleanUrl);
 }
