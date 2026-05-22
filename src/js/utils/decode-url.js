@@ -10,7 +10,7 @@ const MASTER_CODE   = 'ESEMASTER'; // never stored in DB — change to your actu
 async function resolveAccessCode() {
   const urlParams = new URLSearchParams(window.location.search);
   const codeFromUrl = urlParams.get('code');
-  const codeFromStorage = localStorage.getItem('panoAccessCode');
+  const codeFromStorage = sessionStorage.getItem('panoAccessCode');
   const candidate = codeFromUrl || codeFromStorage;
 
   if (!candidate) {
@@ -22,7 +22,7 @@ async function resolveAccessCode() {
   // Master code — never hits the DB
   if (candidate === MASTER_CODE) {
     window.panoAccessCode = { code: candidate, scope: 'master', project_id: null };
-    localStorage.setItem('panoAccessCode', candidate);
+    sessionStorage.setItem('panoAccessCode', candidate);
     window._resolvePanoAccessCode?.(window.panoAccessCode);
     return;
   }
@@ -45,7 +45,7 @@ async function resolveAccessCode() {
     if (!row) {
       // Code not found — clear storage
       console.warn('[access-code] Code not found:', candidate);
-      localStorage.removeItem('panoAccessCode');
+      sessionStorage.removeItem('panoAccessCode');
       window.panoAccessCode = null;
       window._resolvePanoAccessCode?.(null);
       return;
@@ -54,7 +54,7 @@ async function resolveAccessCode() {
     // Check use limit
     if (row.max_uses !== null && row.use_count >= row.max_uses) {
       console.warn('[access-code] Code exhausted:', candidate);
-      localStorage.removeItem('panoAccessCode');
+      sessionStorage.removeItem('panoAccessCode');
       window.panoAccessCode = null;
       window._resolvePanoAccessCode?.(null);
       return;
@@ -63,7 +63,7 @@ async function resolveAccessCode() {
     // Check expiry
     if (row.expires_at && new Date(row.expires_at) < new Date()) {
       console.warn('[access-code] Code expired:', candidate);
-      localStorage.removeItem('panoAccessCode');
+      sessionStorage.removeItem('panoAccessCode');
       window.panoAccessCode = null;
       window._resolvePanoAccessCode?.(null);
       return;
@@ -87,7 +87,7 @@ async function resolveAccessCode() {
     }
 
     window.panoAccessCode = row;
-    localStorage.setItem('panoAccessCode', candidate);
+    sessionStorage.setItem('panoAccessCode', candidate);
     window._resolvePanoAccessCode?.(row);
 
   } catch (err) {

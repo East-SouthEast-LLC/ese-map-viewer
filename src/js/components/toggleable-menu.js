@@ -172,6 +172,107 @@ if (clickedLayer === 'updates') {
             };
     
             menu.appendChild(link);
+
+            // ── ACCESS CODE button — injected below Pano Projects ────────────
+            if (id === 'pano-projects-fill') {
+                const codeBtn = document.createElement('a');
+                codeBtn.href = '#';
+                codeBtn.id = 'pano-access-btn';
+                codeBtn.style.cssText = `
+                    font-size: 10px;
+                    padding: 2px 8px;
+                    color: #aaa;
+                    letter-spacing: 0.04em;
+                    display: flex;
+                    align-items: center;
+                    gap: 4px;
+                    border-top: none;
+                    margin-top: -4px;
+                `;
+                codeBtn.innerHTML = `<span id="pano-lock-icon">🔒</span> ACCESS CODE`;
+
+                codeBtn.onclick = function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const existing = document.getElementById('pano-code-popup');
+                    if (existing) { existing.remove(); return; }
+
+                    const popup = document.createElement('div');
+                    popup.id = 'pano-code-popup';
+                    popup.style.cssText = `
+                        position: absolute;
+                        left: 310px;
+                        z-index: 1000;
+                        background: rgba(0,0,0,0.85);
+                        border-radius: 8px;
+                        padding: 10px 12px;
+                        display: flex;
+                        gap: 6px;
+                        align-items: center;
+                        box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+                    `;
+                    popup.innerHTML = `
+                        <input id="pano-code-input" placeholder="ACCESS CODE"
+                            style="font-family:monospace;font-size:12px;padding:5px 10px;border-radius:4px;
+                                   border:1px solid #555;background:#111;color:#fff;width:130px;outline:none;">
+                        <button id="pano-code-go"
+                            style="font-family:monospace;font-size:12px;padding:5px 12px;border-radius:4px;
+                                   border:none;background:#4488ff;color:#fff;cursor:pointer;font-weight:600;">
+                            GO
+                        </button>
+                    `;
+
+                    // Position vertically near the button
+                    const btnRect = codeBtn.getBoundingClientRect();
+                    popup.style.top = `${btnRect.top}px`;
+                    document.getElementById('map').appendChild(popup);
+
+                    const input = document.getElementById('pano-code-input');
+                    input.focus();
+
+                    async function submitCode() {
+                        const val = input.value.trim();
+                        if (!val) return;
+                        const url = new URL(window.location.href);
+                        url.searchParams.set('code', val);
+                        window.location.href = url.toString();
+                    }
+
+                    document.getElementById('pano-code-go').addEventListener('click', submitCode);
+                    input.addEventListener('keydown', e => { if (e.key === 'Enter') submitCode(); });
+
+                    // Close popup if clicking outside
+                    setTimeout(() => {
+                        document.addEventListener('click', function closePop(ev) {
+                            if (!popup.contains(ev.target) && ev.target !== codeBtn) {
+                                popup.remove();
+                                document.removeEventListener('click', closePop);
+                            }
+                        });
+                    }, 100);
+                };
+
+                menu.appendChild(codeBtn);
+
+                // Update lock icon based on current access code state
+                function updateLockIcon() {
+                    const icon = document.getElementById('pano-lock-icon');
+                    const btn  = document.getElementById('pano-access-btn');
+                    if (!icon || !btn) return;
+                    const code = sessionStorage.getItem('panoAccessCode');
+                    if (code) {
+                        icon.textContent = '🔓';
+                        btn.style.color  = '#88aaff';
+                    } else {
+                        icon.textContent = '🔒';
+                        btn.style.color  = '#aaa';
+                    }
+                }
+
+                // Check on load and whenever access code resolves
+                updateLockIcon();
+                window.panoAccessCodeReady?.then(updateLockIcon);
+            }
         }
     }
     

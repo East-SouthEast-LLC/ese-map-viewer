@@ -128,51 +128,6 @@
     },
   });
 
-  // ── ACCESS CODE INPUT UI ─────────────────────────────────────────────────────
-  // Show the input box only if no valid code is active
-  if (!accessCode) {
-    const codeBox = document.createElement('div');
-    codeBox.id = 'pano-access-box';
-    codeBox.style.cssText = `
-      position: absolute;
-      bottom: 36px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 950;
-      display: flex;
-      gap: 6px;
-      background: rgba(0,0,0,0.75);
-      padding: 8px 12px;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
-    `;
-    codeBox.innerHTML = `
-      <input id="pano-code-input" placeholder="ACCESS CODE"
-        style="font-family:monospace;font-size:12px;padding:5px 10px;border-radius:4px;
-               border:1px solid #555;background:#111;color:#fff;width:140px;outline:none;">
-      <button id="pano-code-go"
-        style="font-family:monospace;font-size:12px;padding:5px 14px;border-radius:4px;
-               border:none;background:#4488ff;color:#fff;cursor:pointer;font-weight:600;">
-        GO
-      </button>
-    `;
-    document.getElementById('map').appendChild(codeBox);
-
-    async function submitCode() {
-      const val = document.getElementById('pano-code-input').value.trim();
-      if (!val) return;
-      // Reload page with code as URL param — decode-url will validate and store
-      const url = new URL(window.location.href);
-      url.searchParams.set('code', val);
-      window.location.href = url.toString();
-    }
-
-    document.getElementById('pano-code-go').addEventListener('click', submitCode);
-    document.getElementById('pano-code-input').addEventListener('keydown', e => {
-      if (e.key === 'Enter') submitCode();
-    });
-  }
-
   // ── Hover popup ──────────────────────────────────────────────────────────────
   function createHoverPopup() {
     const el = document.createElement('div');
