@@ -50,6 +50,9 @@
     loadCSS('https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css');
     loadScript('https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js');
 
+    // Load Supabase SDK — needed for JWT auth in share.js (token minting)
+    loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js');
+
 
 
     /**
@@ -252,6 +255,16 @@ map.moveLayer('print-marker-layer');
                         "https://east-southeast-llc.github.io/ese-map-viewer/src/js/components/panorama-viewer.js"
                     ];
                     
+                    // Initialize Supabase client for JWT access in share.js
+                    // The UMD bundle sets window.supabase = { createClient, ... }
+                    // We replace it with an initialized client instance.
+                    if (window.supabase?.createClient) {
+                        window.supabase = window.supabase.createClient(
+                            'https://ayktuzidcoolddlphqia.supabase.co',
+                            'sb_publishable_B49zBvkMVuRCw2u9cbBJaQ_HrlrgdBL'
+                        );
+                    }
+
                     await Promise.all(controlScripts.map(loadScript));
                     
                     initializePanoramaViewer();
