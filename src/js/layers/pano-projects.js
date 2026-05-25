@@ -10,7 +10,7 @@
 
 (async function () {
 
-  const R2_BASE   = 'https://pano.ese-llc.com';
+  const R2_BASE   = 'https://panoramas.ese-llc.com';
   const INDEX_URL = `${R2_BASE}/pano_index.geojson?nocache=${Date.now()}`;
 
   // ── Access code promise ──────────────────────────────────────────────────────
