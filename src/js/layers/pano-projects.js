@@ -97,11 +97,13 @@
     paint: {
       'fill-color': [
         'case',
-        ['==', ['get', 'private'], true], '#4488ff', // private unlocked → blue
-        '#888888',                                     // public → grey
+        ['boolean', ['feature-state', 'unavailable'], false], '#884444', // offline → red-grey
+        ['==', ['get', 'private'], true], '#4488ff',                      // private unlocked → blue
+        '#888888',                                                          // public → grey
       ],
       'fill-opacity': [
         'case',
+        ['boolean', ['feature-state', 'unavailable'], false], 0.18,
         ['boolean', ['feature-state', 'open'], false], 0.08,
         0.22,
       ],
@@ -116,12 +118,14 @@
     paint: {
       'line-color': [
         'case',
-        ['==', ['get', 'private'], true], '#2266dd', // private unlocked → blue outline
-        '#555555',                                     // public → grey outline
+        ['boolean', ['feature-state', 'unavailable'], false], '#aa4444', // offline → red-grey
+        ['==', ['get', 'private'], true], '#2266dd',                       // private unlocked → blue
+        '#555555',                                                           // public → grey
       ],
       'line-width': 1.5,
       'line-opacity': [
         'case',
+        ['boolean', ['feature-state', 'unavailable'], false], 0.6,
         ['boolean', ['feature-state', 'open'], false], 0.35,
         0.85,
       ],
@@ -158,9 +162,17 @@
     const p     = f.properties;
     const total = hoverFeatures.length;
 
-    const privateBadge = p.private
-      ? `<span style="background:#1a3a7a;color:#88aaff;font-size:9px;padding:1px 5px;border-radius:2px;margin-left:4px;">PRIVATE</span>`
-      : '';
+    // Check feature state for unavailable (requires querying rendered features)
+    const renderedF = map.queryRenderedFeatures(
+      { layers: ['pano-projects-fill'] }
+    ).find(rf => rf.properties.id === p.id);
+    const isUnavailable = renderedF?.state?.unavailable === true;
+
+    const privateBadge = isUnavailable
+      ? `<span style="background:#4a1a1a;color:#ff8888;font-size:9px;padding:1px 5px;border-radius:2px;margin-left:4px;">UNAVAILABLE</span>`
+      : p.private
+        ? `<span style="background:#1a3a7a;color:#88aaff;font-size:9px;padding:1px 5px;border-radius:2px;margin-left:4px;">PRIVATE</span>`
+        : '';
 
     const nav = total > 1 ? `
       <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;border-top:1px solid #444;padding-top:6px;">
@@ -304,6 +316,17 @@
     let projectData;
     try {
       const res = await fetch(dataUrl);
+
+      // ── 402: project offline (owner account lapsed) ───────────────────────
+      if (res.status === 402) {
+        map.setFeatureState(
+          { source: 'pano-projects-source', id: projectId },
+          { open: false, unavailable: true }
+        );
+        showUnavailablePopup(feature);
+        return;
+      }
+
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       projectData = await res.json();
     } catch (err) {
@@ -392,6 +415,44 @@
     const features = map.queryRenderedFeatures(e.point, { layers: ['pano-projects-fill'] });
     for (const f of features) openProject(f);
   });
+
+  // ── Unavailable popup (402 / account lapsed) ────────────────────────────────
+  function showUnavailablePopup(feature) {
+    const p    = feature.properties;
+    const name = p.name || p.id;
+
+    // Position popup at centroid
+    const centroid = getCentroid(feature);
+    const point    = map.project(centroid);
+
+    if (!hoverPopupEl) return;
+
+    hoverPopupEl.innerHTML = `
+      <div style="font-weight:bold;font-size:13px;margin-bottom:4px;color:#ff8888;">
+        ⚠ ${name}
+      </div>
+      <div style="color:#cc8888;font-size:11px;line-height:1.5;">
+        This project is currently unavailable.<br>
+        The account may be past due or cancelled.
+      </div>
+    `;
+    hoverPopupEl.style.pointerEvents = 'none';
+
+    const mapEl = document.getElementById('map');
+    const rect  = mapEl.getBoundingClientRect();
+    const popW  = 270;
+    let left = point.x + 14;
+    let top  = point.y - 10;
+    if (left + popW > rect.width) left = point.x - popW - 14;
+    hoverPopupEl.style.left    = `${left}px`;
+    hoverPopupEl.style.top     = `${top}px`;
+    hoverPopupEl.style.display = 'block';
+
+    // Auto-hide after 4 seconds
+    setTimeout(() => {
+      if (hoverPopupEl) hoverPopupEl.style.display = 'none';
+    }, 4000);
+  }
 
   console.log(`[pano-projects] Loaded ${visibleFeatures.length} of ${indexData.features.length} project(s).`);
 
