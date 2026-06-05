@@ -37,7 +37,7 @@ if (!customPrintButton || !customPrintBox) {
             { page: 2, layers: ['parcel highlight', 'satellite', 'acec'] },
             { page: 3, layers: ['parcel highlight', 'lidar contours', 'DEP wetland'] },
             { page: 4, layers: ['parcel highlight', 'satellite', 'endangered species'] },
-            { page: 5, layers: ['usgs-stream'] }
+            { page: 5, layers: ['usgs topo'] }
         ],
         'Test Hole': [
             { page: 1, layers: ['parcel highlight', 'lidar contours'] },
@@ -45,7 +45,7 @@ if (!customPrintButton || !customPrintBox) {
             { page: 3, layers: ['parcel highlight', 'DEP wetland', 'lidar contours'] },
             { page: 4, layers: ['parcel highlight', 'zone II',] },
             { page: 5, layers: ['parcel highlight', 'soils'] },
-            { page: 6, layers: ['usgs-stream'] }
+            { page: 6, layers: ['usgs topo'] }
         ]
     };
     
