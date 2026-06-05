@@ -270,9 +270,9 @@ if (!customPrintButton || !customPrintBox) {
         const currentDate = new Date().toLocaleDateString();
         const usgsLayerIsActive = document.querySelector('[data-layer-id="usgs-stream"].active');
         
-        // if usgs layer is on, temporarily disable it to prevent interference.
-        if (usgsLayerIsActive && typeof deinitializeUsgsTileManager === 'function') {
-            deinitializeUsgsTileManager();
+        // if usgs stream layer is on, temporarily disable it to prevent interference.
+        if (usgsLayerIsActive && typeof deinitializeUsgsStream === 'function') {
+            deinitializeUsgsStream();
         }
 
         let fullHtml = '';
@@ -299,8 +299,9 @@ if (!customPrintButton || !customPrintBox) {
 
             if (isUsgsPage) {
                 // initialize the streaming USGS layer and wait for tiles to fully render.
-                if (typeof initializeUsgsTileManager === 'function') {
-                    await initializeUsgsTileManager();
+                if (typeof initializeUsgsStream === 'function') {
+                    initializeUsgsStream();
+                    await new Promise(resolve => map.once('idle', resolve));
                 }
             } else {
                 // for standard vector/raster layers, turn them on and wait for map to be idle.
@@ -320,8 +321,8 @@ if (!customPrintButton || !customPrintBox) {
 
             // clean up after each page.
             if (isUsgsPage) {
-                if (typeof deinitializeUsgsTileManager === 'function') {
-                    deinitializeUsgsTileManager();
+                if (typeof deinitializeUsgsStream === 'function') {
+                    deinitializeUsgsStream();
                 }
             } else {
                 config.layers.forEach(layerId => setLayerVisibility(layerId, 'none'));
@@ -331,9 +332,9 @@ if (!customPrintButton || !customPrintBox) {
         // restore all initially visible layers to return the map to its original state.
         initiallyVisibleLayers.forEach(layerId => setLayerVisibility(layerId, 'visible'));
 
-        // re-initialize the usgs layer if it was active before printing.
-        if (usgsLayerIsActive && typeof initializeUsgsTileManager === 'function') {
-            initializeUsgsTileManager();
+        // re-initialize the usgs stream layer if it was active before printing.
+        if (usgsLayerIsActive && typeof initializeUsgsStream === 'function') {
+            initializeUsgsStream();
         }
 
         // open a new window and write the generated html for printing.
