@@ -290,17 +290,16 @@ if (!customPrintButton || !customPrintBox) {
             map.setCenter(marker.getLngLat());
         }
         
-        // turn off all layers to start with a clean slate for each page.
-        allToggleableLayers.forEach(layerId => setLayerVisibility(layerId, 'none'));
-
         // loop through each page configuration in the preset.
         for (const config of pageConfigs) {
             const isUsgsPage = config.layers.includes('usgs-stream');
-    
-            // handle usgs quad pages by awaiting the tile manager.
+
+            // always ensure all standard layers are off before each page.
+            allToggleableLayers.forEach(layerId => setLayerVisibility(layerId, 'none'));
+
             if (isUsgsPage) {
+                // initialize the streaming USGS layer and wait for tiles to fully render.
                 if (typeof initializeUsgsTileManager === 'function') {
-                    // this now returns a promise that resolves only when tiles are fully rendered.
                     await initializeUsgsTileManager();
                 }
             } else {
@@ -308,16 +307,18 @@ if (!customPrintButton || !customPrintBox) {
                 config.layers.forEach(layerId => setLayerVisibility(layerId, 'visible'));
                 await new Promise(resolve => map.once('idle', resolve));
             }
-            // let's try the draw order here to make the marker go on top of the satellite
-			if (map.getLayer('print-marker-layer')) {
-			map.moveLayer('print-marker-layer');
-			}
+
+            // move marker layer to top so it renders above everything.
+            if (map.getLayer('print-marker-layer')) {
+                map.moveLayer('print-marker-layer');
+            }
+
             // capture the canvas and generate the html for the page.
             const mapCanvas = map.getCanvas();
             const mapImageSrc = mapCanvas.toDataURL();
             fullHtml += getPageHTML(printData, mapImageSrc, config.page, config.layers, currentDate);
-    
-            // clean up layers before the next page generation.
+
+            // clean up after each page.
             if (isUsgsPage) {
                 if (typeof deinitializeUsgsTileManager === 'function') {
                     deinitializeUsgsTileManager();
