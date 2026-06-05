@@ -88,6 +88,16 @@ function setupToggleableMenu() {
                     }
                     return;
                 }
+
+                if (layerConfig.type === 'managed-stream') {
+                    const isActive = this.classList.toggle('active');
+                    if (isActive) {
+                        if (window.initializeUsgsStream) initializeUsgsStream();
+                    } else {
+                        if (window.deinitializeUsgsStream) deinitializeUsgsStream();
+                    }
+                    return;
+                }
 // chatgpt add 
 if (clickedLayer === 'maphelp') {
     window.open('https://www.ese-llc.com/maphelp/map-help', '_blank', 'noopener,noreferrer');

@@ -698,6 +698,13 @@
       "template": "<strong>{NAME}</strong>, {STATE}"
   }
 },
+{
+  "id": "usgs-stream",
+  "displayName": "USGS Topo",
+  "scriptName": "usgs-stream.js",
+  "drawOrder": 2,
+  "type": "managed-stream"
+},
   {
     "id": "private properties upland",
     "displayName": "Private Properties Upland",
