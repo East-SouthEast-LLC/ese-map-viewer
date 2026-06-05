@@ -268,7 +268,7 @@ if (!customPrintButton || !customPrintBox) {
      */
     async function generateMultiPagePrintout(printData, pageConfigs) {
         const currentDate = new Date().toLocaleDateString();
-        const usgsLayerIsActive = document.querySelector('[data-layer-id="usgs quad"].active');
+        const usgsLayerIsActive = document.querySelector('[data-layer-id="usgs-stream"].active');
         
         // if usgs layer is on, temporarily disable it to prevent interference.
         if (usgsLayerIsActive && typeof deinitializeUsgsTileManager === 'function') {
@@ -276,7 +276,7 @@ if (!customPrintButton || !customPrintBox) {
         }
 
         let fullHtml = '';
-        const allToggleableLayers = window.toggleableLayerIds.filter(id => id !== 'tools' && id !== 'usgs quad');
+        const allToggleableLayers = window.toggleableLayerIds.filter(id => id !== 'tools' && id !== 'usgs-stream');
         const initiallyVisibleLayers = listVisibleLayers(map, allToggleableLayers);
         
         // set the map to the user-defined scale for printing.
@@ -295,7 +295,7 @@ if (!customPrintButton || !customPrintBox) {
 
         // loop through each page configuration in the preset.
         for (const config of pageConfigs) {
-            const isUsgsPage = config.layers.includes('usgs quad');
+            const isUsgsPage = config.layers.includes('usgs-stream');
     
             // handle usgs quad pages by awaiting the tile manager.
             if (isUsgsPage) {
